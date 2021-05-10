@@ -3,6 +3,7 @@ import enemy from '../entity/Enemy';
 import gun from '../entity/Gun';
 import Ground from '../entity/Ground';
 import Laser from '../entity/Laser';
+import io from 'socket.io-client';
 
 const numberOfFrames = 15;
 
@@ -51,6 +52,10 @@ export default class SynthwaveScene extends Phaser.Scene {
     }
   }
 
+  processCollide() {
+    console.log("Dude, stop it!")
+  }
+
   createBackgroundElement(imageWidth, texture, count, scrollFactor) {
     const height = this.game.config.height;
     for (let i=0; i<count; i++) {
@@ -59,6 +64,36 @@ export default class SynthwaveScene extends Phaser.Scene {
   }
 
   create() {
+    //socket logic
+    const scene = this
+    this.socket = io();
+
+    scene.otherPlayer=null;
+
+    this.socket.on("currentPlayers", function (arg) {
+      const  players  = arg;
+      Object.keys(players).forEach(function (id) {
+        if (players[id].playerId !== scene.socket.id) {
+          scene.otherPlayer = new Player(scene, 100, 400, 'josh').setScale(0.25);
+          //note: to address variable characters
+          scene.add.existing(scene.otherPlayer)
+          scene.physics.add.collider(scene.otherPlayer, scene.groundGroup)
+          //'this' context here is the function; need to grab the 'this' that is the scene (i.e. 'scene')
+        } 
+      });
+    });
+
+    this.socket.on("newPlayer", function (arg) {
+      const playerInfo  = arg;
+     //need to add socket id to player?
+      scene.otherPlayer = new Player(scene, 100, 400, 'josh').setScale(0.25);
+      //note: to address variable characters
+      scene.add.existing(scene.otherPlayer)
+      scene.physics.add.collider(scene.otherPlayer, scene.groundGroup)
+    });
+
+  
+
     //mute the previous scene
     this.game.sound.stopAll();
 
@@ -75,9 +110,18 @@ export default class SynthwaveScene extends Phaser.Scene {
 
     // Create game entities
     // << CREATE GAME ENTITIES HERE >>
-    this.player = new Player(this, 60, 400, 'josh').setScale(0.25);
+    this.player = new Player(this, 60, 400, 'josh', this.socket).setScale(0.25);
     this.player.setCollideWorldBounds(true); //stop player from running off the edges
     this.physics.world.setBounds(0, null, width * numberOfFrames, height, true, true, false, false) //set world bounds only on sides
+
+    //check other players moves and if collision between players:
+      this.socket.on("playerMoved", function (data){
+      
+      scene.otherPlayer.x = data.x
+      scene.otherPlayer.y = data.y
+      scene.otherPlayer.setPosition(data.x, data.y)
+      scene.physics.add.collider(scene.player, scene.otherPlayer, scene.processCollide);
+    })
 
     //set up camera
     const cam = this.cameras.main;
