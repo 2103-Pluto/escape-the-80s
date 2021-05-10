@@ -60,6 +60,9 @@ export default class MoonlightScene extends Phaser.Scene {
   }
 
   create() {
+    //mute the previous scene
+    this.game.sound.stopAll();
+
     //Set up background
     const width = this.game.config.width;
     const height = this.game.config.height;
@@ -76,7 +79,7 @@ export default class MoonlightScene extends Phaser.Scene {
     // << CREATE GAME ENTITIES HERE >>
     this.player = new Player(this, 60, 400, 'josh').setScale(0.25);
     this.player.setCollideWorldBounds(true); //stop player from running off the edges
-    this.physics.world.setBounds(0, null, width * numberOfFrames, height) //set world bounds
+    this.physics.world.setBounds(0, null, width * numberOfFrames, height, true, true, false, false) //set world bounds only on sides
 
     //set up camera
     const cam = this.cameras.main;
@@ -132,10 +135,14 @@ export default class MoonlightScene extends Phaser.Scene {
 
     // Create sounds
     // << CREATE SOUNDS HERE >>
-    //add background music for this level
-    this.backgroundSound = this.sound.add('background-music');
-    this.backgroundSound.play();
+    this.backgroundSound = this.sound.add('background-music'); //add background music for this level
+    this.backgroundSound.setLoop(true);
     this.backgroundSound.volume = 0.1;
+    this.backgroundSound.play();
+
+    this.sound.pauseOnBlur = false; //prevent sound from cutting when you leave tab
+
+    this.sound.pauseOnBlur = false; //prevent sound from cutting when you leave tab
 
     this.jumpSound = this.sound.add('jump');
 

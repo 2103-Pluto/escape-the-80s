@@ -20,6 +20,10 @@ import NeonAlleyScene from './scenes/NeonAlleyScene';
 import MoonlightScene from './scenes/MoonlightScene';
 import SkyLineScene from './scenes/SkyLineScene';
 import MainScene from './scenes/MainScene'
+import TitleScene from './scenes/TitleScene'
+import CreditsScene from './scenes/CreditsScene'
+import MainMenuScene from './scenes/MainMenuScene'
+import HighScoresScene from './scenes/HighScoresScene'
 
 class Game extends Phaser.Game {
   constructor() {
@@ -33,11 +37,13 @@ class Game extends Phaser.Game {
     this.scene.add('MoonlightScene', MoonlightScene)
     this.scene.add('SkyLineScene', SkyLineScene)
     this.scene.add('MainScene', MainScene)
-    // Start the game with the mainscene
-    this.scene.start('MainScene')
+    this.scene.add('TitleScene', TitleScene)
+    this.scene.add('CreditsScene', CreditsScene)
+    this.scene.add('MainMenuScene', MainMenuScene)
+    this.scene.add('HighScoresScene', HighScoresScene)
+    // Start the game with the titlescene
+    this.scene.start('TitleScene')
 
-    // Start the game with the mainscene
-    // << START GAME WITH MAIN SCENE HERE >>
   }
 }
 // Create new instance of game
