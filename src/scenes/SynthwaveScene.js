@@ -51,6 +51,10 @@ export default class SynthwaveScene extends Phaser.Scene {
     }
   }
 
+  processCollide() {
+    console.log("Dude, stop it!")
+  }
+
   createBackgroundElement(imageWidth, texture, count, scrollFactor) {
     const height = this.game.config.height;
     for (let i=0; i<count; i++) {
@@ -59,6 +63,36 @@ export default class SynthwaveScene extends Phaser.Scene {
   }
 
   create() {
+    //socket logic
+    const scene = this
+    this.socket = io();
+
+    scene.otherPlayer=null;
+
+    this.socket.on("currentPlayers", function (arg) {
+      const  players  = arg;
+      Object.keys(players).forEach(function (id) {
+        if (players[id].playerId !== scene.socket.id) {
+          scene.otherPlayer = new Player(scene, 100, 400, 'josh').setScale(0.25);
+          //note: to address variable characters
+          scene.add.existing(scene.otherPlayer)
+          scene.physics.add.collider(scene.otherPlayer, scene.groundGroup)
+          //'this' context here is the function; need to grab the 'this' that is the scene (i.e. 'scene')
+        } 
+      });
+    });
+
+    this.socket.on("newPlayer", function (arg) {
+      const playerInfo  = arg;
+     //need to add socket id to player?
+      scene.otherPlayer = new Player(scene, 100, 400, 'josh').setScale(0.25);
+      //note: to address variable characters
+      scene.add.existing(scene.otherPlayer)
+      scene.physics.add.collider(scene.otherPlayer, scene.groundGroup)
+    });
+
+  
+
     //mute the previous scene
     this.game.sound.stopAll();
 
