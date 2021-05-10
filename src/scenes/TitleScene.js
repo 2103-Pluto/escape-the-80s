@@ -10,6 +10,8 @@ export default class TitleScene extends Phaser.Scene {
     this.load.image("title-background", "assets/backgrounds/title_scene/title-background.png");
     this.load.audio("title-music", "assets/audio/title_scene/title-music.wav");
     this.load.addFile(new WebFontFile(this.load, 'Press Start 2P'))
+
+    this.load.audio("click", "assets/audio/click.wav");
   }
 
   create() {
@@ -30,6 +32,9 @@ export default class TitleScene extends Phaser.Scene {
     //listen to event to transition to next scene
     this.input.keyboard.on('keydown', () => {
       // backgroundMusic.stop();
+      const click = this.sound.add('click');
+      click.volume = 0.1;
+      click.play();
       this.scene.start('MainMenuScene');
     })
   }
