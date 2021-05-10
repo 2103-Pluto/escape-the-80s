@@ -14,6 +14,7 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
   }
 
   updateMovement(cursors) {
+    
     const cam = this.scene.cameras.main;
     const speed = 3;
     // Move left

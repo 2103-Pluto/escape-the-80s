@@ -3,6 +3,7 @@ import enemy from '../entity/Enemy';
 import gun from '../entity/Gun';
 import Ground from '../entity/Ground';
 import Laser from '../entity/Laser';
+import Flagpole from '../entity/Flagpole'
 import io from 'socket.io-client';
 
 const numberOfFrames = 15;
@@ -24,6 +25,12 @@ export default class SynthwaveScene extends Phaser.Scene {
       frameWidth: 340,
       frameHeight: 460,
     });
+
+    
+    this.load.spritesheet('flagpole', 'assets/spriteSheets/flagpoles_sheet.png', {
+      frameWidth: 32,
+      frameHeight: 168,
+    })
 
     this.load.image('ground', 'assets/sprites/ground-juan-test.png');
     this.load.image('brandon', 'assets/sprites/brandon.png');
@@ -69,7 +76,6 @@ export default class SynthwaveScene extends Phaser.Scene {
     this.socket = io();
 
     scene.otherPlayer=null;
-
     this.socket.on("currentPlayers", function (arg) {
       const  players  = arg;
       Object.keys(players).forEach(function (id) {
@@ -192,6 +198,8 @@ export default class SynthwaveScene extends Phaser.Scene {
 
     this.screamSound = this.sound.add('scream');
 
+    const flagpoleX = 770*numberOfFrames
+    this.flagpole = new Flagpole(this, flagpoleX, 375, 'flagpole').setScale(2.0);
     // Create collisions for all entities
     // << CREATE COLLISIONS HERE >>
   }
