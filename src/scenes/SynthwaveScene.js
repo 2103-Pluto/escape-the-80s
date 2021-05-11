@@ -6,6 +6,7 @@ import Ground from '../entity/Ground';
 import Laser from '../entity/Laser';
 import Star from '../entity/Star';
 import io from 'socket.io-client';
+import SoldierPlayer from '../entity/SoldierPlayer'
 import Phaser from 'phaser'
 
 const numberOfFrames = 15;
@@ -19,19 +20,40 @@ export default class SynthwaveScene extends Phaser.Scene {
     this.fireLaser = this.fireLaser.bind(this);
     this.hit = this.hit.bind(this);
     this.createBackgroundElement = this.createBackgroundElement.bind(this);
-
+    this.color = 'Blue';
+    
     this.createStar = this.createStar.bind(this)
-
+    
     this.createHeart = this.createHeart.bind(this);
   }
 
   preload() {
     // Preload Sprites
     // << LOAD SPRITES HERE >>
-    this.load.spritesheet('josh', 'assets/spriteSheets/josh.png', {
-      frameWidth: 340,
-      frameHeight: 460,
-    });
+    // this.load.spritesheet('blueSoldier', 'assets/spriteSheets/josh.png', {
+    //   frameWidth: 340,
+    //   frameHeight: 460,
+    // });
+
+    
+    //Running Blue Soldier
+      this.load.spritesheet(`${this.color}SoldierRunning`, `assets/spriteSheets/${this.color}/Gunner_${this.color}_Run.png`, {
+        frameWidth: 48,
+        frameHeight: 39,
+      })
+    
+    
+    //Idle Blue Soldier
+    this.load.spritesheet(`${this.color}SoldierIdle`, `assets/spriteSheets/${this.color}/Gunner_${this.color}_Idle.png`, {
+      frameWidth: 48,
+      frameHeight: 39,
+    })
+    
+    //Jumping Blue Soldier
+    this.load.spritesheet(`${this.color}SoldierJumping`, `assets/spriteSheets/${this.color}/Gunner_${this.color}_Jump.png`, {
+      frameWidth: 48,
+      frameHeight: 39,
+    })
 
     this.load.spritesheet('heart', 'assets/spriteSheets/heart.png', {
       frameWidth: 16,
@@ -102,7 +124,7 @@ export default class SynthwaveScene extends Phaser.Scene {
       const  players  = arg;
       Object.keys(players).forEach(function (id) {
         if (players[id].playerId !== scene.socket.id) {
-          scene.otherPlayer = new Player(scene, 100, 400, 'josh').setScale(0.25);
+          scene.otherPlayer = new SoldierPlayer(scene, 100, 400, `${this.color}SoldierIdle`).setScale(2.78);
           //note: to address variable characters
           scene.add.existing(scene.otherPlayer)
           scene.physics.add.collider(scene.otherPlayer, scene.groundGroup)
@@ -114,7 +136,7 @@ export default class SynthwaveScene extends Phaser.Scene {
     this.socket.on("newPlayer", function (arg) {
       const playerInfo  = arg;
      //need to add socket id to player?
-      scene.otherPlayer = new Player(scene, 100, 400, 'josh').setScale(0.25);
+      scene.otherPlayer = new SoldierPlayer(scene, 100, 400, `${this.color}SoldierIdle`).setScale(2.78);
       //note: to address variable characters
       scene.add.existing(scene.otherPlayer)
       scene.physics.add.collider(scene.otherPlayer, scene.groundGroup)
@@ -138,7 +160,7 @@ export default class SynthwaveScene extends Phaser.Scene {
 
     // Create game entities
     // << CREATE GAME ENTITIES HERE >>
-    this.player = new Player(this, 60, 400, 'josh', this.socket).setScale(0.25);
+    this.player = new SoldierPlayer(this, 60, 400, `${this.color}SoldierIdle`, this.socket).setScale(2.78);
     this.player.setCollideWorldBounds(true); //stop player from running off the edges
     this.physics.world.setBounds(0, null, width * numberOfFrames, height, true, true, false, false) //set world bounds only on sides
 
@@ -280,24 +302,20 @@ export default class SynthwaveScene extends Phaser.Scene {
   createAnimations() {
     this.anims.create({
       key: 'run',
-      frames: this.anims.generateFrameNumbers('josh', { start: 17, end: 20 }),
+      frames: this.anims.generateFrameNumbers(`${this.color}SoldierRunning`),
       frameRate: 10,
       repeat: -1,
     });
     this.anims.create({
       key: 'jump',
-      frames: [{ key: 'josh', frame: 17 }],
+      frames: this.anims.generateFrameNumbers(`${this.color}SoldierJumping`),
       frameRate: 20,
     });
     this.anims.create({
-      key: 'idleUnarmed',
-      frames: [{ key: 'josh', frame: 11 }],
+      key: 'idle',
+      frames: this.anims.generateFrameNumbers(`${this.color}SoldierIdle`),
       frameRate: 10,
-    });
-    this.anims.create({
-      key: 'idleArmed',
-      frames: [{ key: 'josh', frame: 6 }],
-      frameRate: 10,
+      repeat: -1,
     });
     this.anims.create({
       key: 'rotate-star',
