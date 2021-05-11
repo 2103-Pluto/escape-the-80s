@@ -3,6 +3,7 @@ import enemy from '../entity/Enemy';
 import gun from '../entity/Gun';
 import Ground from '../entity/Ground';
 import Laser from '../entity/Laser';
+import Star from '../entity/Star';
 import io from 'socket.io-client';
 
 const numberOfFrames = 15;
@@ -15,6 +16,7 @@ export default class SynthwaveScene extends Phaser.Scene {
     this.fireLaser = this.fireLaser.bind(this);
     this.hit = this.hit.bind(this);
     this.createBackgroundElement = this.createBackgroundElement.bind(this);
+    this.star = this.star.bind(this)
   }
 
   preload() {
@@ -29,6 +31,10 @@ export default class SynthwaveScene extends Phaser.Scene {
     this.load.image('brandon', 'assets/sprites/brandon.png');
     this.load.image('gun', 'assets/sprites/gun.png');
     this.load.image('laserBolt', 'assets/sprites/laserBolt.png');
+    this.load.spritesheet('star', 'assets/spriteSheets/star.png', {
+      frameWidth: 16,
+      frameHeight: 16,
+    })
 
     //preload background
     this.load.image("sky", "assets/backgrounds/synthwave_scene/back.png");
@@ -122,6 +128,8 @@ export default class SynthwaveScene extends Phaser.Scene {
       scene.otherPlayer.setPosition(data.x, data.y)
       scene.physics.add.collider(scene.player, scene.otherPlayer, scene.processCollide);
     })
+    
+    
 
     //set up camera
     const cam = this.cameras.main;
@@ -135,8 +143,9 @@ export default class SynthwaveScene extends Phaser.Scene {
     this.createAnimations();
 
     this.enemy = new enemy(this, 600, 400, 'brandon').setScale(.25)
-
-
+    
+    this.star(600, 400)
+    
     // ...
     this.physics.add.collider(this.enemy, this.groundGroup);
     this.physics.add.collider(this.enemy, this.player);
@@ -174,6 +183,8 @@ export default class SynthwaveScene extends Phaser.Scene {
       null,
       this
     );
+    
+
 
     // Create sounds
     // << CREATE SOUNDS HERE >>
@@ -191,7 +202,8 @@ export default class SynthwaveScene extends Phaser.Scene {
     this.laserSound.volume = 0.5;
 
     this.screamSound = this.sound.add('scream');
-
+    
+   
     // Create collisions for all entities
     // << CREATE COLLISIONS HERE >>
   }
@@ -264,7 +276,12 @@ export default class SynthwaveScene extends Phaser.Scene {
       frames: [{ key: 'josh', frame: 6 }],
       frameRate: 10,
     });
-
+    this.anims.create({
+      key: 'rotate',
+      frames: this.anims.generateFrameNumbers('star'),
+      frameRate: 10,
+      repeat: -1,
+    })
   }
 
     // make the laser inactive and insivible when it hits the enemy
@@ -278,6 +295,12 @@ export default class SynthwaveScene extends Phaser.Scene {
     gun.disableBody(true, true); // (disableGameObj, hideGameObj)
     // Set the player to 'armed'
     this.player.armed = true;
+  }
+  
+  star(x, y) {
+    //load star
+    const star = new Star(this, x, y, 'star').setScale(1.5)
+    star.play('rotate')
   }
 
 }
