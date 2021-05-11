@@ -1,4 +1,4 @@
-import 'phaser'
+import Phaser from 'phaser'
 import WebFontFile from '../files/WebFontFile'
 
 export default class CreditsScene extends Phaser.Scene {
@@ -32,13 +32,17 @@ export default class CreditsScene extends Phaser.Scene {
     this.add.text(width*0.5, height*0.75, 'Mahfouz Basith', { fontFamily: '"Press Start 2P"' }).setFontSize(24).setOrigin(0.5, 0.5)
     this.add.text(width*0.5, height*0.9, 'Juan S. Auli', { fontFamily: '"Press Start 2P"' }).setFontSize(24).setOrigin(0.5, 0.5)
 
+    this.createBack(this);
+  }
+
+  createBack(scene) {
     //add hover icon
-    const hoverIcon = this.add.sprite(100, 100, 'cassette-tape');
+    const hoverIcon = scene.add.sprite(100, 100, 'cassette-tape');
     hoverIcon.setScale(0.08)
     hoverIcon.setVisible(false);
 
     //add option to return to menu
-    const back = this.add.text(35, 40, 'Go back', { fontFamily: '"Press Start 2P"' }).setFontSize(28).setOrigin(0, 0.5)
+    const back = scene.add.text(35, 40, 'Go back', { fontFamily: '"Press Start 2P"' }).setFontSize(28).setOrigin(0, 0.5)
 
     back.setInteractive();
     back.on("pointerover", () => {
@@ -52,10 +56,10 @@ export default class CreditsScene extends Phaser.Scene {
       back.setColor('white')
     })
     back.on("pointerup", () => {
-      const click = this.sound.add('click');
+      const click = scene.sound.add('click');
       click.volume = 0.1;
       click.play();
-      this.scene.start('MainMenuScene');
+      scene.scene.start('MainMenuScene');
     })
   }
 }
