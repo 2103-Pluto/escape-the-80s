@@ -5,6 +5,7 @@ import gun from '../entity/Gun';
 import Ground from '../entity/Ground';
 import Laser from '../entity/Laser';
 import Flagpole from '../entity/Flagpole'
+import Mario from '../entity/Mario'
 import io from 'socket.io-client';
 import Phaser from 'phaser'
 
@@ -20,6 +21,7 @@ export default class SynthwaveScene extends Phaser.Scene {
     this.hit = this.hit.bind(this);
     this.createBackgroundElement = this.createBackgroundElement.bind(this);
     this.createHeart = this.createHeart.bind(this);
+    // this.createMario = this.createMario.bind(this)
   }
 
   preload() {
@@ -30,6 +32,10 @@ export default class SynthwaveScene extends Phaser.Scene {
       frameHeight: 460,
     });
 
+    this.load.spritesheet('mario', 'assets/spriteSheets/mario_enemy.png', {
+      frameWidth: 30,
+      frameHeight: 37,
+    });
     
     this.load.spritesheet('flagpole', 'assets/spriteSheets/flagpoles_sheet.png', {
       frameWidth: 32,
@@ -82,6 +88,13 @@ export default class SynthwaveScene extends Phaser.Scene {
     const heart = new Heart(this, x, y, 'heart');
     heart.play("rotate")
   }
+
+  // createMario(x, y) {
+  //   this.mario = new Mario(this, x , y, 'mario').setScale(3.0)
+  //   this.physics.add.collider(this.mario, this.groundGroup);
+  //   this.physics.add.collider(this.mario, this.player);
+  //  }
+  
 
   create() {
     //socket logic
@@ -216,6 +229,14 @@ export default class SynthwaveScene extends Phaser.Scene {
     this.createHeart(100, 500);
     this.createHeart(120, 500);     //create a heart to test the Heart entity
 
+    //create mario(enemy)
+    // this.createMario(300,500)
+    this.mario = new Mario(this, 300, 400, 'mario').setScale(3.0)
+    this.physics.add.collider(this.mario, this.groundGroup);
+    this.physics.add.collider(this.mario, this.player);
+    
+   
+
     // Create collisions for all entities
     // << CREATE COLLISIONS HERE >>
   }
@@ -235,7 +256,9 @@ export default class SynthwaveScene extends Phaser.Scene {
     );
 
     this.enemy.update(this.screamSound);
-
+    
+    this.mario.update()
+    
   }
 
   fireLaser(x, y, left) {
@@ -294,7 +317,14 @@ export default class SynthwaveScene extends Phaser.Scene {
       frameRate: 10,
       repeat: -1
     });
+    this.anims.create({
+      key: 'walk',
+      frames: this.anims.generateFrameNumbers('mario', { start: 5, end: 8 }),
+      frameRate: 5,
+      repeat: -1,
+    });
   }
+
 
     // make the laser inactive and insivible when it hits the enemy
     hit(enemy, laser) {
@@ -309,4 +339,5 @@ export default class SynthwaveScene extends Phaser.Scene {
     this.player.armed = true;
   }
 
+  
 }
