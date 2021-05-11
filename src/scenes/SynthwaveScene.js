@@ -30,18 +30,15 @@ export default class SynthwaveScene extends Phaser.Scene {
       frameHeight: 460,
     });
 
-<<<<<<< HEAD
     
     this.load.spritesheet('flagpole', 'assets/spriteSheets/flagpoles_sheet.png', {
       frameWidth: 32,
       frameHeight: 168,
     })
-=======
     this.load.spritesheet('heart', 'assets/spriteSheets/heart.png', {
       frameWidth: 16,
       frameHeight: 16,
     });
->>>>>>> master
 
     this.load.image('ground', 'assets/sprites/ground-juan-test.png');
     this.load.image('brandon', 'assets/sprites/brandon.png');
@@ -214,14 +211,11 @@ export default class SynthwaveScene extends Phaser.Scene {
 
     this.screamSound = this.sound.add('scream');
 
-<<<<<<< HEAD
     const flagpoleX = 770*numberOfFrames
     this.flagpole = new Flagpole(this, flagpoleX, 375, 'flagpole').setScale(2.0);
-=======
     this.createHeart(100, 500);
     this.createHeart(120, 500);     //create a heart to test the Heart entity
 
->>>>>>> master
     // Create collisions for all entities
     // << CREATE COLLISIONS HERE >>
   }
