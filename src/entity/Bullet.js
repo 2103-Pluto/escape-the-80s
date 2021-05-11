@@ -1,6 +1,6 @@
 import 'phaser';
 
-export default class Laser extends Phaser.Physics.Arcade.Sprite {
+export default class Bullet extends Phaser.Physics.Arcade.Sprite {
   constructor(scene, x, y, spriteKey, facingLeft) {
     super(scene, x, y, spriteKey);
     // Store reference of scene passed to constructor

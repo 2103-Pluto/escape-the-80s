@@ -3,7 +3,7 @@ import enemy from '../entity/Enemy';
 import Heart from '../entity/Heart';
 import gun from '../entity/Gun';
 import Ground from '../entity/Ground';
-import Laser from '../entity/Laser';
+import Bullet from '../entity/Bullet';
 import Star from '../entity/Star';
 import io from 'socket.io-client';
 import SoldierPlayer from '../entity/SoldierPlayer'
@@ -17,13 +17,13 @@ export default class SynthwaveScene extends Phaser.Scene {
 
     this.scene = this;
     this.collectGun = this.collectGun.bind(this);
-    this.fireLaser = this.fireLaser.bind(this);
+    this.fire = this.fire.bind(this);
     this.hit = this.hit.bind(this);
     this.createBackgroundElement = this.createBackgroundElement.bind(this);
     this.color = 'Blue';
-    
+
     this.createStar = this.createStar.bind(this)
-    
+
     this.createHeart = this.createHeart.bind(this);
   }
 
@@ -35,20 +35,20 @@ export default class SynthwaveScene extends Phaser.Scene {
     //   frameHeight: 460,
     // });
 
-    
+
     //Running Blue Soldier
       this.load.spritesheet(`${this.color}SoldierRunning`, `assets/spriteSheets/${this.color}/Gunner_${this.color}_Run.png`, {
         frameWidth: 48,
         frameHeight: 39,
       })
-    
-    
+
+
     //Idle Blue Soldier
     this.load.spritesheet(`${this.color}SoldierIdle`, `assets/spriteSheets/${this.color}/Gunner_${this.color}_Idle.png`, {
       frameWidth: 48,
       frameHeight: 39,
     })
-    
+
     //Jumping Blue Soldier
     this.load.spritesheet(`${this.color}SoldierJumping`, `assets/spriteSheets/${this.color}/Gunner_${this.color}_Jump.png`, {
       frameWidth: 48,
@@ -63,7 +63,7 @@ export default class SynthwaveScene extends Phaser.Scene {
     this.load.image('ground', 'assets/sprites/ground-juan-test.png');
     this.load.image('brandon', 'assets/sprites/brandon.png');
     this.load.image('gun', 'assets/sprites/gun.png');
-    this.load.image('laserBolt', 'assets/sprites/laserBolt.png');
+    this.load.image('bullet', 'assets/sprites/SpongeBullet.png');
     this.load.spritesheet('star', 'assets/spriteSheets/star.png', {
       frameWidth: 16,
       frameHeight: 16,
@@ -79,7 +79,7 @@ export default class SynthwaveScene extends Phaser.Scene {
     // Preload Sounds
     // << LOAD SOUNDS HERE >>
     this.load.audio('jump', 'assets/audio/jump.wav');
-    this.load.audio('laser', 'assets/audio/laser.wav');
+    this.load.audio('shooting', 'assets/audio/shooting.wav');
     this.load.audio('scream', 'assets/audio/scream.wav');
     this.load.audio('background-music', 'assets/audio/synthwave_scene/synthwave-palms.wav');
   }
@@ -101,7 +101,7 @@ export default class SynthwaveScene extends Phaser.Scene {
       this.add.image(i*imageWidth, height, texture).setOrigin(0, 1).setScale(3.5).setScrollFactor(scrollFactor)
     }
   }
-  
+
   createStar(x, y) {
   //load star
     const star = new Star(this, x, y, 'star').setScale(1.5)
@@ -172,8 +172,8 @@ export default class SynthwaveScene extends Phaser.Scene {
       scene.otherPlayer.setPosition(data.x, data.y)
       scene.physics.add.collider(scene.player, scene.otherPlayer, scene.processCollide);
     })
-    
-    
+
+
 
     //set up camera
     const cam = this.cameras.main;
@@ -187,11 +187,11 @@ export default class SynthwaveScene extends Phaser.Scene {
     this.createAnimations();
 
     this.enemy = new enemy(this, 600, 400, 'brandon').setScale(.25)
-    
+
     this.createStar(600, 400); //create a star to test the Heart entity
     this.createHeart(100, 500);
     this.createHeart(120, 500);     //create a heart to test the Heart entity
-    
+
     // ...
     this.physics.add.collider(this.enemy, this.groundGroup);
     this.physics.add.collider(this.enemy, this.player);
@@ -211,8 +211,8 @@ export default class SynthwaveScene extends Phaser.Scene {
     );
 
     // We're going to create a group for our lasers
-    this.lasers = this.physics.add.group({
-      classType: Laser,
+    this.bullets = this.physics.add.group({
+      classType: Bullet,
       runChildUpdate: true,
       allowGravity: false,
       maxSize: 40     // Important! When an obj is added to a group, it will inherit
@@ -223,13 +223,13 @@ export default class SynthwaveScene extends Phaser.Scene {
 
     // When the laser collides with the enemy
     this.physics.add.overlap(
-      this.lasers,
+      this.bullet,
       this.enemy,
       this.hit,
       null,
       this
     );
-    
+
 
 
     // Create sounds
@@ -243,9 +243,9 @@ export default class SynthwaveScene extends Phaser.Scene {
 
     this.jumpSound = this.sound.add('jump');
 
-    this.laserSound = this.sound.add('laser');
+    this.shootingSound = this.sound.add('shooting');
     // The laser sound is a bit too loud so we're going to turn it down
-    this.laserSound.volume = 0.5;
+    this.shootingSound.volume = 0.5;
 
     this.screamSound = this.sound.add('scream');
 
@@ -257,45 +257,37 @@ export default class SynthwaveScene extends Phaser.Scene {
   // delta: time elapsed (ms) since last update() call. 16.666 ms @ 60fps
   update(time, delta) {
     // << DO UPDATE LOGIC HERE >>
-    this.player.update(this.cursors, this.jumpSound);
-
-    this.gun.update(
-      time,
-      this.player,
-      this.cursors,
-      this.fireLaser,
-      this.laserSound
-    );
+    this.player.update(time, this.cursors, this.jumpSound, this.fire, this.shootingSound);
 
     this.enemy.update(this.screamSound);
 
   }
 
-  fireLaser(x, y, left) {
+  fire(x, y, left) {
     // These are the offsets from the player's position that make it look like
     // the laser starts from the gun in the player's hand
     const offsetX = 56;
-    const offsetY = 14;
-    const laserX =
+    const offsetY = 30;
+    const bulletX =
       this.player.x + (this.player.facingLeft ? -offsetX : offsetX);
-    const laserY = this.player.y + offsetY;
+    const bulletY = this.player.y + offsetY;
 
       // Get the first available laser object that has been set to inactive
-      let laser = this.lasers.getFirstDead();
+      let bullet = this.bullets.getFirstDead();
       // Check if we can reuse an inactive laser in our pool of lasers
-      if (!laser) {
+      if (!bullet) {
         // Create a laser bullet and scale the sprite down
-        laser = new Laser(
+        bullet = new Bullet(
           this,
-          laserX,
-          laserY,
-          'laserBolt',
+          bulletX,
+          bulletY,
+          'bullet',
           this.player.facingLeft
         ).setScale(0.25);
-        this.lasers.add(laser);
+        this.bullets.add(bullet);
       }
       // Reset this laser to be used for the shot
-      laser.reset(laserX, laserY, this.player.facingLeft);
+      bullet.reset(bulletX, bulletY, this.player.facingLeft);
 
   }
 
@@ -332,9 +324,9 @@ export default class SynthwaveScene extends Phaser.Scene {
   }
 
     // make the laser inactive and insivible when it hits the enemy
-    hit(enemy, laser) {
-      laser.setActive(false);
-      laser.setVisible(false);
+    hit(enemy, bullet) {
+      bullet.setActive(false);
+      bullet.setVisible(false);
     }
 
   collectGun(player, gun) {

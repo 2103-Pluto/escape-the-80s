@@ -23,7 +23,7 @@ export default class MainMenuScene extends Phaser.Scene {
 
     //add text options
     const options = {};
-    options['NeonAlleyScene'] = this.add.text(width*0.3, height*0.3, 'Campaign', { fontFamily: '"Press Start 2P"' }).setFontSize(32).setOrigin(0, 0.5)
+    options['CharacterChoosingScene'] = this.add.text(width*0.3, height*0.3, 'Campaign', { fontFamily: '"Press Start 2P"' }).setFontSize(32).setOrigin(0, 0.5)
 
     options['SynthwaveScene'] = this.add.text(width*0.3, height*0.45, 'Multiplayer', { fontFamily: '"Press Start 2P"' }).setFontSize(32).setOrigin(0, 0.5)
 

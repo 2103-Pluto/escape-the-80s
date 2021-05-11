@@ -2,16 +2,19 @@ import 'phaser'
 
 export default class SoldierPlayer extends Phaser.Physics.Arcade.Sprite {
   constructor(scene, x, y, spriteKey, socket /*, color */) {
-    super(scene, x, y, spriteKey) 
+    super(scene, x, y, spriteKey)
     this.scene = scene;
     this.scene.add.existing(this)
     this.scene.physics.world.enable(this)
     this.facingLeft = false;
     this.socket = socket
-    
+
     this.color = 'Blue'
+    //firing features
+    this.fireDelay = 100;
+    this.lastFired = 0;
   }
-  
+
   updateMovement(cursors) {
     const cam = this.scene.cameras.main;
     const speed = 3;
@@ -45,7 +48,7 @@ export default class SoldierPlayer extends Phaser.Physics.Arcade.Sprite {
       this.setVelocityX(0);
       // Whenever Josh is not moving, use the idleUnarmed animation
         this.anims.play('idle');
-      
+
     }
 
     //emit any movement
@@ -65,17 +68,18 @@ export default class SoldierPlayer extends Phaser.Physics.Arcade.Sprite {
       y: this.y
     }
   }
-  
-  update(cursors, jumpSound) {
+
+  update(time, cursors, jumpSound, shootingFn, shootingSound) {
     // << INSERT CODE HERE >>
     this.updateMovement(cursors)
     this.updateJump(cursors, jumpSound)
     this.updateInAir();
+    this.updateShoot(time, cursors, shootingFn, shootingSound);
   }
 
   updateJump(cursors, jumpSound) {
     if (cursors.up.isDown && this.body.touching.down) {
-      this.setVelocityY(-500);
+      this.setVelocityY(-600);
       jumpSound.play()
     }
   }
@@ -84,5 +88,13 @@ export default class SoldierPlayer extends Phaser.Physics.Arcade.Sprite {
     if (!this.body.touching.down) {
       this.play('jump');
     }
+  }
+
+  updateShoot(time, cursors, shootingFn, shootingSound) {
+    if (cursors.space.isDown && time > this.lastFired) {
+        shootingSound.play();
+        shootingFn()
+        this.lastFired = time + this.fireDelay;
+      }
   }
 }
