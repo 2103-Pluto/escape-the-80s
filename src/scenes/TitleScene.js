@@ -1,4 +1,4 @@
-import 'phaser'
+import Phaser from 'phaser'
 import WebFontFile from '../files/WebFontFile'
 
 export default class TitleScene extends Phaser.Scene {

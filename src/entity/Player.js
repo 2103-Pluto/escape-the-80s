@@ -58,7 +58,7 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
     let y = this.y
     if (
       this.oldPosition && (x!=this.oldPosition.x ||
-      y!== this.oldPosition.y)
+      y!== this.oldPosition.y) && this.socket
     ) {
       this.socket.emit("playerMovement", {
         x: this.x,
@@ -66,7 +66,7 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
       })
     }
     this.oldPosition = {
-      x: this.x, 
+      x: this.x,
       y: this.y
     }
 
