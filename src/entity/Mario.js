@@ -46,21 +46,6 @@ export default class Mario extends Phaser.Physics.Arcade.Sprite {
       this.flipX = !this.flipX
     }
     
-    // if (this.x<this.leftDest){
-    //   this.x+=speed
-    // }
-    // if(this.x===this.rightDest){
-    //   this.x-=speed
-    // }
-    
-    // else {
-    //   //this.play('walkRight', true)
-    //   this.x+=speed
-    //   if(this.x===this.rightDest){
-    //     //this.play('walkleft', true)
-    //   }
-    // }
-    console.log('after', this.x)
 }
 
   // Check which controller button is being pushed and execute movement & animation
