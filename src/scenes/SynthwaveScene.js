@@ -4,6 +4,7 @@ import Heart from '../entity/Heart';
 import gun from '../entity/Gun';
 import Ground from '../entity/Ground';
 import Laser from '../entity/Laser';
+import Star from '../entity/Star';
 import io from 'socket.io-client';
 import Phaser from 'phaser'
 
@@ -18,6 +19,9 @@ export default class SynthwaveScene extends Phaser.Scene {
     this.fireLaser = this.fireLaser.bind(this);
     this.hit = this.hit.bind(this);
     this.createBackgroundElement = this.createBackgroundElement.bind(this);
+
+    this.createStar = this.createStar.bind(this)
+
     this.createHeart = this.createHeart.bind(this);
   }
 
@@ -38,6 +42,10 @@ export default class SynthwaveScene extends Phaser.Scene {
     this.load.image('brandon', 'assets/sprites/brandon.png');
     this.load.image('gun', 'assets/sprites/gun.png');
     this.load.image('laserBolt', 'assets/sprites/laserBolt.png');
+    this.load.spritesheet('star', 'assets/spriteSheets/star.png', {
+      frameWidth: 16,
+      frameHeight: 16,
+    })
 
     //preload background
     this.load.image("sky", "assets/backgrounds/synthwave_scene/back.png");
@@ -71,10 +79,16 @@ export default class SynthwaveScene extends Phaser.Scene {
       this.add.image(i*imageWidth, height, texture).setOrigin(0, 1).setScale(3.5).setScrollFactor(scrollFactor)
     }
   }
+  
+  createStar(x, y) {
+  //load star
+    const star = new Star(this, x, y, 'star').setScale(1.5)
+    star.play('rotate-star')
+  }
 
   createHeart(x, y) {
     const heart = new Heart(this, x, y, 'heart');
-    heart.play("rotate")
+    heart.play("rotate-heart")
   }
 
   create() {
@@ -136,6 +150,8 @@ export default class SynthwaveScene extends Phaser.Scene {
       scene.otherPlayer.setPosition(data.x, data.y)
       scene.physics.add.collider(scene.player, scene.otherPlayer, scene.processCollide);
     })
+    
+    
 
     //set up camera
     const cam = this.cameras.main;
@@ -149,8 +165,11 @@ export default class SynthwaveScene extends Phaser.Scene {
     this.createAnimations();
 
     this.enemy = new enemy(this, 600, 400, 'brandon').setScale(.25)
-
-
+    
+    this.createStar(600, 400); //create a star to test the Heart entity
+    this.createHeart(100, 500);
+    this.createHeart(120, 500);     //create a heart to test the Heart entity
+    
     // ...
     this.physics.add.collider(this.enemy, this.groundGroup);
     this.physics.add.collider(this.enemy, this.player);
@@ -188,6 +207,8 @@ export default class SynthwaveScene extends Phaser.Scene {
       null,
       this
     );
+    
+
 
     // Create sounds
     // << CREATE SOUNDS HERE >>
@@ -205,9 +226,6 @@ export default class SynthwaveScene extends Phaser.Scene {
     this.laserSound.volume = 0.5;
 
     this.screamSound = this.sound.add('scream');
-
-    this.createHeart(100, 500);
-    this.createHeart(120, 500);     //create a heart to test the Heart entity
 
     // Create collisions for all entities
     // << CREATE COLLISIONS HERE >>
@@ -282,7 +300,13 @@ export default class SynthwaveScene extends Phaser.Scene {
       frameRate: 10,
     });
     this.anims.create({
-      key: 'rotate',
+      key: 'rotate-star',
+      frames: this.anims.generateFrameNumbers('star'),
+      frameRate: 10,
+      repeat: -1,
+    })
+    this.anims.create({
+    key: 'rotate-heart',
       frames: this.anims.generateFrameNumbers('heart'),
       frameRate: 10,
       repeat: -1
