@@ -1,4 +1,4 @@
-import 'phaser'
+import Phaser from 'phaser'
 import SynthwaveScene from './SynthwaveScene';
 import NeonAlleyScene from './NeonAlleyScene';
 import MoonlightScene from './MoonlightScene';
@@ -11,8 +11,8 @@ export default class MainScene extends Phaser.Scene {
 
   create() {
     // Launch scene here
-    this.scene.launch('SynthwaveScene');
-    // this.scene.launch('NeonAlleyScene');
+    // this.scene.launch('SynthwaveScene');
+    this.scene.launch('NeonAlleyScene');
     // this.scene.launch('MoonlightScene');
     // this.scene.launch('SkyLineScene');
 

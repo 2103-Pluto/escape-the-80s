@@ -1,4 +1,4 @@
-import 'phaser'
+import Phaser from 'phaser'
 import WebFontFile from '../files/WebFontFile'
 
 export default class MainMenuScene extends Phaser.Scene {
@@ -23,11 +23,13 @@ export default class MainMenuScene extends Phaser.Scene {
 
     //add text options
     const options = {};
-    options['MainScene'] = this.add.text(width*0.3, height*0.3, 'Play', { fontFamily: '"Press Start 2P"' }).setFontSize(32).setOrigin(0, 0.5)
+    options['NeonAlleyScene'] = this.add.text(width*0.3, height*0.3, 'Campaign', { fontFamily: '"Press Start 2P"' }).setFontSize(32).setOrigin(0, 0.5)
 
-    options['HighScoresScene'] = this.add.text(width*0.3, height*0.45, 'High Scores', { fontFamily: '"Press Start 2P"' }).setFontSize(32).setOrigin(0, 0.5)
+    options['SynthwaveScene'] = this.add.text(width*0.3, height*0.45, 'Multiplayer', { fontFamily: '"Press Start 2P"' }).setFontSize(32).setOrigin(0, 0.5)
 
-    options['CreditsScene'] = this.add.text(width*0.3, height*0.6, 'Credits', { fontFamily: '"Press Start 2P"' }).setFontSize(32).setOrigin(0, 0.5)
+    options['HighScoresScene'] = this.add.text(width*0.3, height*0.6, 'High Scores', { fontFamily: '"Press Start 2P"' }).setFontSize(32).setOrigin(0, 0.5)
+
+    options['CreditsScene'] = this.add.text(width*0.3, height*0.75, 'Credits', { fontFamily: '"Press Start 2P"' }).setFontSize(32).setOrigin(0, 0.5)
 
     //add hover icon
     const hoverIcon = this.add.sprite(100, 100, 'cassette-tape');
