@@ -1,9 +1,11 @@
 import Player from '../entity/Player';
 import enemy from '../entity/Enemy';
+import Heart from '../entity/Heart';
 import gun from '../entity/Gun';
 import Ground from '../entity/Ground';
 import Laser from '../entity/Laser';
 import io from 'socket.io-client';
+import Phaser from 'phaser'
 
 const numberOfFrames = 15;
 
@@ -11,10 +13,12 @@ export default class SynthwaveScene extends Phaser.Scene {
   constructor() {
     super('SynthwaveScene');
 
+    this.scene = this;
     this.collectGun = this.collectGun.bind(this);
     this.fireLaser = this.fireLaser.bind(this);
     this.hit = this.hit.bind(this);
     this.createBackgroundElement = this.createBackgroundElement.bind(this);
+    this.createHeart = this.createHeart.bind(this);
   }
 
   preload() {
@@ -23,6 +27,11 @@ export default class SynthwaveScene extends Phaser.Scene {
     this.load.spritesheet('josh', 'assets/spriteSheets/josh.png', {
       frameWidth: 340,
       frameHeight: 460,
+    });
+
+    this.load.spritesheet('heart', 'assets/spriteSheets/heart.png', {
+      frameWidth: 16,
+      frameHeight: 16,
     });
 
     this.load.image('ground', 'assets/sprites/ground-juan-test.png');
@@ -63,6 +72,11 @@ export default class SynthwaveScene extends Phaser.Scene {
     }
   }
 
+  createHeart(x, y) {
+    const heart = new Heart(this, x, y, 'heart');
+    heart.play("rotate")
+  }
+
   create() {
     //socket logic
     const scene = this
@@ -79,7 +93,7 @@ export default class SynthwaveScene extends Phaser.Scene {
           scene.add.existing(scene.otherPlayer)
           scene.physics.add.collider(scene.otherPlayer, scene.groundGroup)
           //'this' context here is the function; need to grab the 'this' that is the scene (i.e. 'scene')
-        } 
+        }
       });
     });
 
@@ -92,7 +106,7 @@ export default class SynthwaveScene extends Phaser.Scene {
       scene.physics.add.collider(scene.otherPlayer, scene.groundGroup)
     });
 
-  
+
 
     //mute the previous scene
     this.game.sound.stopAll();
@@ -116,7 +130,7 @@ export default class SynthwaveScene extends Phaser.Scene {
 
     //check other players moves and if collision between players:
       this.socket.on("playerMoved", function (data){
-      
+
       scene.otherPlayer.x = data.x
       scene.otherPlayer.y = data.y
       scene.otherPlayer.setPosition(data.x, data.y)
@@ -192,6 +206,9 @@ export default class SynthwaveScene extends Phaser.Scene {
 
     this.screamSound = this.sound.add('scream');
 
+    this.createHeart(100, 500);
+    this.createHeart(120, 500);     //create a heart to test the Heart entity
+
     // Create collisions for all entities
     // << CREATE COLLISIONS HERE >>
   }
@@ -264,7 +281,12 @@ export default class SynthwaveScene extends Phaser.Scene {
       frames: [{ key: 'josh', frame: 6 }],
       frameRate: 10,
     });
-
+    this.anims.create({
+      key: 'rotate',
+      frames: this.anims.generateFrameNumbers('heart'),
+      frameRate: 10,
+      repeat: -1
+    });
   }
 
     // make the laser inactive and insivible when it hits the enemy

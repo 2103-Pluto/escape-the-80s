@@ -3,6 +3,7 @@ import enemy from '../entity/Enemy';
 import gun from '../entity/Gun';
 import Ground from '../entity/Ground';
 import Laser from '../entity/Laser';
+import Phaser from 'phaser'
 
 const numberOfFrames = 15;
 
