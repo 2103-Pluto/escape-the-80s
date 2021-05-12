@@ -1,5 +1,4 @@
 import Phaser from 'phaser'
-import animations from 'phaser/src/animations';
 import WebFontFile from '../files/WebFontFile'
 
 export default class CharacterChoosingScene extends Phaser.Scene {
@@ -12,6 +11,7 @@ export default class CharacterChoosingScene extends Phaser.Scene {
     this.load.addFile(new WebFontFile(this.load, 'Press Start 2P'))
 
     this.load.image("cassette-tape", "assets/sprites/cassette-tape.png")
+    this.load.audio("click", "assets/audio/click.wav");
     this.load.audio("click", "assets/audio/click.wav");
 
     for (let color of this.colors) {
@@ -27,7 +27,6 @@ export default class CharacterChoosingScene extends Phaser.Scene {
   }
 
   create() {
-
     this.sound.pauseOnBlur = false; //prevent sound from cutting when you leave tab
 
     const width = this.game.config.width;
@@ -38,32 +37,37 @@ export default class CharacterChoosingScene extends Phaser.Scene {
 
     //add choices
     const options = {};
-    this.createAnimations()
 
     options['Blue'] = this.add.sprite(width*0.35, height*0.45, 'BlueIdle').setScale(3);
     options['Green'] = this.add.sprite(width*0.35, height*0.75, 'GreenIdle').setScale(3);
     options['Red'] = this.add.sprite(width*0.65, height*0.45, 'RedIdle').setScale(3);
     options['Yellow'] = this.add.sprite(width*0.65, height*0.75, 'YellowIdle').setScale(3);
+    const click = this.sound.add('click');
+    click.volume = 0.1;
 
     //set interactivity and selection
     let selected;
+    this.createAnimations()
     for (let key of Object.keys(options)) {
       options[key].setInteractive();
+      options[key].play(`${key}Idle`)
       options[key].on("pointerover", () => {
+        options[key].play(`${key}Run`)
         selected = key;
       })
       options[key].on("pointerout", () => {
-        options[key].animations.stop(null, true)
+        options[key].play(`${key}Idle`)
         selected = ''
       })
       options[key].on("pointerup", () => {
         if (selected) {
-          console.log(selected);
+          click.play();
+          this.scene.start('StoryScene', { color: selected })
         }
       })
     }
     //
-    this.scene.get('CreditsScene').createBack(this);
+    this.scene.get('CreditsScene').createBack(this, 'MainMenuScene');// Going back
   }
 
   createAnimations() {
@@ -76,7 +80,7 @@ export default class CharacterChoosingScene extends Phaser.Scene {
       });
       this.anims.create({
         key: `${color}Run`,
-        frames: this.anims.generateFrameNumbers(`${color}Idle`),
+        frames: this.anims.generateFrameNumbers(`${color}Run`),
         frameRate: 10,
         repeat: -1,
       });

@@ -11,7 +11,7 @@ export default class SoldierPlayer extends Phaser.Physics.Arcade.Sprite {
 
     this.color = 'Blue'
     //firing features
-    this.fireDelay = 100;
+    this.fireDelay = 140;
     this.lastFired = 0;
   }
 
@@ -48,7 +48,6 @@ export default class SoldierPlayer extends Phaser.Physics.Arcade.Sprite {
       this.setVelocityX(0);
       // Whenever Josh is not moving, use the idleUnarmed animation
         this.anims.play('idle');
-
     }
 
     //emit any movement

@@ -21,6 +21,8 @@ export default class MainMenuScene extends Phaser.Scene {
     const backgroundImage = this.add.image(width*0.5, height*0.5, "title-background").setOrigin(0.5, 0.5).setScale(1.2);
     backgroundImage.alpha = 0.1;
 
+    this.createClick(this) //add clicking sound
+
     //add text options
     const options = {};
     options['CharacterChoosingScene'] = this.add.text(width*0.3, height*0.3, 'Campaign', { fontFamily: '"Press Start 2P"' }).setFontSize(32).setOrigin(0, 0.5)
@@ -54,12 +56,15 @@ export default class MainMenuScene extends Phaser.Scene {
       })
       options[key].on("pointerup", () => {
         if (selected) {
-          const click = this.sound.add('click');
-          click.volume = 0.1;
-          click.play();
+          this.click.play();
           this.scene.start(selected);
         }
       })
     }
+  }
+
+  createClick(scene) {
+    scene.click = this.sound.add('click');
+    scene.click.volume = 0.1;
   }
 }
