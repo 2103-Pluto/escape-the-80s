@@ -1,14 +1,10 @@
 import enemy from '../entity/Enemy';
 import Heart from '../entity/Heart';
 import Ground from '../entity/Ground';
-<<<<<<< HEAD
-import Laser from '../entity/Laser';
 import Flagpole from '../entity/Flagpole'
 import Mario from '../entity/Mario'
-=======
 import Bullet from '../entity/Bullet';
 import Star from '../entity/Star';
->>>>>>> master
 import io from 'socket.io-client';
 import SoldierPlayer from '../entity/SoldierPlayer'
 import Phaser from 'phaser'
@@ -247,7 +243,6 @@ export default class SynthwaveScene extends Phaser.Scene {
 
     this.screamSound = this.sound.add('scream');
 
-<<<<<<< HEAD
     const flagpoleX = 770*numberOfFrames
     this.flagpole = new Flagpole(this, flagpoleX, 375, 'flagpole').setScale(2.0);
     this.createHeart(100, 500);
@@ -261,8 +256,6 @@ export default class SynthwaveScene extends Phaser.Scene {
     
    
 
-=======
->>>>>>> master
     // Create collisions for all entities
     // << CREATE COLLISIONS HERE >>
   }
@@ -359,15 +352,4 @@ export default class SynthwaveScene extends Phaser.Scene {
       bullet.setVisible(false);
     }
 
-<<<<<<< HEAD
-  collectGun(player, gun) {
-    // << ADD GAME LOGIC HERE >>
-    gun.disableBody(true, true); // (disableGameObj, hideGameObj)
-    // Set the player to 'armed'
-    this.player.armed = true;
-  }
-
-  
-=======
->>>>>>> master
 }
