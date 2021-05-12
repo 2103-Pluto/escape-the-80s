@@ -4,7 +4,7 @@
   "description": "A workshop for getting started with Phaser",
   "main": "src/index.js",
   "scripts": {
-    "start": "webpack-dev-server",
+    "start": "npm run build-watch & node server",
     "build": "npx webpack --config webpack.config.js",
     "start-dev": "npm run build-watch & nodemon server",
     "build-watch": "webpack -w"
