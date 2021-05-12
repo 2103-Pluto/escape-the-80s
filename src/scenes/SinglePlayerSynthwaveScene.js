@@ -3,7 +3,6 @@ import Heart from '../entity/Heart';
 import Ground from '../entity/Ground';
 import Bullet from '../entity/Bullet';
 import Star from '../entity/Star';
-import io from 'socket.io-client';
 import SoldierPlayer from '../entity/SoldierPlayer'
 import Phaser from 'phaser'
 import MuzzleFlash from '../entity/MuzzleFlash';
@@ -21,6 +20,7 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
 
     this.createStar = this.createStar.bind(this)
     this.createHeart = this.createHeart.bind(this);
+    this.createPlayer = this.createPlayer.bind(this);
   }
 
   init(data) {
@@ -83,69 +83,71 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
   }
 
   createGround(tileWidth, count) {
-    const height = this.game.config.height;
     for (let i=0; i<count; i++) {
-      this.groundGroup.create(i*tileWidth, height, 'road').setOrigin(0, 1).setScale(3.5).refreshBody();
+      this.groundGroup.create(i*tileWidth, this.height, 'road').setOrigin(0, 1).setScale(3.5).refreshBody();
     }
   }
 
   createBackgroundElement(imageWidth, texture, count, scrollFactor) {
-    const height = this.game.config.height;
     for (let i=0; i<count; i++) {
-      this.add.image(i*imageWidth, height, texture).setOrigin(0, 1).setScale(3.5).setScrollFactor(scrollFactor)
+      this.add.image(i*imageWidth, this.height, texture).setOrigin(0, 1).setScale(3.5).setScrollFactor(scrollFactor)
     }
   }
 
   createMap() {
-    const width = this.game.config.width;
-    const height = this.game.config.height;
-    this.add.image(width * 0.5, height * 0.46, 'sky').setOrigin(0.5).setScale(3.5).setScrollFactor(0)
+    this.add.image(this.width * 0.5, this.height * 0.46, 'sky').setOrigin(0.5).setScale(3.5).setScrollFactor(0)
     this.createBackgroundElement(504, 'mountains', 2*numberOfFrames, 0.15)
     this.createBackgroundElement(168, 'palms-back', 5*numberOfFrames, 0.3)
     this.createBackgroundElement(448, 'palms', 2*numberOfFrames, 0.45)
 
     this.groundGroup = this.physics.add.staticGroup({ classType: Ground });
     this.createGround(168, 5*numberOfFrames);
+    this.physics.world.setBounds(0, null, this.width * numberOfFrames, this.height, true, true, false, false) //set world bounds only on sides
   }
 
-  createStar(x, y) {
+  createStar(x, y, scene) {
   //load star
-    const star = new Star(this, x, y, 'star').setScale(1.5)
+    const star = new Star(scene, x, y, 'star').setScale(1.5)
     star.play('rotate-star')
   }
 
-  createHeart(x, y) {
-    const heart = new Heart(this, x, y, 'heart');
+  createHeart(x, y, scene) {
+    const heart = new Heart(scene, x, y, 'heart');
     heart.play("rotate-heart")
   }
 
+  createPlayer(scene) {
+    scene.player = new SoldierPlayer(scene, 60, 400, `${scene.color}SoldierIdle`, scene.socket).setScale(2.78);
+    scene.player.setCollideWorldBounds(true); //stop player from running off the edges
+    scene.physics.add.collider(scene.player, scene.groundGroup)
+  }
+
+  setCamera(scene) {
+    scene.cameras.main.startFollow(this.player);
+    scene.cameras.main.setBounds(0, 0, this.width * numberOfFrames, this.height)
+  }
+
+  // createScoreLabel(scene) {
+  //   scene.add.sprite(40 , 40, 'star').setOrigin(0.5).setScale(1.5).setScrollFactor(0)
+
+  // }
+
   create() {
+    this.height = this.game.config.height; //retrive width and height (careful--Has to be at the top of create)
+    this.width = this.game.config.width;
     this.createSounds() //create all the sounds
     this.createMap() //Set up background
+    this.createPlayer(this) //create player
+    this.setCamera(this)
 
-    const width = this.game.config.width;
-    const height = this.game.config.height;
-
-    // Create game entities
-    // << CREATE GAME ENTITIES HERE >>
-    this.player = new SoldierPlayer(this, 60, 400, `${this.color}SoldierIdle`, this.socket).setScale(2.78);
-    this.player.setCollideWorldBounds(true); //stop player from running off the edges
-    this.physics.world.setBounds(0, null, width * numberOfFrames, height, true, true, false, false) //set world bounds only on sides
-
-    //set up camera
-    const cam = this.cameras.main;
-    cam.startFollow(this.player);
-    cam.setBounds(0, 0, width * numberOfFrames, height)
-
-    this.physics.add.collider(this.player, this.groundGroup)
     this.cursors = this.input.keyboard.createCursorKeys();
     this.createAnimations();
 
     this.enemy = new enemy(this, 600, 400, 'brandon').setScale(.25)
 
-    this.createStar(600, 400); //create a star to test the Heart entity
-    this.createHeart(100, 500);
-    this.createHeart(120, 500);     //create a heart to test the Heart entity
+    this.createStar(600, 400, this); //create a star to test the Heart entity
+    this.createHeart(100, 500, this);
+    this.createHeart(120, 500, this);     //create a heart to test the Heart entity
 
     // ...
     this.physics.add.collider(this.enemy, this.groundGroup);
@@ -203,8 +205,16 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
   }
 
   fire() {
-    // These are the offsets from the player's position that make it look like
-    // the laser starts from the gun in the player's hand
+    //testing mode
+    // this.player.increaseHealth(1)
+    // this.player.decreaseHealth(1)
+    // this.player.increaseScore(1)
+    // this.player.decreaseScore(1)
+    // this.player.revive()
+    // console.log("health ---> ", this.player.health)
+    // console.log("score ---> ", this.player.score)
+    // console.log("dead ---> ", this.player.dead)
+    //testing mode
     const offsetX = 60;
     const offsetY = 5.5;
     const bulletX =
@@ -266,6 +276,10 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
       frameRate: 10,
       repeat: -1
     });
+    this.anims.create({
+      key: 'still-star',
+      frames: [{ key: 'star', frame: 0 }]
+    })
   }
 
     // make the laser inactive and insivible when it hits the enemy
