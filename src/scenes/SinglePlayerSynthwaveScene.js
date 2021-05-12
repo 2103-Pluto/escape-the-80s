@@ -127,6 +127,11 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
     scene.cameras.main.setBounds(0, 0, this.width * numberOfFrames, this.height)
   }
 
+  // createScoreLabel(scene) {
+  //   scene.add.sprite(40 , 40, 'star').setOrigin(0.5).setScale(1.5).setScrollFactor(0)
+
+  // }
+
   create() {
     this.height = this.game.config.height; //retrive width and height (careful--Has to be at the top of create)
     this.width = this.game.config.width;
@@ -271,6 +276,10 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
       frameRate: 10,
       repeat: -1
     });
+    this.anims.create({
+      key: 'still-star',
+      frames: [{ key: 'star', frame: 0 }]
+    })
   }
 
     // make the laser inactive and insivible when it hits the enemy

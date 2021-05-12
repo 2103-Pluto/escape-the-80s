@@ -117,6 +117,7 @@ export default class SoldierPlayer extends Phaser.Physics.Arcade.Sprite {
   }
 
   decreaseHealth(deltaHealth) {
+    this.scene.cameras.main.shake(500, 0.004)
     this.health = Math.max(0, this.health - deltaHealth);
     if (this.health === 0) this.dead = true
   }
