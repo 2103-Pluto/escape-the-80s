@@ -6,7 +6,7 @@ const path = require("path")
 const PORT = process.env.PORT || 8080
 var players = {};
 //app.use(express.static(__dirname + '/public'));
- 
+console.log('test')
 app.get('/', function (req, res) {
   //res.sendFile(__dirname + '/index.html');
   res.sendFile(path.join(__dirname, ".", "public/index.html"))
