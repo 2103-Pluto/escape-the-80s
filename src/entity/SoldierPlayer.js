@@ -1,16 +1,18 @@
-import 'phaser';
-import { GetSpeed } from 'phaser/src/math';
+import 'phaser'
 
-export default class Player extends Phaser.Physics.Arcade.Sprite {
-  constructor(scene, x, y, spriteKey, socket) {
-    super(scene, x, y, spriteKey);
+export default class SoldierPlayer extends Phaser.Physics.Arcade.Sprite {
+  constructor(scene, x, y, spriteKey, socket /*, color */) {
+    super(scene, x, y, spriteKey)
     this.scene = scene;
-    this.scene.add.existing(this);
-    this.scene.physics.world.enable(this);
+    this.scene.add.existing(this)
+    this.scene.physics.world.enable(this)
     this.facingLeft = false;
-    this.armed = false;
     this.socket = socket
-    // << INITIALIZE PLAYER ATTRIBUTES HERE >>
+
+    this.color = 'Blue'
+    //firing features
+    this.fireDelay = 140;
+    this.lastFired = 0;
   }
 
   updateMovement(cursors) {
@@ -45,11 +47,7 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
     else {
       this.setVelocityX(0);
       // Whenever Josh is not moving, use the idleUnarmed animation
-      if (!this.armed) {
-        this.anims.play('idleUnarmed');
-      } else {
-        this.anims.play('idleArmed');
-      }
+        this.anims.play('idle');
     }
 
     //emit any movement
@@ -68,20 +66,19 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
       x: this.x,
       y: this.y
     }
-
   }
 
-  // Check which controller button is being pushed and execute movement & animation
-  update(cursors, jumpSound) {
+  update(time, cursors, jumpSound, shootingFn, shootingSound) {
     // << INSERT CODE HERE >>
     this.updateMovement(cursors)
     this.updateJump(cursors, jumpSound)
     this.updateInAir();
+    this.updateShoot(time, cursors, shootingFn, shootingSound);
   }
 
   updateJump(cursors, jumpSound) {
     if (cursors.up.isDown && this.body.touching.down) {
-      this.setVelocityY(-800);
+      this.setVelocityY(-600);
       jumpSound.play()
     }
   }
@@ -90,5 +87,13 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
     if (!this.body.touching.down) {
       this.play('jump');
     }
+  }
+
+  updateShoot(time, cursors, shootingFn, shootingSound) {
+    if (cursors.space.isDown && time > this.lastFired) {
+        shootingSound.play();
+        shootingFn()
+        this.lastFired = time + this.fireDelay;
+      }
   }
 }

@@ -32,34 +32,33 @@ export default class CreditsScene extends Phaser.Scene {
     this.add.text(width*0.5, height*0.75, 'Mahfouz Basith', { fontFamily: '"Press Start 2P"' }).setFontSize(24).setOrigin(0.5, 0.5)
     this.add.text(width*0.5, height*0.9, 'Juan S. Auli', { fontFamily: '"Press Start 2P"' }).setFontSize(24).setOrigin(0.5, 0.5)
 
-    this.createBack(this);
+    this.createBack(this, 'MainMenuScene');
   }
 
-  createBack(scene) {
+  createBack(scene, previousScene) {
+    this.scene.get('MainMenuScene').createClick(scene) //add click sound
     //add hover icon
-    const hoverIcon = scene.add.sprite(100, 100, 'cassette-tape');
-    hoverIcon.setScale(0.08)
-    hoverIcon.setVisible(false);
+    scene.hoverIcon = scene.add.sprite(100, 100, 'cassette-tape');
+    scene.hoverIcon.setScale(0.08)
+    scene.hoverIcon.setVisible(false);
 
     //add option to return to menu
     const back = scene.add.text(35, 40, 'Go back', { fontFamily: '"Press Start 2P"' }).setFontSize(28).setOrigin(0, 0.5)
 
     back.setInteractive();
     back.on("pointerover", () => {
-      hoverIcon.setVisible(true);
+      scene.hoverIcon.setVisible(true);
       back.setColor('yellow')
-      hoverIcon.x = back.x + back.width + 50;
-      hoverIcon.y = back.y;
+      scene.hoverIcon.x = back.x + back.width + 50;
+      scene.hoverIcon.y = back.y;
     })
     back.on("pointerout", () => {
-      hoverIcon.setVisible(false);
+      scene.hoverIcon.setVisible(false);
       back.setColor('white')
     })
     back.on("pointerup", () => {
-      const click = scene.sound.add('click');
-      click.volume = 0.1;
-      click.play();
-      scene.scene.start('MainMenuScene');
+      scene.click.play();
+      scene.scene.start(previousScene);
     })
   }
 }
