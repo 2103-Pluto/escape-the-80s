@@ -57,13 +57,16 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
   }
 
   preloadMap() {
+    this.load.tilemapTiledJSON('map', 'assets/SynthWave.json')  // THIS IS THE MAP
     this.load.image('ground', 'assets/sprites/ground-juan-test.png');
     this.load.image("sky", "assets/backgrounds/synthwave_scene/back.png");
     this.load.image("mountains", "assets/backgrounds/synthwave_scene/mountains.png");
     this.load.image("palms-back", "assets/backgrounds/synthwave_scene/palms-back.png");
     this.load.image("palms", "assets/backgrounds/synthwave_scene/palms.png");
     this.load.image("road", "assets/backgrounds/synthwave_scene/road.png");
+    this.load.image("platform", "assets/sprites/platform.png")    ///THIS IS THE TILESET OF THE PLATFORM
   }
+
 
   preload() {
     this.preloadSoldier() //load all the soldier things
@@ -103,6 +106,9 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
     this.createBackgroundElement(504, 'mountains', 2*numberOfFrames, 0.15)
     this.createBackgroundElement(168, 'palms-back', 5*numberOfFrames, 0.3)
     this.createBackgroundElement(448, 'palms', 2*numberOfFrames, 0.45)
+    const map = this.make.tilemap({key: 'map'})
+    const platform = map.addTilesetImage('Platform', 'platform') // First name is form tiled, Second name is key above
+    map.createStaticLayer("Tile Layer 1", platform)
 
     this.groundGroup = this.physics.add.staticGroup({ classType: Ground });
     this.createGround(168, 5*numberOfFrames);
