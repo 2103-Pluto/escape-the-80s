@@ -3,7 +3,6 @@ import Heart from '../entity/Heart';
 import Ground from '../entity/Ground';
 import Bullet from '../entity/Bullet';
 import Star from '../entity/Star';
-import io from 'socket.io-client';
 import SoldierPlayer from '../entity/SoldierPlayer'
 import Phaser from 'phaser'
 import MuzzleFlash from '../entity/MuzzleFlash';
@@ -203,8 +202,16 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
   }
 
   fire() {
-    // These are the offsets from the player's position that make it look like
-    // the laser starts from the gun in the player's hand
+    //testing mode
+    // this.player.increaseHealth(1)
+    // this.player.decreaseHealth(1)
+    // this.player.increaseScore(1)
+    // this.player.decreaseScore(1)
+    // this.player.revive()
+    // console.log("health ---> ", this.player.health)
+    // console.log("score ---> ", this.player.score)
+    // console.log("dead ---> ", this.player.dead)
+    //testing mode
     const offsetX = 60;
     const offsetY = 5.5;
     const bulletX =
