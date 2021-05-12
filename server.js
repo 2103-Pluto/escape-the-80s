@@ -14,7 +14,7 @@ app.get('/', function (req, res) {
 
 app.use(express.static(path.join(__dirname, ".", "public")));
  
-server.listen(8080, function () {
+server.listen(PORT, function () {
   console.log(`Listening on ${PORT}`);
 });
 
