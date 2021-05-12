@@ -24,8 +24,6 @@ export default class Mario extends Phaser.Physics.Arcade.Sprite {
     this.rightDest = this.initialX+100
 
     this.anims.play('walk', true)
-
-    console.log('before', this.x)
     
     if(this.x<=this.rightDest && this.movingLeft===false){
       
