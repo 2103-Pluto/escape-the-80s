@@ -1,6 +1,8 @@
 import enemy from '../entity/Enemy';
 import Heart from '../entity/Heart';
 import Ground from '../entity/Ground';
+import Flagpole from '../entity/Flagpole'
+import Mario from '../entity/Mario'
 import Bullet from '../entity/Bullet';
 import Star from '../entity/Star';
 import io from 'socket.io-client';
@@ -22,6 +24,7 @@ export default class SynthwaveScene extends Phaser.Scene {
 
     this.createStar = this.createStar.bind(this)
     this.createHeart = this.createHeart.bind(this);
+    // this.createMario = this.createMario.bind(this)
   }
 
   preload() {
@@ -44,6 +47,15 @@ export default class SynthwaveScene extends Phaser.Scene {
       frameHeight: 39,
     })
 
+    this.load.spritesheet('mario', 'assets/spriteSheets/mario_enemy.png', {
+      frameWidth: 30,
+      frameHeight: 37,
+    });
+    
+    this.load.spritesheet('flagpole', 'assets/spriteSheets/flagpoles_sheet.png', {
+      frameWidth: 32,
+      frameHeight: 168,
+    })
     this.load.spritesheet('heart', 'assets/spriteSheets/heart.png', {
       frameWidth: 16,
       frameHeight: 16,
@@ -102,13 +114,19 @@ export default class SynthwaveScene extends Phaser.Scene {
     heart.play("rotate-heart")
   }
 
+  // createMario(x, y) {
+  //   this.mario = new Mario(this, x , y, 'mario').setScale(3.0)
+  //   this.physics.add.collider(this.mario, this.groundGroup);
+  //   this.physics.add.collider(this.mario, this.player);
+  //  }
+  
+
   create() {
     //socket logic
     const scene = this
     this.socket = io();
 
     scene.otherPlayer=null;
-
     this.socket.on("currentPlayers", function (arg) {
       const  players  = arg;
       Object.keys(players).forEach(function (id) {
@@ -225,6 +243,19 @@ export default class SynthwaveScene extends Phaser.Scene {
 
     this.screamSound = this.sound.add('scream');
 
+    const flagpoleX = 770*numberOfFrames
+    this.flagpole = new Flagpole(this, flagpoleX, 375, 'flagpole').setScale(2.0);
+    this.createHeart(100, 500);
+    this.createHeart(120, 500);     //create a heart to test the Heart entity
+
+    //create mario(enemy)
+    // this.createMario(300,500)
+    this.mario = new Mario(this, 300, 400, 'mario').setScale(3.0)
+    this.physics.add.collider(this.mario, this.groundGroup);
+    this.physics.add.collider(this.mario, this.player);
+    
+   
+
     // Create collisions for all entities
     // << CREATE COLLISIONS HERE >>
   }
@@ -237,7 +268,9 @@ export default class SynthwaveScene extends Phaser.Scene {
     if (this.muzzleFlash) this.muzzleFlash.update(delta)
 
     this.enemy.update(this.screamSound);
-
+    
+    this.mario.update()
+    
   }
 
   fire(x, y, left) {
@@ -304,7 +337,14 @@ export default class SynthwaveScene extends Phaser.Scene {
       frameRate: 10,
       repeat: -1
     });
+    this.anims.create({
+      key: 'walk',
+      frames: this.anims.generateFrameNumbers('mario', { start: 5, end: 8 }),
+      frameRate: 5,
+      repeat: -1,
+    });
   }
+
 
     // make the laser inactive and insivible when it hits the enemy
     hit(enemy, bullet) {
