@@ -22,7 +22,7 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
     this.createStar = this.createStar.bind(this)
     this.createHeart = this.createHeart.bind(this);
     this.createPlayer = this.createPlayer.bind(this);
-    this.createMarios = this.createMarios.bind(this)
+    this.createEnemies = this.createEnemies.bind(this)
   }
 
   init(data) {
@@ -143,17 +143,20 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
     scene.physics.add.collider(scene.player, scene.groundGroup)
   }
 
-  createMarios(scene, x, y, number){
-    let marioX = x
-    let marioY = y
+  createEnemies(scene, enemy, x, y, number){
+    const enemies = {mario: Mario}
+    let enemyX = x
+    let enemyY = y
+    let type = enemies[enemy]
+    let groupType = scene[`${enemy}s`]
     for(let i = 0; i<number; i++){
-      let newMario = new Mario(scene, marioX, marioY, 'mario').setScale(3.0)
-      scene.marios.add(newMario)
-      scene.physics.add.collider(newMario, scene.groundGroup);
-      scene.physics.add.collider(newMario, scene.player, function(){
+      let newEnemy = new type(scene, enemyX, enemyY, enemy).setScale(3.0)
+      groupType.add(newEnemy)
+      scene.physics.add.collider(newEnemy, scene.groundGroup);
+      scene.physics.add.collider(newEnemy, scene.player, function(){
         console.log('hit')
       });
-      marioX+=50
+      enemyX+=50
     }
     return scene.mario
   }
@@ -197,8 +200,8 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
 
     
     
-    this.createMarios(this, 500, 400, 3)
-    this.createMarios(this, 1500, 400, 5)
+    this.createEnemies(this, 'mario', 500, 400, 3)
+    this.createEnemies(this, 'mario', 1500, 400, 5)
 
     
 
