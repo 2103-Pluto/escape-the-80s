@@ -10,7 +10,6 @@ export default class TitleScene extends Phaser.Scene {
     this.load.image("title-background", "assets/backgrounds/title_scene/title-background.png");
     this.load.audio("title-music", "assets/audio/title_scene/title-music.wav");
     this.load.addFile(new WebFontFile(this.load, 'Press Start 2P'))
-
     this.load.audio("click", "assets/audio/click.wav");
   }
 
@@ -27,11 +26,11 @@ export default class TitleScene extends Phaser.Scene {
     const width = this.game.config.width;
     const height = this.game.config.height;
     this.add.image(width*0.5, height*0.5, "title-background").setOrigin(0.5, 0.5).setScale(1.2);
+
     this.add.text(width*0.5, height*0.65, '- PRESS A KEY TO START -', { fontFamily: '"Press Start 2P"' }).setFontSize(18).setOrigin(0.5, 0.5)
 
     //listen to event to transition to next scene
     this.input.keyboard.on('keydown', () => {
-      // backgroundMusic.stop();
       const click = this.sound.add('click');
       click.volume = 0.1;
       click.play();

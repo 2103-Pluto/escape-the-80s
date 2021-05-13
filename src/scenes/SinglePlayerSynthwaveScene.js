@@ -3,10 +3,10 @@ import Heart from '../entity/Heart';
 import Ground from '../entity/Ground';
 import Bullet from '../entity/Bullet';
 import Star from '../entity/Star';
-import io from 'socket.io-client';
 import SoldierPlayer from '../entity/SoldierPlayer'
 import Phaser from 'phaser'
 import MuzzleFlash from '../entity/MuzzleFlash';
+import Mario from '../entity/Mario'
 
 const numberOfFrames = 15;
 
@@ -19,8 +19,17 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
     this.hit = this.hit.bind(this);
     this.createBackgroundElement = this.createBackgroundElement.bind(this);
 
-    this.createStar = this.createStar.bind(this)
-    this.createHeart = this.createHeart.bind(this);
+    this.createPlayer = this.createPlayer.bind(this);
+    this.createEnemies = this.createEnemies.bind(this)
+    this.createAnimatedStar = this.createAnimatedStar.bind(this)
+    this.createAnimatedHeart = this.createAnimatedHeart.bind(this);
+    this.createScoreLabel = this.createScoreLabel.bind(this);
+    this.createHealthLabel = this.createHealthLabel.bind(this);
+    this.pickupStar = this.pickupStar.bind(this)
+    this.createStarGroup = this.createStarGroup.bind(this)
+    this.pickupHeart = this.pickupHeart.bind(this)
+    this.createHeartGroup = this.createHeartGroup.bind(this)
+
   }
 
   init(data) {
@@ -32,8 +41,6 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
       frameWidth: 48,
       frameHeight: 39,
     })
-
-
     //Idle Soldier
     this.load.spritesheet(`${this.color}SoldierIdle`, `assets/spriteSheets/${this.color}/Gunner_${this.color}_Idle.png`, {
       frameWidth: 48,
@@ -42,6 +49,12 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
 
     //Jumping Soldier
     this.load.spritesheet(`${this.color}SoldierJumping`, `assets/spriteSheets/${this.color}/Gunner_${this.color}_Jump.png`, {
+      frameWidth: 48,
+      frameHeight: 39,
+    })
+
+    //Dying Soldier
+    this.load.spritesheet(`${this.color}SoldierDying`, `assets/spriteSheets/${this.color}/Gunner_${this.color}_Death.png`, {
       frameWidth: 48,
       frameHeight: 39,
     })
@@ -54,6 +67,9 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
     this.load.audio('shooting', 'assets/audio/shooting.wav');
     this.load.audio('scream', 'assets/audio/scream.wav');
     this.load.audio('background-music', 'assets/audio/synthwave_scene/synthwave-palms.wav');
+    this.load.audio('hurt', 'assets/audio/hurt.wav');
+    this.load.audio('coin', 'assets/audio/coin.wav');
+    this.load.audio('power-up', 'assets/audio/power-up.wav');
   }
 
   preloadMap() {
@@ -67,11 +83,18 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
     this.load.image("platform", "assets/sprites/platform.png")    ///THIS IS THE TILESET OF THE PLATFORM
   }
 
+  preloadMario(){
+    this.load.spritesheet('mario', 'assets/spriteSheets/mario_enemy.png', {
+      frameWidth: 30,
+      frameHeight: 37,
+    });
+  }
 
   preload() {
     this.preloadSoldier() //load all the soldier things
     this.preloadSounds() //load all sounds
     this.preloadMap() //preload background
+    // this.preloadMario()
 
     this.load.spritesheet('heart', 'assets/spriteSheets/heart.png', {
       frameWidth: 16,
@@ -82,20 +105,28 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
     this.load.spritesheet('star', 'assets/spriteSheets/star.png', {
       frameWidth: 16,
       frameHeight: 16,
-    })
+    });
+
+    this.load.spritesheet('mario', 'assets/spriteSheets/mario_enemy.png', {
+      frameWidth: 30,
+      frameHeight: 37,
+    });
+
+
   }
 
   createGround(tileWidth, count) {
-    const height = this.game.config.height;
     for (let i=0; i<count; i++) {
-      this.groundGroup.create(i*tileWidth, height, 'road').setOrigin(0, 1).setScale(3.5).refreshBody();
+      let newGround = this.groundGroup.create(i*tileWidth, this.height, 'road').setOrigin(0, 1).setScale(3.5).refreshBody();
+      newGround.body.allowGravity = false
+      newGround.body.immovable = true
+
     }
   }
 
   createBackgroundElement(imageWidth, texture, count, scrollFactor) {
-    const height = this.game.config.height;
     for (let i=0; i<count; i++) {
-      this.add.image(i*imageWidth, height, texture).setOrigin(0, 1).setScale(3.5).setScrollFactor(scrollFactor)
+      this.add.image(i*imageWidth, this.height, texture).setOrigin(0, 1).setScale(3.5).setScrollFactor(scrollFactor)
     }
   }
 
@@ -109,61 +140,159 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
   }
 
   createMap() {
-    const width = this.game.config.width;
-    const height = this.game.config.height;
-    this.add.image(width * 0.5, height * 0.46, 'sky').setOrigin(0.5).setScale(3.5).setScrollFactor(0)
+    this.add.image(this.width * 0.5, this.height * 0.46, 'sky').setOrigin(0.5).setScale(3.5).setScrollFactor(0)
     this.createBackgroundElement(504, 'mountains', 2*numberOfFrames, 0.15)
     this.createBackgroundElement(168, 'palms-back', 5*numberOfFrames, 0.3)
     this.createBackgroundElement(448, 'palms', 2*numberOfFrames, 0.45)
 
-    this.groundGroup = this.physics.add.staticGroup({ classType: Ground });
+    // this.groundGroup = this.physics.add.staticGroup({classType: Ground});
+    this.groundGroup = this.physics.add.group()
     this.createGround(168, 5*numberOfFrames);
+    this.physics.world.setBounds(0, null, this.width * numberOfFrames, this.height, true, true, false, false) //set world bounds only on sides
   }
 
-  createStar(x, y) {
-  //load star
-    const star = new Star(this, x, y, 'star').setScale(1.5)
-    star.play('rotate-star')
-  }
-
-  createHeart(x, y) {
-    const heart = new Heart(this, x, y, 'heart');
+  createAnimatedHeart(x, y, scene) {
+    const heart = new Heart(scene, x, y, 'heart');
     heart.play("rotate-heart")
+    this.hearts.add(heart)
+  }
+
+  createAnimatedStar(x, y, scene) {
+    //load star
+      const star = new Star(scene, x, y, 'star').setScale(1.5)
+      star.play('rotate-star')
+      this.stars.add(star)
+    }
+
+  createPlayer(scene) {
+    scene.player = new SoldierPlayer(scene, 60, 400, `${scene.color}SoldierIdle`, scene.socket).setScale(2.78);
+    scene.player.color = scene.color;
+    scene.player.setCollideWorldBounds(true); //stop player from running off the edges
+    scene.physics.add.collider(scene.player, scene.groundGroup)
+  }
+
+  createEnemies(scene, enemy, x, y, number){
+    const enemies = {mario: Mario}
+    let enemyX = x
+    let enemyY = y
+    let type = enemies[enemy]
+    let groupType = scene[`${enemy}s`]
+    for(let i = 0; i<number; i++){
+      let newEnemy = new type(scene, enemyX, enemyY, enemy).setScale(3.0)
+      groupType.add(newEnemy)
+      scene.physics.add.collider(newEnemy, scene.groundGroup);
+      scene.physics.add.collider(newEnemy, scene.player);
+      enemyX+=50
+    }
+    return scene.mario
+  }
+
+  setCamera(scene) {
+    scene.cameras.main.startFollow(this.player);
+    scene.cameras.main.setBounds(0, 0, this.width * numberOfFrames, this.height)
+  }
+
+  createScoreLabel(scene) {
+    scene.add.image(35 , 55, 'star').setOrigin(0.5).setScale(1.2).setScrollFactor(0)
+    scene.add.text(50, 55, "x", { fontFamily: '"Press Start 2P"' }).setFontSize(14).setOrigin(0, 0.45).setScrollFactor(0)
+    scene.score = scene.add.text(65, 55, `${scene.player.score}`, { fontFamily: '"Press Start 2P"' }).setFontSize(14).setOrigin(0, 0.5).setScrollFactor(0)
+  }
+
+  createHealthLabel(scene) {
+    scene.add.image(35, 30, 'heart').setOrigin(0.5).setScale(1.2).setScrollFactor(0)
+    scene.add.text(50, 30, "x", { fontFamily: '"Press Start 2P"' }).setFontSize(14).setOrigin(0, 0.45).setScrollFactor(0)
+    scene.health = scene.add.text(65, 30, `${scene.player.health}`, { fontFamily: '"Press Start 2P"' }).setFontSize(14).setOrigin(0, 0.5).setScrollFactor(0)
+  }
+
+  createStarGroup() {
+    this.stars = this.physics.add.group({
+      classType: Star,
+      runChildUpdate: true,
+      allowGravity: false,
+    })
+
+    this.physics.add.overlap(
+      this.stars,
+      this.player,
+      this.pickupStar,
+      null,
+      this
+    )
+  }
+
+  createHeartGroup() {
+    this.hearts = this.physics.add.group({
+      classType: Heart,
+      runChildUpdate: true,
+      allowGravity: false,
+    })
+
+    this.physics.add.overlap(
+      this.hearts,
+      this.player,
+      this.pickupHeart,
+      null,
+      this
+    )
   }
 
   create() {
+
+   // const scene = this
+
+    // ALL THESE ('--->') NEED TO BE IN ORDER
+
+    this.height = this.game.config.height; //retrive width and height (careful--Has to be at the top of create)
+    this.width = this.game.config.width;
     this.createSounds() //create all the sounds
     this.createMap() //Set up background
-    const platform = this.createPlatformLayer() // Creates Layers from Tiled
+    this.createPlayer(this) //create player
+    this.setCamera(this)
+    this.createScoreLabel(this) //create score
+    this.createHealthLabel(this) //create health
+    this.createStarGroup() //allows for stars to be picked up
+    this.createHeartGroup() //allows for hearts to be picked up
+    // --->
 
-    const width = this.game.config.width;
-    const height = this.game.config.height;
-
-    // Create game entities
-    // << CREATE GAME ENTITIES HERE >>
-    this.player = new SoldierPlayer(this, 60, 400, `${this.color}SoldierIdle`, this.socket).setScale(2.78);
-    this.player.setCollideWorldBounds(true); //stop player from running off the edges
-    this.physics.world.setBounds(0, null, width * numberOfFrames, height, true, true, false, false) //set world bounds only on sides
-
-    //set up camera
-    const cam = this.cameras.main;
-    cam.startFollow(this.player);
-    cam.setBounds(0, 0, width * numberOfFrames, height)
-
-    this.physics.add.collider(this.player, this.groundGroup)
     this.cursors = this.input.keyboard.createCursorKeys();
     this.createAnimations();
 
-    this.enemy = new enemy(this, 600, 400, 'brandon').setScale(.25)
 
-    this.createStar(600, 400); //create a star to test the Heart entity
-    this.createHeart(100, 500);
-    this.createHeart(120, 500);     //create a heart to test the Heart entity
+
+
+    // this.enemy = new enemy(this, 600, 400, 'brandon').setScale(.25) UNCOMMENT TO TEST BRANDON
+
+    // this.physics.add.collider(this.enemy, this.groundGroup)
+    // this.physics.add.collider(this.enemy, this.player, function(){
+    //   console.log('hit')
+    // })
+
+
+
+    this.marios=this.physics.add.group();
+
+
+
+    this.createEnemies(this, 'mario', 500, 400, 3)
+    this.createEnemies(this, 'mario', 1500, 400, 5)
+
+
+
+    this.createStar(600, 400, this); //create a star to test the Heart entity
+    this.createHeart(100, 500, this);
+    this.createHeart(120, 500, this);     //create a heart to test the Heart entity
+
+
+
+    this.createAnimatedStar(500, 400, this); //create a star to test the Heart entity
+    this.createAnimatedHeart(100, 500, this);
+    this.createAnimatedHeart(120, 500, this);     //create a heart to test the Heart entity
 
     // ...
     this.physics.add.collider(this.enemy, this.groundGroup);
     this.physics.add.collider(this.enemy, this.player);
     this.physics.add.collider(this.player, platform)
+
 
     // We're going to create a group for our lasers
     this.bullets = this.physics.add.group({
@@ -199,10 +328,18 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
     this.jumpSound.volume = 0.2;
 
     this.shootingSound = this.sound.add('shooting');
-    // The laser sound is a bit too loud so we're going to turn it down
     this.shootingSound.volume = 0.03;
 
     this.screamSound = this.sound.add('scream');
+
+    this.coinSound = this.sound.add('coin');
+    this.coinSound.volume = 0.05;
+
+    this.hurtSound = this.sound.add('hurt');
+    this.hurtSound.volume = 0.3;
+
+    this.powerUpSound = this.sound.add('power-up');
+    this.powerUpSound.volume = 0.08;
   }
 
   // time: total time elapsed (ms)
@@ -210,15 +347,30 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
   update(time, delta) {
     // << DO UPDATE LOGIC HERE >>
     this.player.update(time, this.cursors, this.jumpSound, this.fire, this.shootingSound);
-    if (this.muzzleFlash) this.muzzleFlash.update(delta)
+    this.updateHealth(this) //updates the pleyer's health displayed on scene
+    this.updateScore(this) //updates the pleyer's score displayed on scene
+    if (this.muzzleFlash) this.muzzleFlash.update(delta) //updates muzzleFlash
 
-    this.enemy.update(this.screamSound);
+    this.marios.getChildren().forEach(function (mario) {
+      mario.update()
+    })
+    //this.mario.update()
 
   }
 
+  updateHealth(scene) {
+    if (scene.health.text !== scene.player.health.toString()) {
+      scene.health.text = scene.player.health.toString()
+    }
+  }
+
+  updateScore(scene) {
+    if (scene.score.text !== scene.player.score.toString()) {
+      scene.score.text = scene.player.score.toString()
+    }
+  }
+
   fire() {
-    // These are the offsets from the player's position that make it look like
-    // the laser starts from the gun in the player's hand
     const offsetX = 60;
     const offsetY = 5.5;
     const bulletX =
@@ -269,6 +421,11 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
       repeat: -1,
     });
     this.anims.create({
+      key: 'die',
+      frames: this.anims.generateFrameNumbers(`${this.color}SoldierDying`),
+      frameRate: 10,
+    });
+    this.anims.create({
       key: 'rotate-star',
       frames: this.anims.generateFrameNumbers('star'),
       frameRate: 10,
@@ -280,12 +437,35 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
       frameRate: 10,
       repeat: -1
     });
+    this.anims.create({
+      key: 'walk',
+      frames: this.anims.generateFrameNumbers('mario', { start: 5, end: 8 }),
+      frameRate: 5,
+      repeat: -1,
+    });
   }
 
     // make the laser inactive and insivible when it hits the enemy
     hit(enemy, bullet) {
       bullet.setActive(false);
       bullet.setVisible(false);
+    }
+
+    pickupStar(player, star) {
+      star.destroy()
+      this.player.increaseScore(1)
+    }
+
+    pickupHeart(player, heart) {
+      heart.destroy()
+      this.player.increaseHealth(1)
+    }
+
+    showGameOverMenu() {
+      this.scene.pause() //pause scene
+      this.backgroundSound.pause()  //pause music
+      this.scene.launch('GameOverMenuScene', { previousScene: this })
+      this.scene.moveAbove(this, 'GameOverMenuScene')
     }
 
 }

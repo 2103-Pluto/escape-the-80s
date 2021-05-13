@@ -4,18 +4,30 @@ export default class SoldierPlayer extends Phaser.Physics.Arcade.Sprite {
   constructor(scene, x, y, spriteKey, socket /*, color */) {
     super(scene, x, y, spriteKey)
     this.scene = scene;
+    this.score = 0; //player's score
+    this.health = 5; //player's health
+    this.dead = false // variable to keep track of whether a player is dead
     this.scene.add.existing(this)
     this.scene.physics.world.enable(this)
     this.facingLeft = false;
     this.socket = socket
 
-    this.color = 'Blue'
+    this.color = 'Blue' //defaultColor
+
     //firing features
     this.fireDelay = 140;
     this.lastFired = 0;
+
+    //bind health and score changers
+    this.increaseHealth = this.increaseHealth.bind(this)
+    this.increaseScore = this.increaseScore.bind(this)
+    this.decreaseHealth = this.decreaseHealth.bind(this)
+    this.decreaseScore = this.decreaseScore.bind(this)
+    this.revive = this.revive.bind(this)
   }
 
   updateMovement(cursors) {
+    
     const cam = this.scene.cameras.main;
     const speed = 3;
     // Move left
@@ -70,10 +82,22 @@ export default class SoldierPlayer extends Phaser.Physics.Arcade.Sprite {
 
   update(time, cursors, jumpSound, shootingFn, shootingSound) {
     // << INSERT CODE HERE >>
-    this.updateMovement(cursors)
-    this.updateJump(cursors, jumpSound)
-    this.updateInAir();
-    this.updateShoot(time, cursors, shootingFn, shootingSound);
+    this.updateDying()
+    if (!this.dead) {
+      this.updateMovement(cursors)
+      this.updateJump(cursors, jumpSound)
+      this.updateInAir();
+      this.updateShoot(time, cursors, shootingFn, shootingSound);
+    }
+  }
+  
+  updateDying() {
+    if (this.dead) {
+      this.play('die', true) //play dying animation
+      if (this.anims.currentAnim.key === 'die' && this.anims.getProgress() > 0.6) {
+        this.scene.showGameOverMenu();
+      }
+    }
   }
 
   updateJump(cursors, jumpSound) {
@@ -95,5 +119,30 @@ export default class SoldierPlayer extends Phaser.Physics.Arcade.Sprite {
         shootingFn()
         this.lastFired = time + this.fireDelay;
       }
+  }
+
+  increaseHealth(deltaHealth) {
+    this.health = Math.min(5, this.health + deltaHealth);
+  }
+
+  increaseScore(deltaScore) {
+    this.score += deltaScore;
+  }
+
+  decreaseHealth(deltaHealth) {
+    this.scene.cameras.main.shake(500, 0.004)
+    this.health = Math.max(0, this.health - deltaHealth);
+    if (this.health === 0) this.dead = true
+  }
+
+  decreaseScore(deltaScore) {
+    this.score = Math.max(0, this.score - deltaScore);
+  }
+
+  // The revive a
+  revive() {
+    this.dead = false;
+    this.score = 0;
+    this.health = 5;
   }
 }

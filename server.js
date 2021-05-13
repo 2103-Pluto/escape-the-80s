@@ -2,16 +2,20 @@ var express = require('express');
 var app = express();
 var server = require('http').Server(app);
 var io = require('socket.io')
+const path = require("path")
+const PORT = process.env.PORT || 8080
 var players = {};
+//app.use(express.static(__dirname + '/public'));
 
-app.use(express.static(__dirname + '/public'));
- 
 app.get('/', function (req, res) {
-  res.sendFile(__dirname + '/index.html');
+  //res.sendFile(__dirname + '/index.html');
+  res.sendFile(path.join(__dirname, ".", "public/index.html"))
 });
+
+app.use(express.static(path.join(__dirname, ".", "public")));
  
-server.listen(8000, function () {
-  console.log(`Listening on ${server.address().port}`);
+server.listen(PORT, function () {
+  console.log(`Listening on ${PORT}`);
 });
 
 const serverSocket = io(server);

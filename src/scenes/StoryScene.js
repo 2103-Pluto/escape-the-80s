@@ -1,5 +1,4 @@
 import Phaser from 'phaser'
-import WebFontFile from '../files/WebFontFile'
 
 export default class StoryScene extends Phaser.Scene {
   constructor() {
@@ -11,10 +10,7 @@ export default class StoryScene extends Phaser.Scene {
   }
 
   preload() {
-    this.load.addFile(new WebFontFile(this.load, 'Press Start 2P'))
 
-    this.load.image("cassette-tape", "assets/sprites/cassette-tape.png")
-    this.load.audio("click", "assets/audio/click.wav");
   }
 
   create() {
