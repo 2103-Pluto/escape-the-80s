@@ -6,6 +6,7 @@ import Star from '../entity/Star';
 import SoldierPlayer from '../entity/SoldierPlayer'
 import Phaser from 'phaser'
 import MuzzleFlash from '../entity/MuzzleFlash';
+import Mario from '../entity/Mario'
 
 const numberOfFrames = 15;
 
@@ -19,6 +20,7 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
     this.createBackgroundElement = this.createBackgroundElement.bind(this);
 
     this.createPlayer = this.createPlayer.bind(this);
+    this.createEnemies = this.createEnemies.bind(this)
     this.createAnimatedStar = this.createAnimatedStar.bind(this)
     this.createAnimatedHeart = this.createAnimatedHeart.bind(this);
     this.createScoreLabel = this.createScoreLabel.bind(this);
@@ -27,6 +29,7 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
     this.createStarGroup = this.createStarGroup.bind(this)
     this.pickupHeart = this.pickupHeart.bind(this)
     this.createHeartGroup = this.createHeartGroup.bind(this)
+
   }
 
   init(data) {
@@ -78,10 +81,18 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
     this.load.image("road", "assets/backgrounds/synthwave_scene/road.png");
   }
 
+  preloadMario(){
+    this.load.spritesheet('mario', 'assets/spriteSheets/mario_enemy.png', {
+      frameWidth: 30,
+      frameHeight: 37,
+    });
+  }
+
   preload() {
     this.preloadSoldier() //load all the soldier things
     this.preloadSounds() //load all sounds
     this.preloadMap() //preload background
+    // this.preloadMario()
 
     this.load.spritesheet('heart', 'assets/spriteSheets/heart.png', {
       frameWidth: 16,
@@ -92,12 +103,22 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
     this.load.spritesheet('star', 'assets/spriteSheets/star.png', {
       frameWidth: 16,
       frameHeight: 16,
-    })
+    });
+
+    this.load.spritesheet('mario', 'assets/spriteSheets/mario_enemy.png', {
+      frameWidth: 30,
+      frameHeight: 37,
+    });
+
+
   }
 
   createGround(tileWidth, count) {
     for (let i=0; i<count; i++) {
-      this.groundGroup.create(i*tileWidth, this.height, 'road').setOrigin(0, 1).setScale(3.5).refreshBody();
+      let newGround = this.groundGroup.create(i*tileWidth, this.height, 'road').setOrigin(0, 1).setScale(3.5).refreshBody();
+      newGround.body.allowGravity = false
+      newGround.body.immovable = true
+      
     }
   }
 
@@ -113,7 +134,8 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
     this.createBackgroundElement(168, 'palms-back', 5*numberOfFrames, 0.3)
     this.createBackgroundElement(448, 'palms', 2*numberOfFrames, 0.45)
 
-    this.groundGroup = this.physics.add.staticGroup({ classType: Ground });
+    // this.groundGroup = this.physics.add.staticGroup({classType: Ground});
+    this.groundGroup = this.physics.add.group()
     this.createGround(168, 5*numberOfFrames);
     this.physics.world.setBounds(0, null, this.width * numberOfFrames, this.height, true, true, false, false) //set world bounds only on sides
   }
@@ -136,6 +158,22 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
     scene.player.color = scene.color;
     scene.player.setCollideWorldBounds(true); //stop player from running off the edges
     scene.physics.add.collider(scene.player, scene.groundGroup)
+  }
+
+  createEnemies(scene, enemy, x, y, number){
+    const enemies = {mario: Mario}
+    let enemyX = x
+    let enemyY = y
+    let type = enemies[enemy]
+    let groupType = scene[`${enemy}s`]
+    for(let i = 0; i<number; i++){
+      let newEnemy = new type(scene, enemyX, enemyY, enemy).setScale(3.0)
+      groupType.add(newEnemy)
+      scene.physics.add.collider(newEnemy, scene.groundGroup);
+      scene.physics.add.collider(newEnemy, scene.player);
+      enemyX+=50
+    }
+    return scene.mario
   }
 
   setCamera(scene) {
@@ -188,7 +226,11 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
   }
 
   create() {
+
+   // const scene = this
+
     // ALL THESE ('--->') NEED TO BE IN ORDER
+
     this.height = this.game.config.height; //retrive width and height (careful--Has to be at the top of create)
     this.width = this.game.config.width;
     this.createSounds() //create all the sounds
@@ -204,7 +246,32 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
     this.cursors = this.input.keyboard.createCursorKeys();
     this.createAnimations();
 
-    this.enemy = new enemy(this, 600, 400, 'brandon').setScale(.25)
+
+    
+
+    // this.enemy = new enemy(this, 600, 400, 'brandon').setScale(.25) UNCOMMENT TO TEST BRANDON
+    
+    // this.physics.add.collider(this.enemy, this.groundGroup)
+    // this.physics.add.collider(this.enemy, this.player, function(){
+    //   console.log('hit')
+    // })
+    
+    
+
+    this.marios=this.physics.add.group();
+
+    
+    
+    this.createEnemies(this, 'mario', 500, 400, 3)
+    this.createEnemies(this, 'mario', 1500, 400, 5)
+
+    
+
+    this.createStar(600, 400, this); //create a star to test the Heart entity
+    this.createHeart(100, 500, this);
+    this.createHeart(120, 500, this);     //create a heart to test the Heart entity
+
+    
     
     this.createAnimatedStar(500, 400, this); //create a star to test the Heart entity
     this.createAnimatedHeart(100, 500, this);
@@ -213,6 +280,7 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
     // ...
     this.physics.add.collider(this.enemy, this.groundGroup);
     this.physics.add.collider(this.enemy, this.player);
+
 
     // We're going to create a group for our lasers
     this.bullets = this.physics.add.group({
@@ -271,7 +339,10 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
     this.updateScore(this) //updates the pleyer's score displayed on scene
     if (this.muzzleFlash) this.muzzleFlash.update(delta) //updates muzzleFlash
 
-    this.enemy.update(this.screamSound);
+    this.marios.getChildren().forEach(function (mario) {
+      mario.update()
+    })
+    //this.mario.update()
 
   }
 
@@ -353,6 +424,12 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
       frames: this.anims.generateFrameNumbers('heart'),
       frameRate: 10,
       repeat: -1
+    });
+    this.anims.create({
+      key: 'walk',
+      frames: this.anims.generateFrameNumbers('mario', { start: 5, end: 8 }),
+      frameRate: 5,
+      repeat: -1,
     });
   }
 
