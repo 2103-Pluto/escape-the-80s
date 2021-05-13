@@ -153,9 +153,7 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
       let newEnemy = new type(scene, enemyX, enemyY, enemy).setScale(3.0)
       groupType.add(newEnemy)
       scene.physics.add.collider(newEnemy, scene.groundGroup);
-      scene.physics.add.collider(newEnemy, scene.player, function(){
-        console.log('hit')
-      });
+      scene.physics.add.collider(newEnemy, scene.player);
       enemyX+=50
     }
     return scene.mario
@@ -193,8 +191,7 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
     //   console.log('hit')
     // })
     
-    console.log('THIS', this)
-    console.log(this.enemy)
+    
 
     this.marios=this.physics.add.group();
 
