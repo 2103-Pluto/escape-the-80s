@@ -99,6 +99,15 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
     }
   }
 
+  createPlatformLayer() {
+    const map = this.make.tilemap({key: 'map'})
+    const platforms = map.addTilesetImage('Platform', 'platform') // First name is form tiled, Second name is key above
+    map.createStaticLayer("Tile Layer 1", platforms, 0, -100)
+    //const platformGroup = this.platforms.physics.add.staticGroup()
+
+    return { map, platforms}
+  }
+
   createMap() {
     const width = this.game.config.width;
     const height = this.game.config.height;
@@ -106,9 +115,6 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
     this.createBackgroundElement(504, 'mountains', 2*numberOfFrames, 0.15)
     this.createBackgroundElement(168, 'palms-back', 5*numberOfFrames, 0.3)
     this.createBackgroundElement(448, 'palms', 2*numberOfFrames, 0.45)
-    const map = this.make.tilemap({key: 'map'})
-    const platform = map.addTilesetImage('Platform', 'platform') // First name is form tiled, Second name is key above
-    map.createStaticLayer("Tile Layer 1", platform)
 
     this.groundGroup = this.physics.add.staticGroup({ classType: Ground });
     this.createGround(168, 5*numberOfFrames);
@@ -128,6 +134,7 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
   create() {
     this.createSounds() //create all the sounds
     this.createMap() //Set up background
+    const platform = this.createPlatformLayer() // Creates Layers from Tiled
 
     const width = this.game.config.width;
     const height = this.game.config.height;
@@ -156,6 +163,7 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
     // ...
     this.physics.add.collider(this.enemy, this.groundGroup);
     this.physics.add.collider(this.enemy, this.player);
+    this.physics.add.collider(this.player, platform)
 
     // We're going to create a group for our lasers
     this.bullets = this.physics.add.group({
