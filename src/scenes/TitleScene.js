@@ -10,7 +10,6 @@ export default class TitleScene extends Phaser.Scene {
     this.load.image("title-background", "assets/backgrounds/title_scene/title-background.png");
     this.load.audio("title-music", "assets/audio/title_scene/title-music.wav");
     this.load.addFile(new WebFontFile(this.load, 'Press Start 2P'))
-
     this.load.audio("click", "assets/audio/click.wav");
   }
 

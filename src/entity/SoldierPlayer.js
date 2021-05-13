@@ -57,8 +57,7 @@ export default class SoldierPlayer extends Phaser.Physics.Arcade.Sprite {
     // Neutral (no movement)
     else {
       this.setVelocityX(0);
-      // Whenever Josh is not moving, use the idleUnarmed animation
-        this.anims.play('idle');
+      this.play('idle', true);
     }
 
     //emit any movement
@@ -81,10 +80,29 @@ export default class SoldierPlayer extends Phaser.Physics.Arcade.Sprite {
 
   update(time, cursors, jumpSound, shootingFn, shootingSound) {
     // << INSERT CODE HERE >>
-    this.updateMovement(cursors)
-    this.updateJump(cursors, jumpSound)
-    this.updateInAir();
-    this.updateShoot(time, cursors, shootingFn, shootingSound);
+    this.updateDying()
+    if (!this.dead) {
+      this.updateMovement(cursors)
+      this.updateJump(cursors, jumpSound)
+      this.updateInAir();
+      this.updateShoot(time, cursors, shootingFn, shootingSound);
+    }
+  }
+
+  updateDying() {
+    if (this.dead) {
+      this.play('die', true) //play dying animation
+      if (this.anims.currentAnim.key === 'die' && this.anims.getProgress() > 0.6) {
+        this.scene.scene.pause() //pause scene
+        // const tx = this.scene.add.text(400, 300, "Game Over", { fontFamily: '"Press Start 2P"' }).setFontSize(20).setOrigin(0.5)
+        // tx.on("pointerup", () => {
+        //   console.log("yup")
+        // })
+        this.scene.backgroundSound.pause()  //pause music
+        this.scene.scene.launch('StoryScene')
+        this.scene.scene.moveAbove('SinglePlayerSynthwaveScene', 'StoryScene')
+      }
+    }
   }
 
   updateJump(cursors, jumpSound) {
@@ -119,7 +137,7 @@ export default class SoldierPlayer extends Phaser.Physics.Arcade.Sprite {
   decreaseHealth(deltaHealth) {
     this.scene.cameras.main.shake(500, 0.004)
     this.health = Math.max(0, this.health - deltaHealth);
-    if (this.health === 0) this.dead = true
+    if (this.health === 0) this.dead = true;
   }
 
   decreaseScore(deltaScore) {
