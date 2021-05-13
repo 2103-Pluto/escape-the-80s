@@ -27,6 +27,7 @@ export default class SoldierPlayer extends Phaser.Physics.Arcade.Sprite {
   }
 
   updateMovement(cursors) {
+    
     const cam = this.scene.cameras.main;
     const speed = 3;
     // Move left
@@ -57,7 +58,8 @@ export default class SoldierPlayer extends Phaser.Physics.Arcade.Sprite {
     // Neutral (no movement)
     else {
       this.setVelocityX(0);
-      this.play('idle', true);
+      // Whenever Josh is not moving, use the idleUnarmed animation
+        this.anims.play('idle');
     }
 
     //emit any movement
@@ -88,7 +90,7 @@ export default class SoldierPlayer extends Phaser.Physics.Arcade.Sprite {
       this.updateShoot(time, cursors, shootingFn, shootingSound);
     }
   }
-
+  
   updateDying() {
     if (this.dead) {
       this.play('die', true) //play dying animation
@@ -121,25 +123,23 @@ export default class SoldierPlayer extends Phaser.Physics.Arcade.Sprite {
 
   increaseHealth(deltaHealth) {
     this.health = Math.min(5, this.health + deltaHealth);
-    this.scene.powerUpSound.play() //play power up sound
   }
 
   increaseScore(deltaScore) {
     this.score += deltaScore;
-    this.scene.coinSound.play() //play collecting coin sound
   }
 
   decreaseHealth(deltaHealth) {
-    this.scene.cameras.main.shake(500, 0.004) //shake camera
-    this.scene.hurtSound.play() //play hurt sound
+    this.scene.cameras.main.shake(500, 0.004)
     this.health = Math.max(0, this.health - deltaHealth);
-    if (this.health === 0) this.dead = true;
+    if (this.health === 0) this.dead = true
   }
 
   decreaseScore(deltaScore) {
     this.score = Math.max(0, this.score - deltaScore);
   }
 
+  // The revive a
   revive() {
     this.dead = false;
     this.score = 0;

@@ -23,6 +23,10 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
     this.createAnimatedHeart = this.createAnimatedHeart.bind(this);
     this.createScoreLabel = this.createScoreLabel.bind(this);
     this.createHealthLabel = this.createHealthLabel.bind(this);
+    this.pickupStar = this.pickupStar.bind(this)
+    this.createStarGroup = this.createStarGroup.bind(this)
+    this.pickupHeart = this.pickupHeart.bind(this)
+    this.createHeartGroup = this.createHeartGroup.bind(this)
   }
 
   init(data) {
@@ -117,12 +121,14 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
   createAnimatedHeart(x, y, scene) {
     const heart = new Heart(scene, x, y, 'heart');
     heart.play("rotate-heart")
+    this.hearts.add(heart)
   }
 
   createAnimatedStar(x, y, scene) {
     //load star
       const star = new Star(scene, x, y, 'star').setScale(1.5)
       star.play('rotate-star')
+      this.stars.add(star)
     }
 
   createPlayer(scene) {
@@ -148,8 +154,41 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
     scene.add.text(50, 30, "x", { fontFamily: '"Press Start 2P"' }).setFontSize(14).setOrigin(0, 0.45).setScrollFactor(0)
     scene.health = scene.add.text(65, 30, `${scene.player.health}`, { fontFamily: '"Press Start 2P"' }).setFontSize(14).setOrigin(0, 0.5).setScrollFactor(0)
   }
+  
+  createStarGroup() {
+    this.stars = this.physics.add.group({
+      classType: Star,
+      runChildUpdate: true,
+      allowGravity: false,
+    })
+    
+    this.physics.add.overlap(
+      this.stars,
+      this.player,
+      this.pickupStar,
+      null,
+      this
+    )
+  }
+  
+  createHeartGroup() {
+    this.hearts = this.physics.add.group({
+      classType: Heart,
+      runChildUpdate: true,
+      allowGravity: false,
+    })
+    
+    this.physics.add.overlap(
+      this.hearts,
+      this.player,
+      this.pickupHeart,
+      null,
+      this
+    )
+  }
 
   create() {
+    // ALL THESE ('--->') NEED TO BE IN ORDER
     this.height = this.game.config.height; //retrive width and height (careful--Has to be at the top of create)
     this.width = this.game.config.width;
     this.createSounds() //create all the sounds
@@ -158,16 +197,19 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
     this.setCamera(this)
     this.createScoreLabel(this) //create score
     this.createHealthLabel(this) //create health
-
+    this.createStarGroup() //allows for stars to be picked up
+    this.createHeartGroup() //allows for hearts to be picked up
+    // --->
+    
     this.cursors = this.input.keyboard.createCursorKeys();
     this.createAnimations();
 
     this.enemy = new enemy(this, 600, 400, 'brandon').setScale(.25)
-
-    this.createAnimatedStar(600, 400, this); //create a star to test the Heart entity
+    
+    this.createAnimatedStar(500, 400, this); //create a star to test the Heart entity
     this.createAnimatedHeart(100, 500, this);
     this.createAnimatedHeart(120, 500, this);     //create a heart to test the Heart entity
-
+    
     // ...
     this.physics.add.collider(this.enemy, this.groundGroup);
     this.physics.add.collider(this.enemy, this.player);
@@ -318,6 +360,16 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
     hit(enemy, bullet) {
       bullet.setActive(false);
       bullet.setVisible(false);
+    }
+    
+    pickupStar(player, star) {
+      star.destroy()
+      this.player.increaseScore(1)
+    }
+    
+    pickupHeart(player, heart) {
+      heart.destroy()
+      this.player.increaseHealth(1)
     }
 
     showGameOverMenu() {
