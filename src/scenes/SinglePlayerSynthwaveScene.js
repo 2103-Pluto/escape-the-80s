@@ -130,13 +130,18 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
     }
   }
 
-  createPlatformLayer() {
+  createPlatformLayer(scene) {
     const map = this.make.tilemap({key: 'map'})
-    const platforms = map.addTilesetImage('Platform', 'platform') // First name is form tiled, Second name is key above
-    map.createStaticLayer("Tile Layer 1", platforms, 0, -100)
-    //const platformGroup = this.platforms.physics.add.staticGroup()
-
-    return { map, platforms}
+    const platformTileset = map.addTilesetImage('Platform', 'platform') // First name is form tiled, Second name is key above
+    this.platforms = map.createStaticLayer("Tile Layer 1", platformTileset, 0, -100)
+    //console.log("PLATFORMS", platforms)
+    this.platformGroup = this.physics.add.group()
+    console.log("PLATFORMS GROUP", this.platformGroup)
+    this.platforms.setCollisionBetween(1, 2)
+    this.physics.add.collider(this.player, this.platforms, function() {
+      scene.player.body.touching.down = true
+    })
+    return map
   }
 
   createMap() {
@@ -252,12 +257,13 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
     this.createHealthLabel(this) //create health
     this.createStarGroup() //allows for stars to be picked up
     this.createHeartGroup() //allows for hearts to be picked up
+    this.createPlatformLayer(this)
     // --->
 
     this.cursors = this.input.keyboard.createCursorKeys();
     this.createAnimations();
 
-
+    //this.physics.add.collider(this.player, this.platforms)
 
 
     // this.enemy = new enemy(this, 600, 400, 'brandon').setScale(.25) UNCOMMENT TO TEST BRANDON
