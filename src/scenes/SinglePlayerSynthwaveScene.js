@@ -130,18 +130,25 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
     }
   }
 
-  createPlatformLayer(scene) {
+  createLayers(scene) {
     const map = this.make.tilemap({key: 'map'})
     const platformTileset = map.addTilesetImage('Platform', 'platform') // First name is form tiled, Second name is key above
-    this.platforms = map.createStaticLayer("Tile Layer 1", platformTileset, 0, -100)
-    //console.log("PLATFORMS", platforms)
+    scene.platforms = map.createStaticLayer("Tile Layer 1", platformTileset, 0, -100)
+    scene.zonesOne = map.getObjectLayer('player_zones');
+    scene.playerZones = this.getPlayerZones(scene.zonesOne)
+    console.log(scene.playerZones)
+    //Physics
     this.platformGroup = this.physics.add.group()
-    console.log("PLATFORMS GROUP", this.platformGroup)
     this.platforms.setCollisionBetween(1, 2)
-    this.physics.add.collider(this.player, this.platforms, function() {
-      scene.player.body.touching.down = true
-    })
-    return map
+
+  }
+
+  getPlayerZones(zonesOne){
+    const markers = zonesOne.objects;
+    return {
+        start : markers.find(zone => zone.name === 'startZone'),
+        end : markers.find(zone => zone.name === 'endZone')
+      }
   }
 
   createMap() {
@@ -170,10 +177,13 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
     }
 
   createPlayer(scene) {
-    scene.player = new SoldierPlayer(scene, 60, 400, `${scene.color}SoldierIdle`, scene.socket).setScale(2.78);
+    scene.player = new SoldierPlayer(scene, scene.playerZones.start.x, scene.playerZones.start.y, `${scene.color}SoldierIdle`, scene.socket).setScale(2.78);
     scene.player.color = scene.color;
     scene.player.setCollideWorldBounds(true); //stop player from running off the edges
     scene.physics.add.collider(scene.player, scene.groundGroup)
+    this.physics.add.collider(scene.player, scene.platforms, function() {
+      scene.player.body.touching.down = true
+    })
   }
 
   createEnemies(scene, enemy, x, y, number){
@@ -251,13 +261,15 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
     this.width = this.game.config.width;
     this.createSounds() //create all the sounds
     this.createMap() //Set up background
+    this.createLayers(this)
     this.createPlayer(this) //create player
     this.setCamera(this)
     this.createScoreLabel(this) //create score
     this.createHealthLabel(this) //create health
     this.createStarGroup() //allows for stars to be picked up
     this.createHeartGroup() //allows for hearts to be picked up
-    this.createPlatformLayer(this)
+    console.log("LAYERS", this.createLayers(this))
+    console.log("SCENE", this.scene)
     // --->
 
     this.cursors = this.input.keyboard.createCursorKeys();
