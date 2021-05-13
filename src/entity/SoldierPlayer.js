@@ -27,7 +27,6 @@ export default class SoldierPlayer extends Phaser.Physics.Arcade.Sprite {
   }
 
   updateMovement(cursors) {
-    
     const cam = this.scene.cameras.main;
     const speed = 3;
     // Move left
@@ -90,7 +89,7 @@ export default class SoldierPlayer extends Phaser.Physics.Arcade.Sprite {
       this.updateShoot(time, cursors, shootingFn, shootingSound);
     }
   }
-  
+
   updateDying() {
     if (this.dead) {
       this.play('die', true) //play dying animation

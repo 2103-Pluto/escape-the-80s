@@ -7,6 +7,7 @@ import SoldierPlayer from '../entity/SoldierPlayer'
 import Phaser from 'phaser'
 import MuzzleFlash from '../entity/MuzzleFlash';
 import Mario from '../entity/Mario'
+import Goo from '../entity/Goo'
 
 const numberOfFrames = 15;
 
@@ -28,6 +29,9 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
     this.pickupStar = this.pickupStar.bind(this)
     this.createStarGroup = this.createStarGroup.bind(this)
     this.pickupHeart = this.pickupHeart.bind(this)
+    this.fallInGoo = this.fallInGoo.bind(this)
+    this.createGooGroup = this.createGooGroup.bind(this)
+    this.createGoo = this.createGoo.bind(this)
     this.createHeartGroup = this.createHeartGroup.bind(this)
 
   }
@@ -105,6 +109,8 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
       frameHeight: 16,
     });
 
+    this.load.image('goo', 'assets/sprites/goo.png')
+
     this.load.spritesheet('mario', 'assets/spriteSheets/mario_enemy.png', {
       frameWidth: 30,
       frameHeight: 37,
@@ -118,7 +124,7 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
       let newGround = this.groundGroup.create(i*tileWidth, this.height, 'road').setOrigin(0, 1).setScale(3.5).refreshBody();
       newGround.body.allowGravity = false
       newGround.body.immovable = true
-      
+
     }
   }
 
@@ -151,7 +157,12 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
       const star = new Star(scene, x, y, 'star').setScale(1.5)
       star.play('rotate-star')
       this.stars.add(star)
-    }
+  }
+
+  createGoo(x, y, scene) {
+    const goo = new Goo(scene, x, y, 'goo').setScale(3) //we can custom this
+    this.goos.add(goo)
+  }
 
   createPlayer(scene) {
     scene.player = new SoldierPlayer(scene, 60, 400, `${scene.color}SoldierIdle`, scene.socket).setScale(2.78);
@@ -192,14 +203,14 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
     scene.add.text(50, 30, "x", { fontFamily: '"Press Start 2P"' }).setFontSize(14).setOrigin(0, 0.45).setScrollFactor(0)
     scene.health = scene.add.text(65, 30, `${scene.player.health}`, { fontFamily: '"Press Start 2P"' }).setFontSize(14).setOrigin(0, 0.5).setScrollFactor(0)
   }
-  
+
   createStarGroup() {
     this.stars = this.physics.add.group({
       classType: Star,
       runChildUpdate: true,
       allowGravity: false,
     })
-    
+
     this.physics.add.overlap(
       this.stars,
       this.player,
@@ -208,14 +219,31 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
       this
     )
   }
-  
+
+  createGooGroup() {
+    this.goos = this.physics.add.group({
+      classType: Goo,
+      runChildUpdate: true,
+      allowGravity: false,
+      immovable: true
+    })
+
+    this.physics.add.overlap(
+      this.goos,
+      this.player,
+      this.fallInGoo,
+      null,
+      this
+    )
+  }
+
   createHeartGroup() {
     this.hearts = this.physics.add.group({
       classType: Heart,
       runChildUpdate: true,
       allowGravity: false,
     })
-    
+
     this.physics.add.overlap(
       this.hearts,
       this.player,
@@ -239,40 +267,32 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
     this.setCamera(this)
     this.createScoreLabel(this) //create score
     this.createHealthLabel(this) //create health
-    this.createStarGroup() //allows for stars to be picked up
-    this.createHeartGroup() //allows for hearts to be picked up
+    this.createStarGroup() //create star group
+    this.createHeartGroup() //create heart group
+    this.createGooGroup() //create goo group
     // --->
-    
+
     this.cursors = this.input.keyboard.createCursorKeys();
     this.createAnimations();
 
-
-    
-
     // this.enemy = new enemy(this, 600, 400, 'brandon').setScale(.25) UNCOMMENT TO TEST BRANDON
-    
+
     // this.physics.add.collider(this.enemy, this.groundGroup)
     // this.physics.add.collider(this.enemy, this.player, function(){
     //   console.log('hit')
     // })
-    
-    
 
     this.marios=this.physics.add.group();
 
-    
-    
     this.createEnemies(this, 'mario', 500, 400, 3)
     this.createEnemies(this, 'mario', 1500, 400, 5)
 
-    
-
-  
-    
     this.createAnimatedStar(500, 400, this); //create a star to test the Heart entity
     this.createAnimatedHeart(100, 500, this);
     this.createAnimatedHeart(120, 500, this);     //create a heart to test the Heart entity
-    
+
+    this.createGoo(400, 550, this); //create goo to test it
+
     // ...
     //this.physics.add.collider(this.enemy, this.groundGroup);
     //this.physics.add.collider(this.enemy, this.player);
@@ -434,15 +454,19 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
       bullet.setActive(false);
       bullet.setVisible(false);
     }
-    
+
     pickupStar(player, star) {
       star.destroy()
       this.player.increaseScore(1)
     }
-    
+
     pickupHeart(player, heart) {
       heart.destroy()
       this.player.increaseHealth(1)
+    }
+
+    fallInGoo(player, goo) {
+      this.player.decreaseHealth(5)
     }
 
     showGameOverMenu() {
