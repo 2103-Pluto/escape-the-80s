@@ -2,29 +2,28 @@ import 'phaser';
 //import { GetSpeed } from 'phaser/src/math';
 
 export default class Mario extends Phaser.Physics.Arcade.Sprite {
-  constructor(scene, x, y, spriteKey) {
-    super(scene, x, y, spriteKey);
+  constructor(scene, x, y, spritekey) {
+    super(scene, x, y, spritekey);
     this.scene = scene;
     this.scene.add.existing(this);
     this.scene.physics.world.enable(this);
-    // this.facingLeft = false;
-    // this.armed = false;
     this.initialX = x
     this.x = this.initialX
     this.y = y
     this.movingLeft = false
-    
     // << INITIALIZE PLAYER ATTRIBUTES HERE >>
+    
   }
+
+
+  
 
   patrol(){
     const speed = 1
-
+ 
     this.leftDest = this.initialX-100
     this.rightDest = this.initialX+100
 
-    this.anims.play('walk', true)
-    
     if(this.x<=this.rightDest && this.movingLeft===false){
       
       this.x+=speed
@@ -49,6 +48,7 @@ export default class Mario extends Phaser.Physics.Arcade.Sprite {
   // Check which controller button is being pushed and execute movement & animation
   update() {
     this.patrol()
+    this.anims.play('walk', true)
   
   }
 }
