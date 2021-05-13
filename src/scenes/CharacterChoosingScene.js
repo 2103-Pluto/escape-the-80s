@@ -1,5 +1,4 @@
 import Phaser from 'phaser'
-import WebFontFile from '../files/WebFontFile'
 
 export default class CharacterChoosingScene extends Phaser.Scene {
   constructor() {
@@ -8,12 +7,6 @@ export default class CharacterChoosingScene extends Phaser.Scene {
   }
 
   preload() {
-    this.load.addFile(new WebFontFile(this.load, 'Press Start 2P'))
-
-    this.load.image("cassette-tape", "assets/sprites/cassette-tape.png")
-    this.load.audio("click", "assets/audio/click.wav");
-    this.load.audio("click", "assets/audio/click.wav");
-
     for (let color of this.colors) {
       this.load.spritesheet(`${color}Idle`, `assets/spriteSheets/${color}/Gunner_${color}_Idle.png`, {
         frameWidth: 48,

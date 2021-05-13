@@ -1,5 +1,4 @@
 import Phaser from 'phaser'
-import WebFontFile from '../files/WebFontFile'
 
 export default class CreditsScene extends Phaser.Scene {
   constructor() {
@@ -7,11 +6,7 @@ export default class CreditsScene extends Phaser.Scene {
   }
 
   preload() {
-    this.load.image("title-background", "assets/backgrounds/title_scene/title-background.png");
-    this.load.addFile(new WebFontFile(this.load, 'Press Start 2P'))
 
-    this.load.image("cassette-tape", "assets/sprites/cassette-tape.png")
-    this.load.audio("click", "assets/audio/click.wav");
   }
 
   create() {

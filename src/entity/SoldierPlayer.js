@@ -82,10 +82,22 @@ export default class SoldierPlayer extends Phaser.Physics.Arcade.Sprite {
 
   update(time, cursors, jumpSound, shootingFn, shootingSound) {
     // << INSERT CODE HERE >>
-    this.updateMovement(cursors)
-    this.updateJump(cursors, jumpSound)
-    this.updateInAir();
-    this.updateShoot(time, cursors, shootingFn, shootingSound);
+    this.updateDying()
+    if (!this.dead) {
+      this.updateMovement(cursors)
+      this.updateJump(cursors, jumpSound)
+      this.updateInAir();
+      this.updateShoot(time, cursors, shootingFn, shootingSound);
+    }
+  }
+  
+  updateDying() {
+    if (this.dead) {
+      this.play('die', true) //play dying animation
+      if (this.anims.currentAnim.key === 'die' && this.anims.getProgress() > 0.6) {
+        this.scene.showGameOverMenu();
+      }
+    }
   }
 
   updateJump(cursors, jumpSound) {
@@ -127,6 +139,7 @@ export default class SoldierPlayer extends Phaser.Physics.Arcade.Sprite {
     this.score = Math.max(0, this.score - deltaScore);
   }
 
+  // The revive a
   revive() {
     this.dead = false;
     this.score = 0;
