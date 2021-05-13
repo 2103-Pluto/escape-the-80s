@@ -73,12 +73,14 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
   }
 
   preloadMap() {
+    this.load.tilemapTiledJSON('map', 'assets/SynthWave.json')  // THIS IS THE MAP
     this.load.image('ground', 'assets/sprites/ground-juan-test.png');
     this.load.image("sky", "assets/backgrounds/synthwave_scene/back.png");
     this.load.image("mountains", "assets/backgrounds/synthwave_scene/mountains.png");
     this.load.image("palms-back", "assets/backgrounds/synthwave_scene/palms-back.png");
     this.load.image("palms", "assets/backgrounds/synthwave_scene/palms.png");
     this.load.image("road", "assets/backgrounds/synthwave_scene/road.png");
+    this.load.image("platform", "assets/sprites/platform.png")    ///THIS IS THE TILESET OF THE PLATFORM
   }
 
   preloadMario(){
@@ -118,7 +120,7 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
       let newGround = this.groundGroup.create(i*tileWidth, this.height, 'road').setOrigin(0, 1).setScale(3.5).refreshBody();
       newGround.body.allowGravity = false
       newGround.body.immovable = true
-      
+
     }
   }
 
@@ -126,6 +128,20 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
     for (let i=0; i<count; i++) {
       this.add.image(i*imageWidth, this.height, texture).setOrigin(0, 1).setScale(3.5).setScrollFactor(scrollFactor)
     }
+  }
+
+  createPlatformLayer(scene) {
+    const map = this.make.tilemap({key: 'map'})
+    const platformTileset = map.addTilesetImage('Platform', 'platform') // First name is form tiled, Second name is key above
+    this.platforms = map.createStaticLayer("Tile Layer 1", platformTileset, 0, -100)
+    //console.log("PLATFORMS", platforms)
+    this.platformGroup = this.physics.add.group()
+    console.log("PLATFORMS GROUP", this.platformGroup)
+    this.platforms.setCollisionBetween(1, 2)
+    this.physics.add.collider(this.player, this.platforms, function() {
+      scene.player.body.touching.down = true
+    })
+    return map
   }
 
   createMap() {
@@ -192,14 +208,14 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
     scene.add.text(50, 30, "x", { fontFamily: '"Press Start 2P"' }).setFontSize(14).setOrigin(0, 0.45).setScrollFactor(0)
     scene.health = scene.add.text(65, 30, `${scene.player.health}`, { fontFamily: '"Press Start 2P"' }).setFontSize(14).setOrigin(0, 0.5).setScrollFactor(0)
   }
-  
+
   createStarGroup() {
     this.stars = this.physics.add.group({
       classType: Star,
       runChildUpdate: true,
       allowGravity: false,
     })
-    
+
     this.physics.add.overlap(
       this.stars,
       this.player,
@@ -208,14 +224,14 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
       this
     )
   }
-  
+
   createHeartGroup() {
     this.hearts = this.physics.add.group({
       classType: Heart,
       runChildUpdate: true,
       allowGravity: false,
     })
-    
+
     this.physics.add.overlap(
       this.hearts,
       this.player,
@@ -241,38 +257,39 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
     this.createHealthLabel(this) //create health
     this.createStarGroup() //allows for stars to be picked up
     this.createHeartGroup() //allows for hearts to be picked up
+    this.createPlatformLayer(this)
     // --->
-    
+
     this.cursors = this.input.keyboard.createCursorKeys();
     this.createAnimations();
 
+    //this.physics.add.collider(this.player, this.platforms)
 
-    
 
     // this.enemy = new enemy(this, 600, 400, 'brandon').setScale(.25) UNCOMMENT TO TEST BRANDON
-    
+
     // this.physics.add.collider(this.enemy, this.groundGroup)
     // this.physics.add.collider(this.enemy, this.player, function(){
     //   console.log('hit')
     // })
-    
-    
+
+
 
     this.marios=this.physics.add.group();
 
-    
-    
+
+
     this.createEnemies(this, 'mario', 500, 400, 3)
     this.createEnemies(this, 'mario', 1500, 400, 5)
 
-    
 
-  
-    
+
+
+
     this.createAnimatedStar(500, 400, this); //create a star to test the Heart entity
     this.createAnimatedHeart(100, 500, this);
     this.createAnimatedHeart(120, 500, this);     //create a heart to test the Heart entity
-    
+
     // ...
     //this.physics.add.collider(this.enemy, this.groundGroup);
     //this.physics.add.collider(this.enemy, this.player);
@@ -434,12 +451,12 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
       bullet.setActive(false);
       bullet.setVisible(false);
     }
-    
+
     pickupStar(player, star) {
       star.destroy()
       this.player.increaseScore(1)
     }
-    
+
     pickupHeart(player, heart) {
       heart.destroy()
       this.player.increaseHealth(1)
