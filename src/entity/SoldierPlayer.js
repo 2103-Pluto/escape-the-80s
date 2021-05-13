@@ -11,7 +11,6 @@ export default class SoldierPlayer extends Phaser.Physics.Arcade.Sprite {
     this.scene.physics.world.enable(this)
     this.facingLeft = false;
     this.socket = socket
-
     this.color = 'Blue' //defaultColor
 
     //firing features
@@ -24,6 +23,8 @@ export default class SoldierPlayer extends Phaser.Physics.Arcade.Sprite {
     this.decreaseHealth = this.decreaseHealth.bind(this)
     this.decreaseScore = this.decreaseScore.bind(this)
     this.revive = this.revive.bind(this)
+
+    this.body.setSize(20,30)
   }
 
   updateMovement(cursors) {

@@ -12,6 +12,7 @@ export default class Mario extends Phaser.Physics.Arcade.Sprite {
     this.y = y
     this.movingLeft = false
     this.setPushable(false)
+    this.body.setSize(20,30)
     // << INITIALIZE PLAYER ATTRIBUTES HERE >>
     
   }
@@ -47,9 +48,14 @@ export default class Mario extends Phaser.Physics.Arcade.Sprite {
 }
 
   // Check which controller button is being pushed and execute movement & animation
-  update() {
+  update(hitSound) {
     this.patrol()
     this.anims.play('walk', true)
-  
+    
+    if(this.y>600) {
+      this.destroy()
+      hitSound.play()
+
+    }
   }
 }

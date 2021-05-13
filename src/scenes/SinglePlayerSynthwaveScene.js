@@ -8,6 +8,7 @@ import Phaser from 'phaser'
 import MuzzleFlash from '../entity/MuzzleFlash';
 import Mario from '../entity/Mario'
 
+
 const numberOfFrames = 15;
 
 export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
@@ -70,6 +71,7 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
     this.load.audio('hurt', 'assets/audio/hurt.wav');
     this.load.audio('coin', 'assets/audio/coin.wav');
     this.load.audio('power-up', 'assets/audio/power-up.wav');
+    this.load.audio('mario-hit', 'assets/audio/mario_hurt.wav')
   }
 
   preloadMap() {
@@ -183,10 +185,20 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
     let type = enemies[enemy]
     let groupType = scene[`${enemy}s`]
     for(let i = 0; i<number; i++){
-      let newEnemy = new type(scene, enemyX, enemyY, enemy).setScale(3.0)
+      let newEnemy = new type(scene, enemyX, enemyY, enemy).setScale(2.7)
       groupType.add(newEnemy)
       scene.physics.add.collider(newEnemy, scene.groundGroup);
-      scene.physics.add.collider(newEnemy, scene.player);
+      scene.physics.add.collider(newEnemy, scene.player, function(newEnemy, player){
+        console.log(player.body.x)
+        console.log('enemy', newEnemy.x)
+        if (player.body.velocity.y>0){
+          newEnemy.body.immovable = true
+        }
+        else{
+          //player.bounceOff()
+          player.decreaseHealth()
+        }
+      });
       enemyX+=50
     }
     return scene.mario
@@ -274,8 +286,9 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
     // })
 
 
-
+    
     this.marios=this.physics.add.group();
+    
 
 
 
@@ -309,7 +322,7 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
     // When the laser collides with the enemy
     this.physics.add.overlap(
       this.bullets,
-      this.enemy,
+      this.marios,
       this.hit,
       null,
       this
@@ -341,19 +354,24 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
 
     this.powerUpSound = this.sound.add('power-up');
     this.powerUpSound.volume = 0.08;
+
+    this.marioHitSound = this.sound.add('mario-hit');
+    this.marioHitSound.volume = 0.3
+    
   }
 
   // time: total time elapsed (ms)
   // delta: time elapsed (ms) since last update() call. 16.666 ms @ 60fps
   update(time, delta) {
     // << DO UPDATE LOGIC HERE >>
+    const scene = this
     this.player.update(time, this.cursors, this.jumpSound, this.fire, this.shootingSound);
     this.updateHealth(this) //updates the pleyer's health displayed on scene
     this.updateScore(this) //updates the pleyer's score displayed on scene
     if (this.muzzleFlash) this.muzzleFlash.update(delta) //updates muzzleFlash
 
     this.marios.getChildren().forEach(function (mario) {
-      mario.update()
+      mario.update(scene.marioHitSound)
     })
     //this.mario.update()
 
@@ -448,8 +466,15 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
 
     // make the laser inactive and insivible when it hits the enemy
     hit(enemy, bullet) {
+      console.log(enemy)
+      console.log('overlap')
       bullet.setActive(false);
-      bullet.setVisible(false);
+      // bullet.setVisible(false);
+      enemy.destroy()
+      bullet.destroy()
+      //this.shootingSound.play()
+      this.marioHitSound.play()
+  
     }
 
     pickupStar(player, star) {
