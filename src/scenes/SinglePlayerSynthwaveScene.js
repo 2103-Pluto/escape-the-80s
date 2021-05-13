@@ -140,13 +140,13 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
   createScoreLabel(scene) {
     scene.add.image(35 , 55, 'star').setOrigin(0.5).setScale(1.2).setScrollFactor(0)
     scene.add.text(50, 55, "x", { fontFamily: '"Press Start 2P"' }).setFontSize(14).setOrigin(0, 0.45).setScrollFactor(0)
-    scene.score = scene.add.text(65, 55, `${scene.player.score}`, { fontFamily: '"Press Start 2P"' }).setFontSize(14).setOrigin(0, 0.45).setScrollFactor(0)
+    scene.score = scene.add.text(65, 55, `${scene.player.score}`, { fontFamily: '"Press Start 2P"' }).setFontSize(14).setOrigin(0, 0.5).setScrollFactor(0)
   }
 
   createHealthLabel(scene) {
     scene.add.image(35, 30, 'heart').setOrigin(0.5).setScale(1.2).setScrollFactor(0)
     scene.add.text(50, 30, "x", { fontFamily: '"Press Start 2P"' }).setFontSize(14).setOrigin(0, 0.45).setScrollFactor(0)
-    scene.health = scene.add.text(65, 30, `${scene.player.health}`, { fontFamily: '"Press Start 2P"' }).setFontSize(14).setOrigin(0, 0.45).setScrollFactor(0)
+    scene.health = scene.add.text(65, 30, `${scene.player.health}`, { fontFamily: '"Press Start 2P"' }).setFontSize(14).setOrigin(0, 0.5).setScrollFactor(0)
   }
 
   create() {
@@ -246,16 +246,6 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
   }
 
   fire() {
-    //testing mode
-    // this.player.increaseHealth(1)
-    // this.player.decreaseHealth(1)
-    // this.player.increaseScore(1)
-    // this.player.decreaseScore(1)
-    // this.player.revive()
-    // console.log("health ---> ", this.player.health)
-    // console.log("score ---> ", this.player.score)
-    // console.log("dead ---> ", this.player.dead)
-    //testing mode
     const offsetX = 60;
     const offsetY = 5.5;
     const bulletX =
@@ -328,6 +318,13 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
     hit(enemy, bullet) {
       bullet.setActive(false);
       bullet.setVisible(false);
+    }
+
+    showGameOverMenu() {
+      this.scene.pause() //pause scene
+      this.backgroundSound.pause()  //pause music
+      this.scene.launch('GameOverMenuScene', { previousScene: this })
+      this.scene.moveAbove(this, 'GameOverMenuScene')
     }
 
 }
