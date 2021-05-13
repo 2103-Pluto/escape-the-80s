@@ -183,12 +183,12 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
 
     
 
-    this.enemy = new enemy(this, 600, 400, 'brandon').setScale(.25)
+    // this.enemy = new enemy(this, 600, 400, 'brandon').setScale(.25)
     
-    this.physics.add.collider(this.enemy, this.groundGroup)
-    this.physics.add.collider(this.enemy, this.player, function(){
-      console.log('hit')
-    })
+    // this.physics.add.collider(this.enemy, this.groundGroup)
+    // this.physics.add.collider(this.enemy, this.player, function(){
+    //   console.log('hit')
+    // })
     
     console.log('THIS', this)
     console.log(this.enemy)
@@ -197,7 +197,7 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
 
     
     
-    //this.createMarios(this, 500, 400, 3)
+    this.createMarios(this, 500, 400, 3)
     this.createMarios(this, 1500, 400, 5)
 
     
