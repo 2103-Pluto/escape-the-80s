@@ -18,9 +18,15 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
     this.hit = this.hit.bind(this);
     this.createBackgroundElement = this.createBackgroundElement.bind(this);
 
-    this.createStar = this.createStar.bind(this)
-    this.createHeart = this.createHeart.bind(this);
     this.createPlayer = this.createPlayer.bind(this);
+    this.createAnimatedStar = this.createAnimatedStar.bind(this)
+    this.createAnimatedHeart = this.createAnimatedHeart.bind(this);
+    this.createScoreLabel = this.createScoreLabel.bind(this);
+    this.createHealthLabel = this.createHealthLabel.bind(this);
+    this.pickupStar = this.pickupStar.bind(this)
+    this.createStarGroup = this.createStarGroup.bind(this)
+    this.pickupHeart = this.pickupHeart.bind(this)
+    this.createHeartGroup = this.createHeartGroup.bind(this)
   }
 
   init(data) {
@@ -32,8 +38,6 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
       frameWidth: 48,
       frameHeight: 39,
     })
-
-
     //Idle Soldier
     this.load.spritesheet(`${this.color}SoldierIdle`, `assets/spriteSheets/${this.color}/Gunner_${this.color}_Idle.png`, {
       frameWidth: 48,
@@ -42,6 +46,12 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
 
     //Jumping Soldier
     this.load.spritesheet(`${this.color}SoldierJumping`, `assets/spriteSheets/${this.color}/Gunner_${this.color}_Jump.png`, {
+      frameWidth: 48,
+      frameHeight: 39,
+    })
+
+    //Dying Soldier
+    this.load.spritesheet(`${this.color}SoldierDying`, `assets/spriteSheets/${this.color}/Gunner_${this.color}_Death.png`, {
       frameWidth: 48,
       frameHeight: 39,
     })
@@ -54,6 +64,9 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
     this.load.audio('shooting', 'assets/audio/shooting.wav');
     this.load.audio('scream', 'assets/audio/scream.wav');
     this.load.audio('background-music', 'assets/audio/synthwave_scene/synthwave-palms.wav');
+    this.load.audio('hurt', 'assets/audio/hurt.wav');
+    this.load.audio('coin', 'assets/audio/coin.wav');
+    this.load.audio('power-up', 'assets/audio/power-up.wav');
   }
 
   preloadMap() {
@@ -105,19 +118,22 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
     this.physics.world.setBounds(0, null, this.width * numberOfFrames, this.height, true, true, false, false) //set world bounds only on sides
   }
 
-  createStar(x, y, scene) {
-  //load star
-    const star = new Star(scene, x, y, 'star').setScale(1.5)
-    star.play('rotate-star')
-  }
-
-  createHeart(x, y, scene) {
+  createAnimatedHeart(x, y, scene) {
     const heart = new Heart(scene, x, y, 'heart');
     heart.play("rotate-heart")
+    this.hearts.add(heart)
   }
+
+  createAnimatedStar(x, y, scene) {
+    //load star
+      const star = new Star(scene, x, y, 'star').setScale(1.5)
+      star.play('rotate-star')
+      this.stars.add(star)
+    }
 
   createPlayer(scene) {
     scene.player = new SoldierPlayer(scene, 60, 400, `${scene.color}SoldierIdle`, scene.socket).setScale(2.78);
+    scene.player.color = scene.color;
     scene.player.setCollideWorldBounds(true); //stop player from running off the edges
     scene.physics.add.collider(scene.player, scene.groundGroup)
   }
@@ -127,28 +143,73 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
     scene.cameras.main.setBounds(0, 0, this.width * numberOfFrames, this.height)
   }
 
-  // createScoreLabel(scene) {
-  //   scene.add.sprite(40 , 40, 'star').setOrigin(0.5).setScale(1.5).setScrollFactor(0)
+  createScoreLabel(scene) {
+    scene.add.image(35 , 55, 'star').setOrigin(0.5).setScale(1.2).setScrollFactor(0)
+    scene.add.text(50, 55, "x", { fontFamily: '"Press Start 2P"' }).setFontSize(14).setOrigin(0, 0.45).setScrollFactor(0)
+    scene.score = scene.add.text(65, 55, `${scene.player.score}`, { fontFamily: '"Press Start 2P"' }).setFontSize(14).setOrigin(0, 0.5).setScrollFactor(0)
+  }
 
-  // }
+  createHealthLabel(scene) {
+    scene.add.image(35, 30, 'heart').setOrigin(0.5).setScale(1.2).setScrollFactor(0)
+    scene.add.text(50, 30, "x", { fontFamily: '"Press Start 2P"' }).setFontSize(14).setOrigin(0, 0.45).setScrollFactor(0)
+    scene.health = scene.add.text(65, 30, `${scene.player.health}`, { fontFamily: '"Press Start 2P"' }).setFontSize(14).setOrigin(0, 0.5).setScrollFactor(0)
+  }
+  
+  createStarGroup() {
+    this.stars = this.physics.add.group({
+      classType: Star,
+      runChildUpdate: true,
+      allowGravity: false,
+    })
+    
+    this.physics.add.overlap(
+      this.stars,
+      this.player,
+      this.pickupStar,
+      null,
+      this
+    )
+  }
+  
+  createHeartGroup() {
+    this.hearts = this.physics.add.group({
+      classType: Heart,
+      runChildUpdate: true,
+      allowGravity: false,
+    })
+    
+    this.physics.add.overlap(
+      this.hearts,
+      this.player,
+      this.pickupHeart,
+      null,
+      this
+    )
+  }
 
   create() {
+    // ALL THESE ('--->') NEED TO BE IN ORDER
     this.height = this.game.config.height; //retrive width and height (careful--Has to be at the top of create)
     this.width = this.game.config.width;
     this.createSounds() //create all the sounds
     this.createMap() //Set up background
     this.createPlayer(this) //create player
     this.setCamera(this)
-
+    this.createScoreLabel(this) //create score
+    this.createHealthLabel(this) //create health
+    this.createStarGroup() //allows for stars to be picked up
+    this.createHeartGroup() //allows for hearts to be picked up
+    // --->
+    
     this.cursors = this.input.keyboard.createCursorKeys();
     this.createAnimations();
 
     this.enemy = new enemy(this, 600, 400, 'brandon').setScale(.25)
-
-    this.createStar(600, 400, this); //create a star to test the Heart entity
-    this.createHeart(100, 500, this);
-    this.createHeart(120, 500, this);     //create a heart to test the Heart entity
-
+    
+    this.createAnimatedStar(500, 400, this); //create a star to test the Heart entity
+    this.createAnimatedHeart(100, 500, this);
+    this.createAnimatedHeart(120, 500, this);     //create a heart to test the Heart entity
+    
     // ...
     this.physics.add.collider(this.enemy, this.groundGroup);
     this.physics.add.collider(this.enemy, this.player);
@@ -187,10 +248,18 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
     this.jumpSound.volume = 0.2;
 
     this.shootingSound = this.sound.add('shooting');
-    // The laser sound is a bit too loud so we're going to turn it down
     this.shootingSound.volume = 0.03;
 
     this.screamSound = this.sound.add('scream');
+
+    this.coinSound = this.sound.add('coin');
+    this.coinSound.volume = 0.05;
+
+    this.hurtSound = this.sound.add('hurt');
+    this.hurtSound.volume = 0.3;
+
+    this.powerUpSound = this.sound.add('power-up');
+    this.powerUpSound.volume = 0.08;
   }
 
   // time: total time elapsed (ms)
@@ -198,23 +267,27 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
   update(time, delta) {
     // << DO UPDATE LOGIC HERE >>
     this.player.update(time, this.cursors, this.jumpSound, this.fire, this.shootingSound);
-    if (this.muzzleFlash) this.muzzleFlash.update(delta)
+    this.updateHealth(this) //updates the pleyer's health displayed on scene
+    this.updateScore(this) //updates the pleyer's score displayed on scene
+    if (this.muzzleFlash) this.muzzleFlash.update(delta) //updates muzzleFlash
 
     this.enemy.update(this.screamSound);
 
   }
 
+  updateHealth(scene) {
+    if (scene.health.text !== scene.player.health.toString()) {
+      scene.health.text = scene.player.health.toString()
+    }
+  }
+
+  updateScore(scene) {
+    if (scene.score.text !== scene.player.score.toString()) {
+      scene.score.text = scene.player.score.toString()
+    }
+  }
+
   fire() {
-    //testing mode
-    // this.player.increaseHealth(1)
-    // this.player.decreaseHealth(1)
-    // this.player.increaseScore(1)
-    // this.player.decreaseScore(1)
-    // this.player.revive()
-    // console.log("health ---> ", this.player.health)
-    // console.log("score ---> ", this.player.score)
-    // console.log("dead ---> ", this.player.dead)
-    //testing mode
     const offsetX = 60;
     const offsetY = 5.5;
     const bulletX =
@@ -265,6 +338,11 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
       repeat: -1,
     });
     this.anims.create({
+      key: 'die',
+      frames: this.anims.generateFrameNumbers(`${this.color}SoldierDying`),
+      frameRate: 10,
+    });
+    this.anims.create({
       key: 'rotate-star',
       frames: this.anims.generateFrameNumbers('star'),
       frameRate: 10,
@@ -276,16 +354,29 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
       frameRate: 10,
       repeat: -1
     });
-    this.anims.create({
-      key: 'still-star',
-      frames: [{ key: 'star', frame: 0 }]
-    })
   }
 
     // make the laser inactive and insivible when it hits the enemy
     hit(enemy, bullet) {
       bullet.setActive(false);
       bullet.setVisible(false);
+    }
+    
+    pickupStar(player, star) {
+      star.destroy()
+      this.player.increaseScore(1)
+    }
+    
+    pickupHeart(player, heart) {
+      heart.destroy()
+      this.player.increaseHealth(1)
+    }
+
+    showGameOverMenu() {
+      this.scene.pause() //pause scene
+      this.backgroundSound.pause()  //pause music
+      this.scene.launch('GameOverMenuScene', { previousScene: this })
+      this.scene.moveAbove(this, 'GameOverMenuScene')
     }
 
 }
