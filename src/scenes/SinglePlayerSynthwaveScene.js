@@ -77,12 +77,14 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
   }
 
   preloadMap() {
+    this.load.tilemapTiledJSON('map', 'assets/SynthWave.json')  // THIS IS THE MAP
     this.load.image('ground', 'assets/sprites/ground-juan-test.png');
     this.load.image("sky", "assets/backgrounds/synthwave_scene/back.png");
     this.load.image("mountains", "assets/backgrounds/synthwave_scene/mountains.png");
     this.load.image("palms-back", "assets/backgrounds/synthwave_scene/palms-back.png");
     this.load.image("palms", "assets/backgrounds/synthwave_scene/palms.png");
     this.load.image("road", "assets/backgrounds/synthwave_scene/road.png");
+    this.load.image("platform", "assets/sprites/platform.png")    ///THIS IS THE TILESET OF THE PLATFORM
   }
 
   preloadMario(){
@@ -132,6 +134,20 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
     for (let i=0; i<count; i++) {
       this.add.image(i*imageWidth, this.height, texture).setOrigin(0, 1).setScale(3.5).setScrollFactor(scrollFactor)
     }
+  }
+
+  createPlatformLayer(scene) {
+    const map = this.make.tilemap({key: 'map'})
+    const platformTileset = map.addTilesetImage('Platform', 'platform') // First name is form tiled, Second name is key above
+    this.platforms = map.createStaticLayer("Tile Layer 1", platformTileset, 0, -100)
+    //console.log("PLATFORMS", platforms)
+    this.platformGroup = this.physics.add.group()
+    console.log("PLATFORMS GROUP", this.platformGroup)
+    this.platforms.setCollisionBetween(1, 2)
+    this.physics.add.collider(this.player, this.platforms, function() {
+      scene.player.body.touching.down = true
+    })
+    return map
   }
 
   createMap() {
@@ -267,13 +283,18 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
     this.setCamera(this)
     this.createScoreLabel(this) //create score
     this.createHealthLabel(this) //create health
+
     this.createStarGroup() //create star group
     this.createHeartGroup() //create heart group
     this.createGooGroup() //create goo group
+
+    this.createPlatformLayer(this)
     // --->
 
     this.cursors = this.input.keyboard.createCursorKeys();
     this.createAnimations();
+
+    //this.physics.add.collider(this.player, this.platforms)
 
     // this.enemy = new enemy(this, 600, 400, 'brandon').setScale(.25) UNCOMMENT TO TEST BRANDON
 
