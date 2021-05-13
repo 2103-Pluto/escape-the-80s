@@ -34,8 +34,6 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
       frameWidth: 48,
       frameHeight: 39,
     })
-
-
     //Idle Soldier
     this.load.spritesheet(`${this.color}SoldierIdle`, `assets/spriteSheets/${this.color}/Gunner_${this.color}_Idle.png`, {
       frameWidth: 48,
@@ -62,6 +60,9 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
     this.load.audio('shooting', 'assets/audio/shooting.wav');
     this.load.audio('scream', 'assets/audio/scream.wav');
     this.load.audio('background-music', 'assets/audio/synthwave_scene/synthwave-palms.wav');
+    this.load.audio('hurt', 'assets/audio/hurt.wav');
+    this.load.audio('coin', 'assets/audio/coin.wav');
+    this.load.audio('power-up', 'assets/audio/power-up.wav');
   }
 
   preloadMap() {
@@ -205,10 +206,18 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
     this.jumpSound.volume = 0.2;
 
     this.shootingSound = this.sound.add('shooting');
-    // The laser sound is a bit too loud so we're going to turn it down
     this.shootingSound.volume = 0.03;
 
     this.screamSound = this.sound.add('scream');
+
+    this.coinSound = this.sound.add('coin');
+    this.coinSound.volume = 0.05;
+
+    this.hurtSound = this.sound.add('hurt');
+    this.hurtSound.volume = 0.3;
+
+    this.powerUpSound = this.sound.add('power-up');
+    this.powerUpSound.volume = 0.08;
   }
 
   // time: total time elapsed (ms)
@@ -239,7 +248,7 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
   fire() {
     //testing mode
     // this.player.increaseHealth(1)
-    this.player.decreaseHealth(1)
+    // this.player.decreaseHealth(1)
     // this.player.increaseScore(1)
     // this.player.decreaseScore(1)
     // this.player.revive()

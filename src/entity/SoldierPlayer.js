@@ -94,13 +94,9 @@ export default class SoldierPlayer extends Phaser.Physics.Arcade.Sprite {
       this.play('die', true) //play dying animation
       if (this.anims.currentAnim.key === 'die' && this.anims.getProgress() > 0.6) {
         this.scene.scene.pause() //pause scene
-        // const tx = this.scene.add.text(400, 300, "Game Over", { fontFamily: '"Press Start 2P"' }).setFontSize(20).setOrigin(0.5)
-        // tx.on("pointerup", () => {
-        //   console.log("yup")
-        // })
         this.scene.backgroundSound.pause()  //pause music
-        this.scene.scene.launch('StoryScene')
-        this.scene.scene.moveAbove('SinglePlayerSynthwaveScene', 'StoryScene')
+        // this.scene.scene.launch('GameOverMenu')
+        // this.scene.scene.moveAbove(this.scene, 'GameOverMenu')
       }
     }
   }
@@ -120,7 +116,7 @@ export default class SoldierPlayer extends Phaser.Physics.Arcade.Sprite {
 
   updateShoot(time, cursors, shootingFn, shootingSound) {
     if (cursors.space.isDown && time > this.lastFired) {
-        shootingSound.play();
+        // shootingSound.play();
         shootingFn()
         this.lastFired = time + this.fireDelay;
       }
@@ -128,14 +124,17 @@ export default class SoldierPlayer extends Phaser.Physics.Arcade.Sprite {
 
   increaseHealth(deltaHealth) {
     this.health = Math.min(5, this.health + deltaHealth);
+    this.scene.powerUpSound.play() //play power up sound
   }
 
   increaseScore(deltaScore) {
     this.score += deltaScore;
+    this.scene.coinSound.play() //play collecting coin sound
   }
 
   decreaseHealth(deltaHealth) {
-    this.scene.cameras.main.shake(500, 0.004)
+    this.scene.cameras.main.shake(500, 0.004) //shake camera
+    this.scene.hurtSound.play() //play hurt sound
     this.health = Math.max(0, this.health - deltaHealth);
     if (this.health === 0) this.dead = true;
   }
