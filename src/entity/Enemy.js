@@ -20,8 +20,6 @@ export default class Enemy extends Phaser.Physics.Arcade.Sprite {
     //   //enemy.setPushable(false)
     //   console.log('collision', enemy)
     // });
-    console.log('SCENE', this.scene)
-    console.log('what is', this)
   }
 
   
