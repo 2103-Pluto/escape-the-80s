@@ -12,6 +12,8 @@ export default class SoldierPlayer extends Phaser.Physics.Arcade.Sprite {
     this.facingLeft = false;
     this.socket = socket
     this.color = 'Blue' //defaultColor
+    this.bounceVelocity = 400;
+    this.hasBeenHit = false;
 
     //firing features
     this.fireDelay = 140;
@@ -25,10 +27,11 @@ export default class SoldierPlayer extends Phaser.Physics.Arcade.Sprite {
     this.revive = this.revive.bind(this)
 
     this.body.setSize(20,30)
+    this.bounceOff = this.bounceOff.bind(this)
+    this.playDamageTween = this.playDamageTween.bind(this)
   }
 
   updateMovement(cursors) {
-    
     const cam = this.scene.cameras.main;
     const speed = 3;
     // Move left
@@ -84,14 +87,14 @@ export default class SoldierPlayer extends Phaser.Physics.Arcade.Sprite {
   update(time, cursors, jumpSound, shootingFn, shootingSound) {
     // << INSERT CODE HERE >>
     this.updateDying()
-    if (!this.dead) {
+    if (!this.dead && !this.hasBeenHit) {
       this.updateMovement(cursors)
       this.updateJump(cursors, jumpSound)
       this.updateInAir();
       this.updateShoot(time, cursors, shootingFn, shootingSound);
     }
   }
-  
+
   updateDying() {
     if (this.dead) {
       this.play('die', true) //play dying animation
@@ -132,6 +135,7 @@ export default class SoldierPlayer extends Phaser.Physics.Arcade.Sprite {
 
   decreaseHealth(deltaHealth) {
     this.scene.cameras.main.shake(500, 0.004)
+    this.scene.hurtSound.play()
     this.health = Math.max(0, this.health - deltaHealth);
     if (this.health === 0) this.dead = true
   }
@@ -145,5 +149,33 @@ export default class SoldierPlayer extends Phaser.Physics.Arcade.Sprite {
     this.dead = false;
     this.score = 0;
     this.health = 5;
+  }
+
+  bounceOff() {
+    this.body.checkCollision.none = true;
+    this.hasBeenHit = true;
+    const hitAnim = this.playDamageTween();
+    this.facingLeft ?
+    this.setVelocity(this.bounceVelocity, -this.bounceVelocity)
+    : this.setVelocity(-this.bounceVelocity, -this.bounceVelocity)
+    this.body.checkCollision.none = false;
+    this.scene.time.addEvent({
+      delay: 500,
+      callback: () => {
+        this.hasBeenHit = false;
+        hitAnim.stop();
+        this.clearTint();
+      },
+      loop: false
+    })
+  }
+
+  playDamageTween() {
+    return this.scene.tweens.add({
+      targets: this,
+      duration: 100,
+      repeat: -1,
+      tint: 0xffffff
+    })
   }
 }
