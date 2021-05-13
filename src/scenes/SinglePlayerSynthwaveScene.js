@@ -278,10 +278,6 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
 
 
 
-    this.createStar(600, 400, this); //create a star to test the Heart entity
-    this.createHeart(100, 500, this);
-    this.createHeart(120, 500, this);     //create a heart to test the Heart entity
-
 
 
     this.createAnimatedStar(500, 400, this); //create a star to test the Heart entity
@@ -289,9 +285,8 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
     this.createAnimatedHeart(120, 500, this);     //create a heart to test the Heart entity
 
     // ...
-    this.physics.add.collider(this.enemy, this.groundGroup);
-    this.physics.add.collider(this.enemy, this.player);
-    this.physics.add.collider(this.player, platform)
+    //this.physics.add.collider(this.enemy, this.groundGroup);
+    //this.physics.add.collider(this.enemy, this.player);
 
 
     // We're going to create a group for our lasers
