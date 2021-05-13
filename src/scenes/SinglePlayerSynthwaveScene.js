@@ -197,14 +197,15 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
       groupType.add(newEnemy)
       scene.physics.add.collider(newEnemy, scene.groundGroup);
       scene.physics.add.collider(newEnemy, scene.player, function(newEnemy, player){
-        console.log(player.body.x)
-        console.log('enemy', newEnemy.x)
-        if (player.body.velocity.y>0){
-          newEnemy.body.immovable = true
+        
+        console.log('velocity', player.body.velocity)
+        console.log(player.body.touching)
+        if (player.body.touching.right || player.body.touching.left){
+          player.bounceOff()
+          player.decreaseHealth(1)
         }
-        else{
-          //player.bounceOff()
-          player.decreaseHealth()
+        else  {
+          newEnemy.body.immovable = true
         }
       });
       enemyX+=50
@@ -310,6 +311,7 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
     this.createStarGroup() //create star group
     this.createHeartGroup() //create heart group
     this.createGooGroup() //create goo group
+    this.marios=this.physics.add.group();
     this.createBulletGroup() //create bullet group
     this.createPlatformLayer(this)
     // --->
@@ -326,7 +328,7 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
     //   console.log('hit')
     // })
 
-    this.marios=this.physics.add.group();
+    
     
 
     this.createEnemies(this, 'mario', 500, 400, 3)
@@ -480,10 +482,9 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
 
     // make the laser inactive and insivible when it hits the enemy
     hit(enemy, bullet) {
-      console.log(enemy)
-      console.log('overlap')
+      
       bullet.setActive(false);
-      // bullet.setVisible(false);
+      //bullet.setVisible(false);
       enemy.destroy()
       bullet.destroy()
       //this.shootingSound.play()

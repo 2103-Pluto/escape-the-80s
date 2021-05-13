@@ -12,7 +12,7 @@ export default class Mario extends Phaser.Physics.Arcade.Sprite {
     this.y = y
     this.movingLeft = false
     this.setPushable(false)
-    this.body.setSize(20,30)
+    this.body.setSize(10,35)
     // << INITIALIZE PLAYER ATTRIBUTES HERE >>
     
   }
