@@ -67,7 +67,7 @@ export default class SoldierPlayer extends Phaser.Physics.Arcade.Sprite {
         this.play('run', true);
       }
     }
-    
+
     // Neutral (no movement)
     else {
       this.setVelocityX(0);

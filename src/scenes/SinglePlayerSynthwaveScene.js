@@ -107,7 +107,7 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
     });
   }
 
-  
+
 
 
   preload() {
@@ -156,32 +156,28 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
     const map = this.make.tilemap({key: 'map'})
     const platformTileset = map.addTilesetImage('Platform', 'platform') // First name is form tiled, Second name is key above
     scene.platforms = map.createStaticLayer("Tile Layer 1", platformTileset, 0, -100)
-    scene.zonesOne = map.getObjectLayer('player_zones');
-    scene.playerZones = this.getPlayerZones(scene.zonesOne)
+
     scene.heartsLayer = map.getObjectLayer('Heart_Layer')
-    console.log(scene.heartsLayer)
-    console.log("SCENE", scene)
+   // console.log(scene.heartsLayer)
+   // console.log("SCENE", scene)
     scene.gotHearts = this.createHeartsFromLayer(scene)
     //console.log(scene.hearts)
+    console.log(scene)
+  }
 
-
-
-    //Physics
-    scene.hearts = this.physics.add.staticGroup()
-    this.platformGroup = this.physics.add.group()
-
-    this.platforms.setCollisionBetween(1, 2)
-    this.heartGroup = this.physics.add.group()
-
-
+  createZoneLayers(scene){
+    const map = this.make.tilemap({key: 'map'})
+    scene.zonesOne = map.getObjectLayer('player_zones');
+    scene.playerZones = this.getPlayerZones(scene.zonesOne)
   }
 
   createHeartsFromLayer(scene){
     const heartsArr = scene.heartsLayer.objects
-    console.log("HEARTS  ARR", heartsArr)
+    //console.log("HEARTS  ARR", heartsArr)
     for (let i = 0; i < heartsArr.length; i++){
       const currentHeart = heartsArr[i]
-      console.log(currentHeart)
+      //console.log(currentHeart)
+      //this.hearts.add(currentHeart)
       this.createAnimatedHeart(currentHeart.x, currentHeart.y, scene)
     }
   }
@@ -209,8 +205,7 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
   createAnimatedHeart(x, y, scene) {
     const heart = new Heart(scene, x, y, 'heart');
     heart.play("rotate-heart")
-    //this.hearts.add(heart)
-
+    this.hearts.add(heart)
   }
 
   createAnimatedStar(x, y, scene) {
@@ -229,11 +224,16 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
   createPlayer(scene) {
     scene.player = new SoldierPlayer(scene, scene.playerZones.start.x, scene.playerZones.start.y, `${scene.color}SoldierIdle`, scene.socket).setSize(28, 32).setOffset(12, 7).setScale(2.78);
     scene.player.color = scene.color;
+  }
+
+  createPhysics(scene){
     scene.player.setCollideWorldBounds(true); //stop player from running off the edges
     scene.physics.add.collider(scene.player, scene.groundGroup)
-    this.physics.add.collider(scene.player, scene.platforms, function() {
+    scene.physics.add.collider(scene.player, scene.platforms, function() {
       scene.player.body.touching.down = true
-    })
+    });
+    scene.platformGroup = this.physics.add.group()
+    scene.platforms.setCollisionBetween(1, 2)
   }
 
   createEnemies(scene, enemy, x, y, number){
@@ -351,20 +351,23 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
     this.width = this.game.config.width;
     this.createSounds() //create all the sounds
     this.createMap() //Set up background
-    this.createLayers(this)
+    this.createZoneLayers(this)
     this.createPlayer(this) //create player
-    this.setCamera(this)
-    this.createScoreLabel(this) //create score
-    this.createHealthLabel(this) //create health
     this.createStarGroup() //create star group
     this.createHeartGroup() //create heart group
     this.createGooGroup() //create goo group
+    this.createLayers(this)
+    this.setCamera(this)
+    this.createScoreLabel(this) //create score
+    this.createHealthLabel(this) //create health
     this.marios=this.physics.add.group();
     this.terminators=this.physics.add.group()
     this.createBulletGroup() //create bullet group
-  
-    this.pause(this) //creates pause functionality
+    this.createPhysics(this)
 
+    this.pause(this) //creates pause functionality
+    console.log("HEARTS", this.hearts)
+    console.log()
     // --->
 
     this.cursors = this.input.keyboard.createCursorKeys();
@@ -379,8 +382,8 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
     //   console.log('hit')
     // })
 
-    
-    
+
+
 
     this.createEnemies(this, 'mario', 800, 400, 3)
     this.createEnemies(this, 'mario', 1200, 400, 5)
@@ -388,7 +391,7 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
     //this.createEnemies(this, 'terminator', 1800, 400, 1)
     this.terminator = new Terminator(this, 3000, 400, 'terminator').setScale(4.5)
     this.physics.add.collider(this.terminator, this.groundGroup);
-    
+
 
     this.createAnimatedStar(400, 400, this); //create a star to test the Heart entity
     this.createAnimatedHeart(300, 500, this);
@@ -429,11 +432,11 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
 
     this.powerUpSound = this.sound.add('power-up');
     this.powerUpSound.volume = 0.1;
-    
-    
+
+
     this.pauseSound = this.sound.add('pause')
     this.pauseSound.volume = 0.03;
-    
+
     this.marioHitSound = this.sound.add('mario-hit');
     this.marioHitSound.volume = 0.3
 
@@ -456,7 +459,7 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
       terminator.update(this.terminatorFire)
     })
     this.terminator.update(time, delta, this.terminatorFire)
-    
+
 
   }
 
@@ -591,14 +594,14 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
 
     // make the laser inactive and insivible when it hits the enemy
     hit(enemy, bullet) {
-      
+
       bullet.setActive(false);
       //bullet.setVisible(false);
       enemy.destroy()
       bullet.destroy()
       //this.shootingSound.play()
       this.marioHitSound.play()
-  
+
     }
 
     pickupStar(player, star) {
