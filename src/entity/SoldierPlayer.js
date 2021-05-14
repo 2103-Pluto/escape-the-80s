@@ -64,7 +64,7 @@ export default class SoldierPlayer extends Phaser.Physics.Arcade.Sprite {
         this.play('run', true);
       }
     }
-    
+
     // Neutral (no movement)
     else {
       this.setVelocityX(0);
@@ -112,7 +112,7 @@ export default class SoldierPlayer extends Phaser.Physics.Arcade.Sprite {
 
   updateJump(cursors, jumpSound) {
     if (cursors.up.isDown && this.body.onFloor()) {
-      this.setVelocityY(-600);
+      this.setVelocityY(-750);
       jumpSound.play()
     }
   }
