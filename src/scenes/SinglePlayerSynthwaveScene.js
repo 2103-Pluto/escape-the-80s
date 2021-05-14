@@ -481,10 +481,10 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
     const offsetY = 5.5;
     const bulletX =
       this.player.x + (this.player.facingLeft ? -offsetX : offsetX);
-    const bulletY = this.player.y + offsetY;
+    const bulletY = this.player.y + offsetY*1.2;
     const muzzleX =
-      this.player.x + (this.player.facingLeft ? -offsetX*0.82 : offsetX*0.82);
-      const muzzleY = this.player.y + offsetY*0.65;
+      this.player.x + (this.player.facingLeft ? -offsetX*0.95 : offsetX*0.95);
+    const muzzleY = this.player.y - offsetY*1.2;
 
     //create muzzleFlash
     {this.muzzleFlash ? this.muzzleFlash.reset(muzzleX, muzzleY, this.player.facingLeft)
@@ -505,7 +505,6 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
       }
       // Reset this laser to be used for the shot
       bullet.reset(bulletX, bulletY, this.player.facingLeft);
-
   }
 
   terminatorFire() {
