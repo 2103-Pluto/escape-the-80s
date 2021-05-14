@@ -1,7 +1,7 @@
 import 'phaser';
 //import { GetSpeed } from 'phaser/src/math';
 
-export default class Mario extends Phaser.Physics.Arcade.Sprite {
+export default class Terminator extends Phaser.Physics.Arcade.Sprite {
   constructor(scene, x, y, spritekey) {
     super(scene, x, y, spritekey);
     this.scene = scene;
@@ -12,7 +12,8 @@ export default class Mario extends Phaser.Physics.Arcade.Sprite {
     this.y = y
     this.movingLeft = false
     this.setPushable(false)
-    this.body.setSize(10,35)
+    this.timeFromLastAttack = 0
+    this.attackDelay = this.getAttackDelay()
     // << INITIALIZE PLAYER ATTRIBUTES HERE >>
     
   }
@@ -21,7 +22,7 @@ export default class Mario extends Phaser.Physics.Arcade.Sprite {
   
 
   patrol(){
-    const speed = 1
+    const speed = 3
  
     this.leftDest = this.initialX-100
     this.rightDest = this.initialX+100
@@ -48,14 +49,21 @@ export default class Mario extends Phaser.Physics.Arcade.Sprite {
 }
 
   // Check which controller button is being pushed and execute movement & animation
-  update(hitSound) {
+  update(time, delta, shootFn) {
     this.patrol()
-    this.anims.play('walk', true)
-    
-    if(this.y>600) {
-      this.destroy()
-      hitSound.play()
+    this.anims.play('terminator-walk', true)
+    // shootFn()
 
+    
+    if(this.timeFromLastAttack + this.attackDelay <=time){
+        shootFn()
+        this.timeFromLastAttack = time
+        this.attackDelay = this.getAttackDelay()
     }
+    
+  }
+
+  getAttackDelay(){
+      return Phaser.Math.Between(200, 400)
   }
 }

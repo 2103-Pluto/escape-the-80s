@@ -8,6 +8,8 @@ import Phaser from 'phaser'
 import MuzzleFlash from '../entity/MuzzleFlash';
 import Mario from '../entity/Mario'
 import Goo from '../entity/Goo'
+import Terminator from '../entity/Terminator'
+
 
 const numberOfFrames = 15;
 
@@ -17,6 +19,7 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
 
     this.scene = this;
     this.fire = this.fire.bind(this);
+    this.terminatorFire = this.terminatorFire.bind(this)
     this.hit = this.hit.bind(this);
     this.createBackgroundElement = this.createBackgroundElement.bind(this);
     //bind functions
@@ -44,25 +47,32 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
   preloadSoldier() {
     this.load.spritesheet(`${this.color}SoldierRunning`, `assets/spriteSheets/${this.color}/Gunner_${this.color}_Run.png`, {
       frameWidth: 48,
-      frameHeight: 39,
+      frameHeight: 48,
     })
     //Idle Soldier
     this.load.spritesheet(`${this.color}SoldierIdle`, `assets/spriteSheets/${this.color}/Gunner_${this.color}_Idle.png`, {
       frameWidth: 48,
-      frameHeight: 39,
+      frameHeight: 48,
     })
 
     //Jumping Soldier
     this.load.spritesheet(`${this.color}SoldierJumping`, `assets/spriteSheets/${this.color}/Gunner_${this.color}_Jump.png`, {
       frameWidth: 48,
-      frameHeight: 39,
+      frameHeight: 48,
     })
 
     //Dying Soldier
     this.load.spritesheet(`${this.color}SoldierDying`, `assets/spriteSheets/${this.color}/Gunner_${this.color}_Death.png`, {
       frameWidth: 48,
+      frameHeight: 48,
+    })
+
+    //Crouching Soldier
+    this.load.spritesheet(`${this.color}SoldierCrouching`, `assets/spriteSheets/${this.color}/Gunner_${this.color}_Crouch.png`, {
+      frameWidth: 48,
       frameHeight: 39,
     })
+
     this.load.image('bullet', 'assets/sprites/SpongeBullet.png');
     this.load.image('muzzleFlash', 'assets/sprites/MuzzleFlash.png');
   }
@@ -76,6 +86,7 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
     this.load.audio('coin', 'assets/audio/coin.wav');
     this.load.audio('power-up', 'assets/audio/power-up.wav');
     this.load.audio('pause', 'assets/audio/pause.wav');
+    this.load.audio('mario-hit', 'assets/audio/mario_hurt.wav')
   }
 
   preloadMap() {
@@ -96,6 +107,9 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
     });
   }
 
+  
+
+
   preload() {
     this.preloadSoldier() //load all the soldier things
     this.preloadSounds() //load all sounds
@@ -115,10 +129,13 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
 
     this.load.image('goo', 'assets/sprites/goo.png')
 
-    this.load.spritesheet('mario', 'assets/spriteSheets/mario_enemy.png', {
-      frameWidth: 30,
-      frameHeight: 37,
+    this.preloadMario()
+
+    this.load.spritesheet('terminator', 'assets/spriteSheets/terminator_gun.png', {
+      frameWidth: 23,
+      frameHeight: 32,
     });
+
   }
 
   createGround(tileWidth, count) {
@@ -135,18 +152,46 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
     }
   }
 
-  createPlatformLayer(scene) {
+  createLayers(scene) {
     const map = this.make.tilemap({key: 'map'})
     const platformTileset = map.addTilesetImage('Platform', 'platform') // First name is form tiled, Second name is key above
-    this.platforms = map.createStaticLayer("Tile Layer 1", platformTileset, 0, -100)
-    //console.log("PLATFORMS", platforms)
+    scene.platforms = map.createStaticLayer("Tile Layer 1", platformTileset, 0, -100)
+    scene.zonesOne = map.getObjectLayer('player_zones');
+    scene.playerZones = this.getPlayerZones(scene.zonesOne)
+    scene.heartsLayer = map.getObjectLayer('Heart_Layer')
+    console.log(scene.heartsLayer)
+    console.log("SCENE", scene)
+    scene.gotHearts = this.createHeartsFromLayer(scene)
+    //console.log(scene.hearts)
+
+
+
+    //Physics
+    scene.hearts = this.physics.add.staticGroup()
     this.platformGroup = this.physics.add.group()
-    // console.log("PLATFORMS GROUP", this.platformGroup)
+
     this.platforms.setCollisionBetween(1, 2)
-    this.physics.add.collider(this.player, this.platforms, function() {
-      scene.player.body.touching.down = true
-    })
-    return map
+    this.heartGroup = this.physics.add.group()
+
+
+  }
+
+  createHeartsFromLayer(scene){
+    const heartsArr = scene.heartsLayer.objects
+    console.log("HEARTS  ARR", heartsArr)
+    for (let i = 0; i < heartsArr.length; i++){
+      const currentHeart = heartsArr[i]
+      console.log(currentHeart)
+      this.createAnimatedHeart(currentHeart.x, currentHeart.y, scene)
+    }
+  }
+
+  getPlayerZones(zonesOne){
+    const markers = zonesOne.objects;
+    return {
+        start : markers.find(zone => zone.name === 'startZone'),
+        end : markers.find(zone => zone.name === 'endZone')
+      }
   }
 
   createMap() {
@@ -164,7 +209,8 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
   createAnimatedHeart(x, y, scene) {
     const heart = new Heart(scene, x, y, 'heart');
     heart.play("rotate-heart")
-    scene.hearts.add(heart)
+    //this.hearts.add(heart)
+
   }
 
   createAnimatedStar(x, y, scene) {
@@ -181,23 +227,34 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
   }
 
   createPlayer(scene) {
-    scene.player = new SoldierPlayer(scene, 60, 400, `${scene.color}SoldierIdle`, scene.socket).setScale(2.78);
+    scene.player = new SoldierPlayer(scene, scene.playerZones.start.x, scene.playerZones.start.y, `${scene.color}SoldierIdle`, scene.socket).setSize(28, 32).setOffset(12, 7).setScale(2.78);
     scene.player.color = scene.color;
     scene.player.setCollideWorldBounds(true); //stop player from running off the edges
     scene.physics.add.collider(scene.player, scene.groundGroup)
+    this.physics.add.collider(scene.player, scene.platforms, function() {
+      scene.player.body.touching.down = true
+    })
   }
 
   createEnemies(scene, enemy, x, y, number){
-    const enemies = {mario: Mario}
+    const enemies = {mario: Mario, terminator:Terminator}
     let enemyX = x
     let enemyY = y
     let type = enemies[enemy]
     let groupType = scene[`${enemy}s`]
     for(let i = 0; i<number; i++){
-      let newEnemy = new type(scene, enemyX, enemyY, enemy).setScale(3.0)
+      let newEnemy = new type(scene, enemyX, enemyY, enemy).setScale(2.7)
       groupType.add(newEnemy)
       scene.physics.add.collider(newEnemy, scene.groundGroup);
-      scene.physics.add.collider(newEnemy, scene.player);
+      scene.physics.add.collider(newEnemy, scene.player, function(newEnemy, player){
+        if (player.body.touching.right || player.body.touching.left){
+          player.bounceOff()
+          player.decreaseHealth(1)
+        }
+        else  {
+          newEnemy.body.immovable = true
+        }
+      });
       enemyX+=50
     }
     return scene.mario
@@ -205,7 +262,7 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
 
   setCamera(scene) {
     scene.cameras.main.startFollow(this.player);
-    scene.cameras.main.setBounds(0, 0, this.width * numberOfFrames, this.height)
+    scene.cameras.main.setBounds(0, 0, this.width * numberOfFrames, this.height * 1.5)
   }
 
   createScoreLabel(scene) {
@@ -279,7 +336,7 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
 
     this.physics.add.overlap(
       this.bullets,
-      this.enemy,
+      this.marios,
       this.hit,
       null,
       this
@@ -294,6 +351,7 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
     this.width = this.game.config.width;
     this.createSounds() //create all the sounds
     this.createMap() //Set up background
+    this.createLayers(this)
     this.createPlayer(this) //create player
     this.setCamera(this)
     this.createScoreLabel(this) //create score
@@ -301,9 +359,12 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
     this.createStarGroup() //create star group
     this.createHeartGroup() //create heart group
     this.createGooGroup() //create goo group
+    this.marios=this.physics.add.group();
+    this.terminators=this.physics.add.group()
     this.createBulletGroup() //create bullet group
-    this.createPlatformLayer(this)
+  
     this.pause(this) //creates pause functionality
+
     // --->
 
     this.cursors = this.input.keyboard.createCursorKeys();
@@ -318,10 +379,16 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
     //   console.log('hit')
     // })
 
-    this.marios=this.physics.add.group();
+    
+    
 
-    this.createEnemies(this, 'mario', 500, 400, 3)
-    this.createEnemies(this, 'mario', 1500, 400, 5)
+    this.createEnemies(this, 'mario', 800, 400, 3)
+    this.createEnemies(this, 'mario', 1200, 400, 5)
+
+    //this.createEnemies(this, 'terminator', 1800, 400, 1)
+    this.terminator = new Terminator(this, 3000, 400, 'terminator').setScale(4.5)
+    this.physics.add.collider(this.terminator, this.groundGroup);
+    
 
     this.createAnimatedStar(400, 400, this); //create a star to test the Heart entity
     this.createAnimatedHeart(300, 500, this);
@@ -362,24 +429,34 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
 
     this.powerUpSound = this.sound.add('power-up');
     this.powerUpSound.volume = 0.1;
-
+    
+    
     this.pauseSound = this.sound.add('pause')
     this.pauseSound.volume = 0.03;
+    
+    this.marioHitSound = this.sound.add('mario-hit');
+    this.marioHitSound.volume = 0.3
+
   }
 
   // time: total time elapsed (ms)
   // delta: time elapsed (ms) since last update() call. 16.666 ms @ 60fps
   update(time, delta) {
     // << DO UPDATE LOGIC HERE >>
+    const scene = this
     this.player.update(time, this.cursors, this.jumpSound, this.fire, this.shootingSound);
     this.updateHealth(this) //updates the pleyer's health displayed on scene
     this.updateScore(this) //updates the pleyer's score displayed on scene
     if (this.muzzleFlash) this.muzzleFlash.update(delta) //updates muzzleFlash
 
     this.marios.getChildren().forEach(function (mario) {
-      mario.update()
+      mario.update(scene.marioHitSound)
     })
-    //this.mario.update()
+    this.terminators.getChildren().forEach(function (terminator) {
+      terminator.update(this.terminatorFire)
+    })
+    this.terminator.update(time, delta, this.terminatorFire)
+    
 
   }
 
@@ -427,6 +504,38 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
 
   }
 
+  terminatorFire() {
+    const offsetX = 60;
+    const offsetY = 5.5;
+    const bulletX =
+      this.terminator.x + (this.terminator.movingLeft ? -offsetX : offsetX);
+    const bulletY = this.terminator.y + offsetY;
+    const muzzleX =
+      this.terminator.x + (this.terminator.movingLeft ? -offsetX*0.82 : offsetX*0.82);
+      const muzzleY = this.terminator.y + offsetY*0.65;
+
+    //create muzzleFlash
+    {this.muzzleFlash ? this.muzzleFlash.reset(muzzleX, muzzleY, this.terminator.movingLeft)
+      : this.muzzleFlash = new MuzzleFlash(this, muzzleX, muzzleY, 'muzzleFlash', this.player.facingLeft)}
+      // Get the first available laser object that has been set to inactive
+      let bullet = this.bullets.getFirstDead();
+      // Check if we can reuse an inactive laser in our pool of lasers
+      if (!bullet) {
+        // Create a laser bullet and scale the sprite down
+        bullet = new Bullet(
+          this,
+          bulletX,
+          bulletY,
+          'bullet',
+          this.terminator.movingLeft
+        ).setScale(3);
+        this.bullets.add(bullet);
+      }
+      // Reset this laser to be used for the shot
+      bullet.reset(bulletX, bulletY, this.terminator.movingLeft);
+
+  }
+
   createAnimations() {
     this.anims.create({
       key: 'run',
@@ -451,6 +560,11 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
       frameRate: 10,
     });
     this.anims.create({
+      key: 'crouch',
+      frames: this.anims.generateFrameNumbers(`${this.color}SoldierCrouching`, {start:3}),
+      frameRate: 10,
+    });
+    this.anims.create({
       key: 'rotate-star',
       frames: this.anims.generateFrameNumbers('star'),
       frameRate: 10,
@@ -468,12 +582,24 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
       frameRate: 5,
       repeat: -1,
     });
+    this.anims.create({
+      key: 'terminator-walk',
+      frames: this.anims.generateFrameNumbers('terminator'),
+      frameRate: 5,
+      repeat: -1,
+    });
   }
 
     // make the laser inactive and insivible when it hits the enemy
     hit(enemy, bullet) {
+      
       bullet.setActive(false);
-      bullet.setVisible(false);
+      //bullet.setVisible(false);
+      enemy.destroy()
+      bullet.destroy()
+      //this.shootingSound.play()
+      this.marioHitSound.play()
+  
     }
 
     pickupStar(player, star) {
