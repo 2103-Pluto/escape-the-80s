@@ -9,6 +9,7 @@ import MuzzleFlash from '../entity/MuzzleFlash';
 import Mario from '../entity/Mario'
 import Goo from '../entity/Goo'
 import Terminator from '../entity/Terminator'
+import Flagpole from '../entity/Flagpole'
 
 
 const numberOfFrames = 15;
@@ -37,6 +38,8 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
     this.createGoo = this.createGoo.bind(this)
     this.createHeartGroup = this.createHeartGroup.bind(this)
     this.createBulletGroup = this.createBulletGroup.bind(this)
+    this.raiseFlagpole = this.raiseFlagpole.bind(this)
+    this.createFlagpole = this.createFlagpole.bind(this)
     this.pause = this.pause.bind(this)
   }
 
@@ -135,7 +138,11 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
       frameWidth: 23,
       frameHeight: 32,
     });
-
+    
+    this.load.spritesheet('flagpole', 'assets/spriteSheets/flagpoles_sheet.png', {
+      frameWidth: 31.6,
+      frameHeight: 168
+    })
   }
 
   createGround(tileWidth, count) {
@@ -234,7 +241,17 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
     });
     scene.platformGroup = this.physics.add.group()
     scene.platforms.setCollisionBetween(1, 2)
+    scene.physics.add.collider(scene.flagpole, scene.groundGroup)
+    scene.physics.add.overlap(scene.player, scene.flagpole, function() {
+      scene.raiseFlagpole() // If the player touches the flagpole it falls through the ground
+    })
+    
   }
+  
+  createFlagpole(scene) {
+    scene.flagpole = new Flagpole(scene, 300, 400, 'flagpole')
+  }
+  
 
   createEnemies(scene, enemy, x, y, number){
     const enemies = {mario: Mario, terminator:Terminator}
@@ -363,6 +380,7 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
     this.marios=this.physics.add.group();
     this.terminators=this.physics.add.group()
     this.createBulletGroup() //create bullet group
+    this.createFlagpole(this)
     this.createPhysics(this)
 
     this.pause(this) //creates pause functionality
@@ -591,6 +609,12 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
       frameRate: 5,
       repeat: -1,
     });
+    this.anims.create({
+      key: 'raise-flagpole',
+      frames: this.anims.generateFrameNumbers('heart'),
+      frameRate: 10,
+      repeat: -1,
+    })
   }
 
     // make the laser inactive and insivible when it hits the enemy
@@ -620,6 +644,10 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
     fallInGoo(player, goo) {
       this.player.bounceOff()
       this.player.decreaseHealth(1)
+    }
+    
+    raiseFlagpole() {
+      this.flagpole.play("raise-flagpole")
     }
 
     showGameOverMenu(scene) {
