@@ -379,7 +379,7 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
     this.createHealthLabel(this) //create health
     this.marios=this.physics.add.group();
     //this.terminators=this.physics.add.group()
-    this.terminator = new Terminator(this, 3000, 400, 'terminator').setScale(4.5)
+    this.terminator = new Terminator(this, 2800, 400, 'terminator').setScale(4.5)
     this.createBulletGroup() //create bullet group
     this.createPhysics(this)
 
