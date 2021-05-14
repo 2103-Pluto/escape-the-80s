@@ -24,17 +24,26 @@ export default class SoldierPlayer extends Phaser.Physics.Arcade.Sprite {
     this.increaseScore = this.increaseScore.bind(this)
     this.decreaseHealth = this.decreaseHealth.bind(this)
     this.decreaseScore = this.decreaseScore.bind(this)
+    this.emitMovement = this.emitMovement.bind(this)
     this.revive = this.revive.bind(this)
 
     this.body.setSize(20,40)
     this.bounceOff = this.bounceOff.bind(this)
     this.playDamageTween = this.playDamageTween.bind(this)
+    this.previousCursor = null
+    this.cursorPosition = null
+
+    this.bulletHits = 0
+    this.bulletDeath = 5
   }
 
   updateMovement(cursors) {
     const cam = this.scene.cameras.main;
     const speed = 3;
-
+    this.previousCursor = this.cursorPosition
+    
+    this.cursorPosition = cursors
+    
     //crouching
     if (cursors.down.isDown){
       
@@ -76,21 +85,24 @@ export default class SoldierPlayer extends Phaser.Physics.Arcade.Sprite {
     }
 
     //emit any movement
-    let x = this.x
-    let y = this.y
-    if (
-      this.oldPosition && (x!=this.oldPosition.x ||
-      y!== this.oldPosition.y) && this.socket
-    ) {
-      this.socket.emit("playerMovement", {
-        x: this.x,
-        y: this.y
-      })
-    }
-    this.oldPosition = {
-      x: this.x,
-      y: this.y
-    }
+    
+    // let x = this.x
+    // let y = this.y
+    // if (
+    //   this.oldPosition && (x!=this.oldPosition.x ||
+    //   y!== this.oldPosition.y) && this.socket
+    // ) {
+    //   this.socket.emit("playerMovement", {
+    //     x: this.x,
+    //     y: this.y
+    //   })
+    // }
+    // this.oldPosition = {
+    //   x: this.x,
+    //   y: this.y
+    // }
+    //if(previousCursor!==this.cursorPosition) this.emitMovement(cursors)
+
   }
 
   update(time, cursors, jumpSound, shootingFn, shootingSound) {
@@ -102,6 +114,8 @@ export default class SoldierPlayer extends Phaser.Physics.Arcade.Sprite {
       this.updateInAir();
       this.updateShoot(time, cursors, shootingFn, shootingSound);
     }
+    this.updateBulletHits()
+    
   }
 
   updateDying() {
@@ -113,6 +127,14 @@ export default class SoldierPlayer extends Phaser.Physics.Arcade.Sprite {
     }
   }
 
+  updateBulletHits(){
+    if(this.bulletHits===1){
+      this.decreaseHealth(1)
+      this.bulletHits=0
+    }
+
+
+  }
   updateJump(cursors, jumpSound) {
     if (cursors.up.isDown && this.body.onFloor()) {
       this.setVelocityY(-750);
@@ -186,5 +208,11 @@ export default class SoldierPlayer extends Phaser.Physics.Arcade.Sprite {
       repeat: -1,
       tint: 0xffffff
     })
+  }
+
+  emitMovement(cursors){
+    console.log('connected')
+    
+    this.socket.emit("playerMovement", cursors)
   }
 }
