@@ -37,6 +37,7 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
     this.createGoo = this.createGoo.bind(this)
     this.createHeartGroup = this.createHeartGroup.bind(this)
     this.createBulletGroup = this.createBulletGroup.bind(this)
+    this.pause = this.pause.bind(this)
   }
 
   init(data) {
@@ -84,6 +85,7 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
     this.load.audio('hurt', 'assets/audio/hurt.wav');
     this.load.audio('coin', 'assets/audio/coin.wav');
     this.load.audio('power-up', 'assets/audio/power-up.wav');
+    this.load.audio('pause', 'assets/audio/pause.wav');
     this.load.audio('mario-hit', 'assets/audio/mario_hurt.wav')
   }
 
@@ -167,6 +169,7 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
     //Physics
     scene.hearts = this.physics.add.staticGroup()
     this.platformGroup = this.physics.add.group()
+
     this.platforms.setCollisionBetween(1, 2)
     this.heartGroup = this.physics.add.group()
 
@@ -207,18 +210,20 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
     const heart = new Heart(scene, x, y, 'heart');
     heart.play("rotate-heart")
     //this.hearts.add(heart)
+
   }
 
   createAnimatedStar(x, y, scene) {
     //load star
       const star = new Star(scene, x, y, 'star').setScale(1.5)
       star.play('rotate-star')
-      this.stars.add(star)
+      scene.stars.add(star)
   }
 
   createGoo(x, y, scene) {
-    const goo = new Goo(scene, x, y, 'goo').setScale(3.8) //we can custom this
-    this.goos.add(goo)
+    const goo = new Goo(scene, x, y, 'goo').setScale(2.8) //we can custom this
+    // goo.alpha = 0.8 //we can custom this
+    scene.goos.add(goo)
   }
 
   createPlayer(scene) {
@@ -357,6 +362,9 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
     this.marios=this.physics.add.group();
     this.terminators=this.physics.add.group()
     this.createBulletGroup() //create bullet group
+  
+    this.pause(this) //creates pause functionality
+
     // --->
 
     this.cursors = this.input.keyboard.createCursorKeys();
@@ -382,12 +390,14 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
     this.physics.add.collider(this.terminator, this.groundGroup);
     
 
-    this.createAnimatedStar(500, 400, this); //create a star to test the Heart entity
-    this.createAnimatedHeart(100, 500, this);
-    this.createAnimatedHeart(120, 500, this);     //create a heart to test the Heart entity
+    this.createAnimatedStar(400, 400, this); //create a star to test the Heart entity
+    this.createAnimatedHeart(300, 500, this);
+    this.createAnimatedHeart(320, 500, this);     //create a heart to test the Heart entity
 
-    this.createGoo(400, 572, this); //create goo to test it
-    this.createGoo(430, 572, this);
+    this.createGoo(400, 566, this); //create goo to test it
+    this.createGoo(430, 566, this);
+    this.createGoo(460, 566, this);
+
 
     // ...
     //this.physics.add.collider(this.enemy, this.groundGroup);
@@ -412,16 +422,21 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
     this.screamSound = this.sound.add('scream');
 
     this.coinSound = this.sound.add('coin');
-    this.coinSound.volume = 0.2;
+    this.coinSound.volume = 0.1;
 
     this.hurtSound = this.sound.add('hurt');
     this.hurtSound.volume = 0.3;
 
     this.powerUpSound = this.sound.add('power-up');
-    this.powerUpSound.volume = 0.2;
-  
+    this.powerUpSound.volume = 0.1;
+    
+    
+    this.pauseSound = this.sound.add('pause')
+    this.pauseSound.volume = 0.03;
+    
     this.marioHitSound = this.sound.add('mario-hit');
     this.marioHitSound.volume = 0.3
+
   }
 
   // time: total time elapsed (ms)
@@ -604,11 +619,20 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
       this.player.decreaseHealth(1)
     }
 
-    showGameOverMenu() {
-      this.scene.pause() //pause scene
-      this.backgroundSound.pause()  //pause music
-      this.scene.launch('GameOverMenuScene', { previousScene: this })
-      this.scene.moveAbove(this, 'GameOverMenuScene')
+    showGameOverMenu(scene) {
+      scene.scene.pause() //pause scene
+      scene.backgroundSound.pause()  //pause music
+      scene.scene.launch('GameOverMenuScene', { previousScene: scene })
+      scene.scene.moveAbove(this, 'GameOverMenuScene')
     }
 
+    pause(scene) {
+      scene.input.keyboard.on('keydown-P', () => {
+        scene.scene.pause()
+        scene.backgroundSound.pause()
+        scene.pauseSound.play()
+        scene.scene.launch('PauseScene', { previousScene: scene })
+        scene.scene.moveAbove(scene, 'PauseScene')
+      })
+    }
 }

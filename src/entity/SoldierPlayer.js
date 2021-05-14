@@ -48,7 +48,7 @@ export default class SoldierPlayer extends Phaser.Physics.Arcade.Sprite {
       }
       this.setVelocityX(-360);
       cam.scrollX -= speed;
-      if (this.body.touching.down) {
+      if (this.body.onFloor()) {
         this.play('run', true);
       }
     }
@@ -60,7 +60,7 @@ export default class SoldierPlayer extends Phaser.Physics.Arcade.Sprite {
       }
       this.setVelocityX(360);
       cam.scrollX += speed;
-      if (this.body.touching.down) {
+      if (this.body.onFloor()) {
         this.play('run', true);
       }
     }
@@ -69,7 +69,7 @@ export default class SoldierPlayer extends Phaser.Physics.Arcade.Sprite {
     else {
       this.setVelocityX(0);
       // Whenever Josh is not moving, use the idleUnarmed animation
-        this.anims.play('idle');
+        this.anims.play('idle', true);
     }
 
     //emit any movement
@@ -105,20 +105,20 @@ export default class SoldierPlayer extends Phaser.Physics.Arcade.Sprite {
     if (this.dead) {
       this.play('die', true) //play dying animation
       if (this.anims.currentAnim.key === 'die' && this.anims.getProgress() > 0.6) {
-        this.scene.showGameOverMenu();
+        this.scene.showGameOverMenu(this.scene);
       }
     }
   }
 
   updateJump(cursors, jumpSound) {
-    if (cursors.up.isDown && this.body.touching.down) {
+    if (cursors.up.isDown && this.body.onFloor()) {
       this.setVelocityY(-600);
       jumpSound.play()
     }
   }
 
   updateInAir() {
-    if (!this.body.touching.down) {
+    if (!this.body.onFloor()) {
       this.play('jump');
     }
   }
