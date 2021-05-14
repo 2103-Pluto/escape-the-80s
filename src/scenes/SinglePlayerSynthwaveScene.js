@@ -390,7 +390,7 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
 
     this.cursors = this.input.keyboard.createCursorKeys();
     this.createAnimations();
-
+    console.log(this.cursors)
     //this.physics.add.collider(this.player, this.platforms)
 
     // this.enemy = new enemy(this, 600, 400, 'brandon').setScale(.25) UNCOMMENT TO TEST BRANDON
