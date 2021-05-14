@@ -27,10 +27,10 @@ export default class TitleScene extends Phaser.Scene {
     const height = this.game.config.height;
     this.add.image(width*0.5, height*0.5, "title-background").setOrigin(0.5, 0.5).setScale(1.2);
 
-    this.add.text(width*0.5, height*0.65, '- PRESS A KEY TO START -', { fontFamily: '"Press Start 2P"' }).setFontSize(18).setOrigin(0.5, 0.5)
+    this.add.text(width*0.5, height*0.65, '- PRESS ENTER TO START -', { fontFamily: '"Press Start 2P"' }).setFontSize(18).setOrigin(0.5, 0.5)
 
     //listen to event to transition to next scene
-    this.input.keyboard.on('keydown', () => {
+    this.input.keyboard.on('keydown-ENTER', () => {
       const click = this.sound.add('click');
       click.volume = 0.1;
       click.play();
