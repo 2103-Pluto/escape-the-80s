@@ -323,9 +323,9 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
     this.createEnemies(this, 'mario', 500, 400, 3)
     this.createEnemies(this, 'mario', 1500, 400, 5)
 
-    this.createAnimatedStar(500, 400, this); //create a star to test the Heart entity
-    this.createAnimatedHeart(100, 500, this);
-    this.createAnimatedHeart(120, 500, this);     //create a heart to test the Heart entity
+    this.createAnimatedStar(400, 400, this); //create a star to test the Heart entity
+    this.createAnimatedHeart(300, 500, this);
+    this.createAnimatedHeart(320, 500, this);     //create a heart to test the Heart entity
 
     this.createGoo(400, 566, this); //create goo to test it
     this.createGoo(430, 566, this);

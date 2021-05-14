@@ -42,7 +42,7 @@ export default class SoldierPlayer extends Phaser.Physics.Arcade.Sprite {
       }
       this.setVelocityX(-360);
       cam.scrollX -= speed;
-      if (this.body.touching.down) {
+      if (this.body.onFloor()) {
         this.play('run', true);
       }
     }
@@ -54,7 +54,7 @@ export default class SoldierPlayer extends Phaser.Physics.Arcade.Sprite {
       }
       this.setVelocityX(360);
       cam.scrollX += speed;
-      if (this.body.touching.down) {
+      if (this.body.onFloor()) {
         this.play('run', true);
       }
     }
@@ -105,17 +105,13 @@ export default class SoldierPlayer extends Phaser.Physics.Arcade.Sprite {
 
   updateJump(cursors, jumpSound) {
     if (cursors.up.isDown && this.body.onFloor()) {
-      // console.log("up-->", this.body.touching.up)
-      // console.log("left-->", this.body.touching.left)
-      // console.log("right-->", this.body.touching.right)
-      // console.log("down-->", this.body.onFloor())
       this.setVelocityY(-600);
       jumpSound.play()
     }
   }
 
   updateInAir() {
-    if (!this.body.touching.down) {
+    if (!this.body.onFloor()) {
       this.play('jump');
     }
   }
