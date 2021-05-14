@@ -15,7 +15,9 @@ export default class Terminator extends Phaser.Physics.Arcade.Sprite {
     this.timeFromLastAttack = 0
     this.attackDelay = this.getAttackDelay()
     // << INITIALIZE PLAYER ATTRIBUTES HERE >>
-    
+    this.bulletHits = 0
+    this.bulletDeath = 20
+    this.name = 'terminator'
   }
 
 
@@ -50,12 +52,13 @@ export default class Terminator extends Phaser.Physics.Arcade.Sprite {
 
   // Check which controller button is being pushed and execute movement & animation
   update(time, delta, shootFn) {
+    const dead = this.bulletHits===this.bulletDeath
     this.patrol()
-    this.anims.play('terminator-walk', true)
+    if(!dead) this.anims.play('terminator-walk', true)
     // shootFn()
 
     
-    if(this.timeFromLastAttack + this.attackDelay <=time){
+    if(!dead && this.timeFromLastAttack + this.attackDelay <=time){
         shootFn()
         this.timeFromLastAttack = time
         this.attackDelay = this.getAttackDelay()

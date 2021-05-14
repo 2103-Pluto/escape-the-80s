@@ -86,7 +86,8 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
     this.load.audio('coin', 'assets/audio/coin.wav');
     this.load.audio('power-up', 'assets/audio/power-up.wav');
     this.load.audio('pause', 'assets/audio/pause.wav');
-    this.load.audio('mario-hit', 'assets/audio/mario_hurt.wav')
+    this.load.audio('mario-dead', 'assets/audio/mario_hurt.wav')
+    this.load.audio('terminator-dead', 'assets/audio/be_back.wav')
   }
 
   preloadMap() {
@@ -335,8 +336,24 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
     });
 
     this.physics.add.overlap(
-      this.bullets,
       this.marios,
+      this.bullets,
+      this.hit,
+      null,
+      this
+    );
+
+    this.physics.add.overlap(
+      this.terminator,
+      this.bullets,
+      this.hit,
+      null,
+      this
+    );
+
+    this.physics.add.overlap(
+      this.player,
+      this.bullets,
       this.hit,
       null,
       this
@@ -361,7 +378,8 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
     this.createScoreLabel(this) //create score
     this.createHealthLabel(this) //create health
     this.marios=this.physics.add.group();
-    this.terminators=this.physics.add.group()
+    //this.terminators=this.physics.add.group()
+    this.terminator = new Terminator(this, 2800, 400, 'terminator').setScale(4.5)
     this.createBulletGroup() //create bullet group
     this.createPhysics(this)
 
@@ -389,8 +407,9 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
     this.createEnemies(this, 'mario', 1200, 400, 5)
 
     //this.createEnemies(this, 'terminator', 1800, 400, 1)
-    this.terminator = new Terminator(this, 3000, 400, 'terminator').setScale(4.5)
+    
     this.physics.add.collider(this.terminator, this.groundGroup);
+    this.physics.add.collider(this.terminator, this.player);
 
 
     this.createAnimatedStar(400, 400, this); //create a star to test the Heart entity
@@ -437,8 +456,11 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
     this.pauseSound = this.sound.add('pause')
     this.pauseSound.volume = 0.03;
 
-    this.marioHitSound = this.sound.add('mario-hit');
-    this.marioHitSound.volume = 0.3
+    this.marioDeathSound = this.sound.add('mario-dead');
+    this.marioDeathSound.volume = 0.3
+
+    this.terminatorDeathSound = this.sound.add('terminator-dead');
+    this.terminatorDeathSound.volume = 0.3
 
   }
 
@@ -453,11 +475,11 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
     if (this.muzzleFlash) this.muzzleFlash.update(delta) //updates muzzleFlash
 
     this.marios.getChildren().forEach(function (mario) {
-      mario.update(scene.marioHitSound)
+      mario.update(scene.marioDeathSound)
     })
-    this.terminators.getChildren().forEach(function (terminator) {
-      terminator.update(this.terminatorFire)
-    })
+    // this.terminators.getChildren().forEach(function (terminator) {
+    //   terminator.update(this.terminatorFire)
+    // })
     this.terminator.update(time, delta, this.terminatorFire)
 
 
@@ -565,7 +587,6 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
     this.anims.create({
       key: 'crouch',
       frames: this.anims.generateFrameNumbers(`${this.color}SoldierCrouching`, {start:3}),
-      frameRate: 10,
     });
     this.anims.create({
       key: 'rotate-star',
@@ -595,14 +616,17 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
 
     // make the laser inactive and insivible when it hits the enemy
     hit(enemy, bullet) {
-
+      const deathSounds = {
+        mario: this.marioDeathSound,
+        terminator: this.terminatorDeathSound
+      }
       bullet.setActive(false);
-      //bullet.setVisible(false);
-      enemy.destroy()
-      bullet.destroy()
-      //this.shootingSound.play()
-      this.marioHitSound.play()
+      if(enemy!==this.player && enemy.bulletHits===enemy.bulletDeath){
+        enemy.destroy()
+        deathSounds[enemy.name].play()
+      } else enemy.bulletHits+=1
 
+      bullet.destroy()
     }
 
     pickupStar(player, star) {
