@@ -43,24 +43,24 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
   preloadSoldier() {
     this.load.spritesheet(`${this.color}SoldierRunning`, `assets/spriteSheets/${this.color}/Gunner_${this.color}_Run.png`, {
       frameWidth: 48,
-      frameHeight: 39,
+      frameHeight: 48,
     })
     //Idle Soldier
     this.load.spritesheet(`${this.color}SoldierIdle`, `assets/spriteSheets/${this.color}/Gunner_${this.color}_Idle.png`, {
       frameWidth: 48,
-      frameHeight: 39,
+      frameHeight: 48,
     })
 
     //Jumping Soldier
     this.load.spritesheet(`${this.color}SoldierJumping`, `assets/spriteSheets/${this.color}/Gunner_${this.color}_Jump.png`, {
       frameWidth: 48,
-      frameHeight: 39,
+      frameHeight: 48,
     })
 
     //Dying Soldier
     this.load.spritesheet(`${this.color}SoldierDying`, `assets/spriteSheets/${this.color}/Gunner_${this.color}_Death.png`, {
       frameWidth: 48,
-      frameHeight: 39,
+      frameHeight: 48,
     })
     this.load.image('bullet', 'assets/sprites/SpongeBullet.png');
     this.load.image('muzzleFlash', 'assets/sprites/MuzzleFlash.png');
@@ -205,7 +205,7 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
   }
 
   createPlayer(scene) {
-    scene.player = new SoldierPlayer(scene, scene.playerZones.start.x, scene.playerZones.start.y, `${scene.color}SoldierIdle`, scene.socket).setScale(2.78);
+    scene.player = new SoldierPlayer(scene, scene.playerZones.start.x, scene.playerZones.start.y, `${scene.color}SoldierIdle`, scene.socket).setSize(28, 32).setOffset(12, 7).setScale(2.78);
     scene.player.color = scene.color;
     scene.player.setCollideWorldBounds(true); //stop player from running off the edges
     scene.physics.add.collider(scene.player, scene.groundGroup)
