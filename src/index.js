@@ -19,7 +19,6 @@ import SynthwaveScene from './scenes/SynthwaveScene';
 import NeonAlleyScene from './scenes/NeonAlleyScene';
 import MoonlightScene from './scenes/MoonlightScene';
 import SkyLineScene from './scenes/SkyLineScene';
-import MainScene from './scenes/MainScene'
 import TitleScene from './scenes/TitleScene'
 import PauseScene from './scenes/PauseScene'
 import CreditsScene from './scenes/CreditsScene'
@@ -42,7 +41,6 @@ class Game extends Phaser.Game {
     this.scene.add('NeonAlleyScene', NeonAlleyScene)
     this.scene.add('MoonlightScene', MoonlightScene)
     this.scene.add('SkyLineScene', SkyLineScene)
-    this.scene.add('MainScene', MainScene)
     this.scene.add('TitleScene', TitleScene)
     this.scene.add('CreditsScene', CreditsScene)
     this.scene.add('MainMenuScene', MainMenuScene)
