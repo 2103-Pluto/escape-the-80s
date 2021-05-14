@@ -175,7 +175,7 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
   }
 
   createGoo(x, y, scene) {
-    const goo = new Goo(scene, x, y, 'goo').setScale(3.8) //we can custom this
+    const goo = new Goo(scene, x, y, 'goo').setScale(2.8) //we can custom this
     // goo.alpha = 0.8 //we can custom this
     scene.goos.add(goo)
   }
@@ -327,8 +327,10 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
     this.createAnimatedHeart(100, 500, this);
     this.createAnimatedHeart(120, 500, this);     //create a heart to test the Heart entity
 
-    this.createGoo(400, 573, this); //create goo to test it
-    this.createGoo(430, 573, this);
+    this.createGoo(400, 566, this); //create goo to test it
+    this.createGoo(430, 566, this);
+    this.createGoo(460, 566, this);
+
 
     // ...
     //this.physics.add.collider(this.enemy, this.groundGroup);

@@ -62,7 +62,7 @@ export default class SoldierPlayer extends Phaser.Physics.Arcade.Sprite {
     else {
       this.setVelocityX(0);
       // Whenever Josh is not moving, use the idleUnarmed animation
-        this.anims.play('idle');
+        this.anims.play('idle', true);
     }
 
     //emit any movement
@@ -104,7 +104,11 @@ export default class SoldierPlayer extends Phaser.Physics.Arcade.Sprite {
   }
 
   updateJump(cursors, jumpSound) {
-    if (cursors.up.isDown && this.body.touching.down) {
+    if (cursors.up.isDown && this.body.onFloor()) {
+      // console.log("up-->", this.body.touching.up)
+      // console.log("left-->", this.body.touching.left)
+      // console.log("right-->", this.body.touching.right)
+      // console.log("down-->", this.body.onFloor())
       this.setVelocityY(-600);
       jumpSound.play()
     }
