@@ -98,7 +98,7 @@ export default class SoldierPlayer extends Phaser.Physics.Arcade.Sprite {
     if (this.dead) {
       this.play('die', true) //play dying animation
       if (this.anims.currentAnim.key === 'die' && this.anims.getProgress() > 0.6) {
-        this.scene.showGameOverMenu();
+        this.scene.showGameOverMenu(this.scene);
       }
     }
   }

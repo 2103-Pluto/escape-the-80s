@@ -21,6 +21,7 @@ import MoonlightScene from './scenes/MoonlightScene';
 import SkyLineScene from './scenes/SkyLineScene';
 import MainScene from './scenes/MainScene'
 import TitleScene from './scenes/TitleScene'
+import PauseScene from './scenes/PauseScene'
 import CreditsScene from './scenes/CreditsScene'
 import MainMenuScene from './scenes/MainMenuScene'
 import HighScoresScene from './scenes/HighScoresScene'
@@ -45,6 +46,7 @@ class Game extends Phaser.Game {
     this.scene.add('TitleScene', TitleScene)
     this.scene.add('CreditsScene', CreditsScene)
     this.scene.add('MainMenuScene', MainMenuScene)
+    this.scene.add('PauseScene', PauseScene)
     this.scene.add('HighScoresScene', HighScoresScene)
     this.scene.add('CharacterChoosingScene', CharacterChoosingScene)
     this.scene.add('StoryScene', StoryScene)

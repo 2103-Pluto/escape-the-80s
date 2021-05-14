@@ -34,6 +34,7 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
     this.createGoo = this.createGoo.bind(this)
     this.createHeartGroup = this.createHeartGroup.bind(this)
     this.createBulletGroup = this.createBulletGroup.bind(this)
+    this.pause = this.pause.bind(this)
   }
 
   init(data) {
@@ -74,6 +75,7 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
     this.load.audio('hurt', 'assets/audio/hurt.wav');
     this.load.audio('coin', 'assets/audio/coin.wav');
     this.load.audio('power-up', 'assets/audio/power-up.wav');
+    this.load.audio('pause', 'assets/audio/pause.wav');
   }
 
   preloadMap() {
@@ -139,7 +141,7 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
     this.platforms = map.createStaticLayer("Tile Layer 1", platformTileset, 0, -100)
     //console.log("PLATFORMS", platforms)
     this.platformGroup = this.physics.add.group()
-    console.log("PLATFORMS GROUP", this.platformGroup)
+    // console.log("PLATFORMS GROUP", this.platformGroup)
     this.platforms.setCollisionBetween(1, 2)
     this.physics.add.collider(this.player, this.platforms, function() {
       scene.player.body.touching.down = true
@@ -300,6 +302,7 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
     this.createGooGroup() //create goo group
     this.createBulletGroup() //create bullet group
     this.createPlatformLayer(this)
+    this.pause(this) //creates pause functionality
     // --->
 
     this.cursors = this.input.keyboard.createCursorKeys();
@@ -349,13 +352,16 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
     this.screamSound = this.sound.add('scream');
 
     this.coinSound = this.sound.add('coin');
-    this.coinSound.volume = 0.2;
+    this.coinSound.volume = 0.1;
 
     this.hurtSound = this.sound.add('hurt');
     this.hurtSound.volume = 0.3;
 
     this.powerUpSound = this.sound.add('power-up');
-    this.powerUpSound.volume = 0.2;
+    this.powerUpSound.volume = 0.1;
+
+    this.pauseSound = this.sound.add('pause')
+    this.pauseSound.volume = 0.03;
   }
 
   // time: total time elapsed (ms)
@@ -484,11 +490,20 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
       this.player.decreaseHealth(1)
     }
 
-    showGameOverMenu() {
-      this.scene.pause() //pause scene
-      this.backgroundSound.pause()  //pause music
-      this.scene.launch('GameOverMenuScene', { previousScene: this })
-      this.scene.moveAbove(this, 'GameOverMenuScene')
+    showGameOverMenu(scene) {
+      scene.scene.pause() //pause scene
+      scene.backgroundSound.pause()  //pause music
+      scene.scene.launch('GameOverMenuScene', { previousScene: scene })
+      scene.scene.moveAbove(this, 'GameOverMenuScene')
     }
 
+    pause(scene) {
+      scene.input.keyboard.on('keydown-P', () => {
+        scene.scene.pause()
+        scene.backgroundSound.pause()
+        scene.pauseSound.play()
+        scene.scene.launch('PauseScene', { previousScene: scene })
+        scene.scene.moveAbove(scene, 'PauseScene')
+      })
+    }
 }
