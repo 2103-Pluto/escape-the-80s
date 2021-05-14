@@ -136,11 +136,31 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
     scene.platforms = map.createStaticLayer("Tile Layer 1", platformTileset, 0, -100)
     scene.zonesOne = map.getObjectLayer('player_zones');
     scene.playerZones = this.getPlayerZones(scene.zonesOne)
-    console.log(scene.playerZones)
+    scene.heartsLayer = map.getObjectLayer('Heart_Layer')
+    console.log(scene.heartsLayer)
+    console.log("SCENE", scene)
+    scene.gotHearts = this.createHeartsFromLayer(scene)
+    //console.log(scene.hearts)
+
+
+
     //Physics
+    scene.hearts = this.physics.add.staticGroup()
     this.platformGroup = this.physics.add.group()
     this.platforms.setCollisionBetween(1, 2)
+    this.heartGroup = this.physics.add.group()
 
+
+  }
+
+  createHeartsFromLayer(scene){
+    const heartsArr = scene.heartsLayer.objects
+    console.log("HEARTS  ARR", heartsArr)
+    for (let i = 0; i < heartsArr.length; i++){
+      const currentHeart = heartsArr[i]
+      console.log(currentHeart)
+      this.createAnimatedHeart(currentHeart.x, currentHeart.y, scene)
+    }
   }
 
   getPlayerZones(zonesOne){
@@ -166,7 +186,7 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
   createAnimatedHeart(x, y, scene) {
     const heart = new Heart(scene, x, y, 'heart');
     heart.play("rotate-heart")
-    this.hearts.add(heart)
+    //this.hearts.add(heart)
   }
 
   createAnimatedStar(x, y, scene) {
@@ -204,7 +224,7 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
 
   setCamera(scene) {
     scene.cameras.main.startFollow(this.player);
-    scene.cameras.main.setBounds(0, 0, this.width * numberOfFrames, this.height)
+    scene.cameras.main.setBounds(0, 0, this.width * numberOfFrames, this.height * 1.5)
   }
 
   createScoreLabel(scene) {
@@ -268,8 +288,7 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
     this.createHealthLabel(this) //create health
     this.createStarGroup() //allows for stars to be picked up
     this.createHeartGroup() //allows for hearts to be picked up
-    console.log("LAYERS", this.createLayers(this))
-    console.log("SCENE", this.scene)
+    //console.log("SCENE", this.scene)
     // --->
 
     this.cursors = this.input.keyboard.createCursorKeys();
