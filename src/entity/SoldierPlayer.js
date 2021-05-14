@@ -34,8 +34,13 @@ export default class SoldierPlayer extends Phaser.Physics.Arcade.Sprite {
   updateMovement(cursors) {
     const cam = this.scene.cameras.main;
     const speed = 3;
+
+    //crouching
+    if (cursors.down.isDown){
+      this.play('crouch', true)
+    }
     // Move left
-    if (cursors.left.isDown) {
+    else if (cursors.left.isDown) {
       if (!this.facingLeft) {
         this.flipX = !this.flipX;
         this.facingLeft = true;
@@ -59,6 +64,7 @@ export default class SoldierPlayer extends Phaser.Physics.Arcade.Sprite {
         this.play('run', true);
       }
     }
+    
     // Neutral (no movement)
     else {
       this.setVelocityX(0);

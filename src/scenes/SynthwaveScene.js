@@ -88,7 +88,9 @@ export default class SynthwaveScene extends Phaser.Scene {
   createGround(tileWidth, count) {
     const height = this.game.config.height;
     for (let i=0; i<count; i++) {
-      this.groundGroup.create(i*tileWidth, height, 'road').setOrigin(0, 1).setScale(3.5).refreshBody();
+      let newGround = this.groundGroup.create(i*tileWidth, height, 'road').setOrigin(0, 1).setScale(3.5).refreshBody();
+      newGround.body.allowGravity = false
+      newGround.body.immovable = true
     }
   }
 
@@ -162,7 +164,7 @@ export default class SynthwaveScene extends Phaser.Scene {
     this.createBackgroundElement(168, 'palms-back', 5*numberOfFrames, 0.3)
     this.createBackgroundElement(448, 'palms', 2*numberOfFrames, 0.45)
 
-    this.groundGroup = this.physics.add.staticGroup({ classType: Ground });
+    this.groundGroup = this.physics.add.group();
     this.createGround(168, 5*numberOfFrames);
 
     // Create game entities
