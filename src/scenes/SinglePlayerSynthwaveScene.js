@@ -86,7 +86,8 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
     this.load.audio('coin', 'assets/audio/coin.wav');
     this.load.audio('power-up', 'assets/audio/power-up.wav');
     this.load.audio('pause', 'assets/audio/pause.wav');
-    this.load.audio('mario-hit', 'assets/audio/mario_hurt.wav')
+    this.load.audio('mario-dead', 'assets/audio/mario_hurt.wav')
+    this.load.audio('terminator-dead', 'assets/audio/be_back.wav')
   }
 
   preloadMap() {
@@ -156,13 +157,12 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
     const map = this.make.tilemap({key: 'map'})
     const platformTileset = map.addTilesetImage('Platform', 'platform') // First name is form tiled, Second name is key above
     scene.platforms = map.createStaticLayer("Tile Layer 1", platformTileset, 0, -100)
-
     scene.heartsLayer = map.getObjectLayer('Heart_Layer')
-   // console.log(scene.heartsLayer)
-   // console.log("SCENE", scene)
     scene.gotHearts = this.createHeartsFromLayer(scene)
-    //console.log(scene.hearts)
-    console.log(scene)
+    scene.starsLayer = map.getObjectLayer('Star_Layer')
+    scene.gotStars = this.createStarsFromLayer(scene)
+    scene.gooLayer = map.getObjectLayer('Goo_Layer')
+    scene.gotGoo = this.createGooFromLayer(scene)
   }
 
   createZoneLayers(scene){
@@ -171,13 +171,26 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
     scene.playerZones = this.getPlayerZones(scene.zonesOne)
   }
 
+  createGooFromLayer(scene){
+    const gooArr = scene.gooLayer.objects
+    for(let i = 0; i < gooArr.length; i++){
+      const currentGoo = gooArr[i]
+      this.createGoo(currentGoo.x, currentGoo.y, scene)
+    }
+  }
+
+  createStarsFromLayer(scene){
+    const starsArr = scene.starsLayer.objects
+    for (let i = 0; i < starsArr.length; i++){
+      const currentStar = starsArr[i]
+      this.createAnimatedStar(currentStar.x, currentStar.y, scene)
+    }
+  }
+
   createHeartsFromLayer(scene){
     const heartsArr = scene.heartsLayer.objects
-    //console.log("HEARTS  ARR", heartsArr)
     for (let i = 0; i < heartsArr.length; i++){
       const currentHeart = heartsArr[i]
-      //console.log(currentHeart)
-      //this.hearts.add(currentHeart)
       this.createAnimatedHeart(currentHeart.x, currentHeart.y, scene)
     }
   }
@@ -203,7 +216,7 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
   }
 
   createAnimatedHeart(x, y, scene) {
-    const heart = new Heart(scene, x, y, 'heart');
+    const heart = new Heart(scene, x, y, 'heart').setScale(1.5);
     heart.play("rotate-heart")
     this.hearts.add(heart)
   }
@@ -263,6 +276,7 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
   setCamera(scene) {
     const desiredHeightLimit = 3*this.height; //this is the height wanted to be the max
     scene.cameras.main.startFollow(this.player);
+
     scene.cameras.main.setBounds(0, -desiredHeightLimit+this.height, this.width * numberOfFrames, desiredHeightLimit)
   }
 
@@ -336,8 +350,24 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
     });
 
     this.physics.add.overlap(
-      this.bullets,
       this.marios,
+      this.bullets,
+      this.hit,
+      null,
+      this
+    );
+
+    this.physics.add.overlap(
+      this.terminator,
+      this.bullets,
+      this.hit,
+      null,
+      this
+    );
+
+    this.physics.add.overlap(
+      this.player,
+      this.bullets,
       this.hit,
       null,
       this
@@ -362,13 +392,12 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
     this.createScoreLabel(this) //create score
     this.createHealthLabel(this) //create health
     this.marios=this.physics.add.group();
-    this.terminators=this.physics.add.group()
+    //this.terminators=this.physics.add.group()
+    this.terminator = new Terminator(this, 2800, 400, 'terminator').setScale(4.5)
     this.createBulletGroup() //create bullet group
     this.createPhysics(this)
 
     this.pause(this) //creates pause functionality
-    console.log("HEARTS", this.hearts)
-    console.log()
     // --->
 
     this.cursors = this.input.keyboard.createCursorKeys();
@@ -390,17 +419,10 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
     this.createEnemies(this, 'mario', 1200, 400, 5)
 
     //this.createEnemies(this, 'terminator', 1800, 400, 1)
-    this.terminator = new Terminator(this, 3000, 400, 'terminator').setScale(4.5)
+    
     this.physics.add.collider(this.terminator, this.groundGroup);
+    this.physics.add.collider(this.terminator, this.player);
 
-
-    this.createAnimatedStar(400, 400, this); //create a star to test the Heart entity
-    this.createAnimatedHeart(300, 500, this);
-    this.createAnimatedHeart(320, 500, this);     //create a heart to test the Heart entity
-
-    this.createGoo(400, 566, this); //create goo to test it
-    this.createGoo(430, 566, this);
-    this.createGoo(460, 566, this);
 
 
     // ...
@@ -438,8 +460,11 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
     this.pauseSound = this.sound.add('pause')
     this.pauseSound.volume = 0.03;
 
-    this.marioHitSound = this.sound.add('mario-hit');
-    this.marioHitSound.volume = 0.3
+    this.marioDeathSound = this.sound.add('mario-dead');
+    this.marioDeathSound.volume = 0.3
+
+    this.terminatorDeathSound = this.sound.add('terminator-dead');
+    this.terminatorDeathSound.volume = 0.3
 
   }
 
@@ -454,11 +479,11 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
     if (this.muzzleFlash) this.muzzleFlash.update(delta) //updates muzzleFlash
 
     this.marios.getChildren().forEach(function (mario) {
-      mario.update(scene.marioHitSound)
+      mario.update(scene.marioDeathSound)
     })
-    this.terminators.getChildren().forEach(function (terminator) {
-      terminator.update(this.terminatorFire)
-    })
+    // this.terminators.getChildren().forEach(function (terminator) {
+    //   terminator.update(this.terminatorFire)
+    // })
     this.terminator.update(time, delta, this.terminatorFire)
 
 
@@ -565,7 +590,6 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
     this.anims.create({
       key: 'crouch',
       frames: this.anims.generateFrameNumbers(`${this.color}SoldierCrouching`, {start:3}),
-      frameRate: 10,
     });
     this.anims.create({
       key: 'rotate-star',
@@ -595,14 +619,17 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
 
     // make the laser inactive and insivible when it hits the enemy
     hit(enemy, bullet) {
-
+      const deathSounds = {
+        mario: this.marioDeathSound,
+        terminator: this.terminatorDeathSound
+      }
       bullet.setActive(false);
-      //bullet.setVisible(false);
-      enemy.destroy()
-      bullet.destroy()
-      //this.shootingSound.play()
-      this.marioHitSound.play()
+      if(enemy!==this.player && enemy.bulletHits===enemy.bulletDeath){
+        enemy.destroy()
+        deathSounds[enemy.name].play()
+      } else enemy.bulletHits+=1
 
+      bullet.destroy()
     }
 
     pickupStar(player, star) {

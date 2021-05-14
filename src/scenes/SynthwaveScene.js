@@ -133,7 +133,7 @@ export default class SynthwaveScene extends Phaser.Scene {
       const  players  = arg;
       Object.keys(players).forEach(function (id) {
         if (players[id].playerId !== scene.socket.id) {
-          scene.otherPlayer = new SoldierPlayer(scene, 100, 400, `${this.color}SoldierIdle`).setScale(2.78);
+          scene.otherPlayer = new SoldierPlayer(scene, 100, 400, `${scene.color}SoldierIdle`, scene.socket,).setScale(2.78);
           //note: to address variable characters
           scene.add.existing(scene.otherPlayer)
           scene.physics.add.collider(scene.otherPlayer, scene.groundGroup)
@@ -145,7 +145,7 @@ export default class SynthwaveScene extends Phaser.Scene {
     this.socket.on("newPlayer", function (arg) {
       const playerInfo  = arg;
      //need to add socket id to player?
-      scene.otherPlayer = new SoldierPlayer(scene, 100, 400, `${this.color}SoldierIdle`).setScale(2.78);
+      scene.otherPlayer = new SoldierPlayer(scene, 100, 400, `${scene.color}SoldierIdle`, scene.socket,).setScale(2.78);
       //note: to address variable characters
       scene.add.existing(scene.otherPlayer)
       scene.physics.add.collider(scene.otherPlayer, scene.groundGroup)
@@ -169,18 +169,12 @@ export default class SynthwaveScene extends Phaser.Scene {
 
     // Create game entities
     // << CREATE GAME ENTITIES HERE >>
-    this.player = new SoldierPlayer(this, 60, 400, `${this.color}SoldierIdle`, this.socket).setScale(2.78);
+    this.player = new SoldierPlayer(this, 60, 400, `${scene.color}SoldierIdle`, this.socket).setScale(2.78);
     this.player.setCollideWorldBounds(true); //stop player from running off the edges
     this.physics.world.setBounds(0, null, width * numberOfFrames, height, true, true, false, false) //set world bounds only on sides
 
     //check other players moves and if collision between players:
-      this.socket.on("playerMoved", function (data){
-
-      scene.otherPlayer.x = data.x
-      scene.otherPlayer.y = data.y
-      scene.otherPlayer.setPosition(data.x, data.y)
-      scene.physics.add.collider(scene.player, scene.otherPlayer, scene.processCollide);
-    })
+      
 
 
 
@@ -266,12 +260,23 @@ export default class SynthwaveScene extends Phaser.Scene {
   // delta: time elapsed (ms) since last update() call. 16.666 ms @ 60fps
   update(time, delta) {
     // << DO UPDATE LOGIC HERE >>
+    const scene = this
     this.player.update(time, this.cursors, this.jumpSound, this.fire, this.shootingSound);
     if (this.muzzleFlash) this.muzzleFlash.update(delta)
 
     this.enemy.update(this.screamSound);
     
     this.mario.update()
+
+    this.socket.on("playerMoved", function (cursors){
+
+      //scene.otherPlayer.updateMovement({right: {isDown:true}})
+      scene.otherPlayer.setPosition(600, 600)
+      // scene.otherPlayer.x = data.x
+      // scene.otherPlayer.y = data.y
+      // scene.otherPlayer.setPosition(data.x, data.y)
+      // scene.physics.add.collider(scene.player, scene.otherPlayer, scene.processCollide);
+    })
     
   }
 
