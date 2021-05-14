@@ -261,8 +261,9 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
   }
 
   setCamera(scene) {
+    const desiredHeightLimit = 3*this.height; //this is the height wanted to be the max
     scene.cameras.main.startFollow(this.player);
-    scene.cameras.main.setBounds(0, 0, this.width * numberOfFrames, this.height * 1.5)
+    scene.cameras.main.setBounds(0, -desiredHeightLimit+this.height, this.width * numberOfFrames, desiredHeightLimit)
   }
 
   createScoreLabel(scene) {
