@@ -7,6 +7,7 @@ export default class Flagpole extends Phaser.Physics.Arcade.Sprite {
         this.x = x
         this.y = y
         this.scene.add.existing(this);
+        this.scene.physics.world.enable(this)
 
 
     }

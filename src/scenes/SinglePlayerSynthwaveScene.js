@@ -9,6 +9,7 @@ import MuzzleFlash from '../entity/MuzzleFlash';
 import Mario from '../entity/Mario'
 import Goo from '../entity/Goo'
 import Terminator from '../entity/Terminator'
+import Flagpole from '../entity/Flagpole'
 
 
 const numberOfFrames = 15;
@@ -37,6 +38,8 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
     this.createGoo = this.createGoo.bind(this)
     this.createHeartGroup = this.createHeartGroup.bind(this)
     this.createBulletGroup = this.createBulletGroup.bind(this)
+    this.raiseFlagpole = this.raiseFlagpole.bind(this)
+    this.createFlagpole = this.createFlagpole.bind(this)
     this.pause = this.pause.bind(this)
   }
 
@@ -136,7 +139,11 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
       frameWidth: 23,
       frameHeight: 32,
     });
-
+    
+    this.load.spritesheet('flagpole', 'assets/spriteSheets/flagpoles_sheet.png', {
+      frameWidth: 31.6,
+      frameHeight: 168
+    })
   }
 
   createGround(tileWidth, count) {
@@ -157,13 +164,12 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
     const map = this.make.tilemap({key: 'map'})
     const platformTileset = map.addTilesetImage('Platform', 'platform') // First name is form tiled, Second name is key above
     scene.platforms = map.createStaticLayer("Tile Layer 1", platformTileset, 0, -100)
-
     scene.heartsLayer = map.getObjectLayer('Heart_Layer')
-   // console.log(scene.heartsLayer)
-   // console.log("SCENE", scene)
     scene.gotHearts = this.createHeartsFromLayer(scene)
-    //console.log(scene.hearts)
-    console.log(scene)
+    scene.starsLayer = map.getObjectLayer('Star_Layer')
+    scene.gotStars = this.createStarsFromLayer(scene)
+    scene.gooLayer = map.getObjectLayer('Goo_Layer')
+    scene.gotGoo = this.createGooFromLayer(scene)
   }
 
   createZoneLayers(scene){
@@ -172,13 +178,26 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
     scene.playerZones = this.getPlayerZones(scene.zonesOne)
   }
 
+  createGooFromLayer(scene){
+    const gooArr = scene.gooLayer.objects
+    for(let i = 0; i < gooArr.length; i++){
+      const currentGoo = gooArr[i]
+      this.createGoo(currentGoo.x, currentGoo.y, scene)
+    }
+  }
+
+  createStarsFromLayer(scene){
+    const starsArr = scene.starsLayer.objects
+    for (let i = 0; i < starsArr.length; i++){
+      const currentStar = starsArr[i]
+      this.createAnimatedStar(currentStar.x, currentStar.y, scene)
+    }
+  }
+
   createHeartsFromLayer(scene){
     const heartsArr = scene.heartsLayer.objects
-    //console.log("HEARTS  ARR", heartsArr)
     for (let i = 0; i < heartsArr.length; i++){
       const currentHeart = heartsArr[i]
-      //console.log(currentHeart)
-      //this.hearts.add(currentHeart)
       this.createAnimatedHeart(currentHeart.x, currentHeart.y, scene)
     }
   }
@@ -204,7 +223,7 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
   }
 
   createAnimatedHeart(x, y, scene) {
-    const heart = new Heart(scene, x, y, 'heart');
+    const heart = new Heart(scene, x, y, 'heart').setScale(1.5);
     heart.play("rotate-heart")
     this.hearts.add(heart)
   }
@@ -235,7 +254,17 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
     });
     scene.platformGroup = this.physics.add.group()
     scene.platforms.setCollisionBetween(1, 2)
+    scene.physics.add.collider(scene.flagpole, scene.groundGroup)
+    scene.physics.add.overlap(scene.player, scene.flagpole, function() {
+      scene.raiseFlagpole() // If the player touches the flagpole it falls through the ground
+    })
+    
   }
+  
+  createFlagpole(scene) {
+    scene.flagpole = new Flagpole(scene, 300, 400, 'flagpole')
+  }
+  
 
   createEnemies(scene, enemy, x, y, number){
     const enemies = {mario: Mario, terminator:Terminator}
@@ -262,8 +291,10 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
   }
 
   setCamera(scene) {
+    const desiredHeightLimit = 3*this.height; //this is the height wanted to be the max
     scene.cameras.main.startFollow(this.player);
-    scene.cameras.main.setBounds(0, 0, this.width * numberOfFrames, this.height * 1.5)
+
+    scene.cameras.main.setBounds(0, -desiredHeightLimit+this.height, this.width * numberOfFrames, desiredHeightLimit)
   }
 
   createScoreLabel(scene) {
@@ -381,11 +412,10 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
     //this.terminators=this.physics.add.group()
     this.terminator = new Terminator(this, 2800, 400, 'terminator').setScale(4.5)
     this.createBulletGroup() //create bullet group
+    this.createFlagpole(this)
     this.createPhysics(this)
 
     this.pause(this) //creates pause functionality
-    console.log("HEARTS", this.hearts)
-    console.log()
     // --->
 
     this.cursors = this.input.keyboard.createCursorKeys();
@@ -411,14 +441,6 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
     this.physics.add.collider(this.terminator, this.groundGroup);
     this.physics.add.collider(this.terminator, this.player);
 
-
-    this.createAnimatedStar(400, 400, this); //create a star to test the Heart entity
-    this.createAnimatedHeart(300, 500, this);
-    this.createAnimatedHeart(320, 500, this);     //create a heart to test the Heart entity
-
-    this.createGoo(400, 566, this); //create goo to test it
-    this.createGoo(430, 566, this);
-    this.createGoo(460, 566, this);
 
 
     // ...
@@ -502,10 +524,10 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
     const offsetY = 5.5;
     const bulletX =
       this.player.x + (this.player.facingLeft ? -offsetX : offsetX);
-    const bulletY = this.player.y + offsetY;
+    const bulletY = this.player.y + offsetY*1.2;
     const muzzleX =
-      this.player.x + (this.player.facingLeft ? -offsetX*0.82 : offsetX*0.82);
-      const muzzleY = this.player.y + offsetY*0.65;
+      this.player.x + (this.player.facingLeft ? -offsetX*0.95 : offsetX*0.95);
+    const muzzleY = this.player.y - offsetY*1.2;
 
     //create muzzleFlash
     {this.muzzleFlash ? this.muzzleFlash.reset(muzzleX, muzzleY, this.player.facingLeft)
@@ -526,7 +548,6 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
       }
       // Reset this laser to be used for the shot
       bullet.reset(bulletX, bulletY, this.player.facingLeft);
-
   }
 
   terminatorFire() {
@@ -612,6 +633,12 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
       frameRate: 5,
       repeat: -1,
     });
+    this.anims.create({
+      key: 'raise-flagpole',
+      frames: this.anims.generateFrameNumbers('heart'),
+      frameRate: 10,
+      repeat: -1,
+    })
   }
 
     // make the laser inactive and insivible when it hits the enemy
@@ -644,6 +671,10 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
     fallInGoo(player, goo) {
       this.player.bounceOff()
       this.player.decreaseHealth(1)
+    }
+    
+    raiseFlagpole() {
+      this.flagpole.play("raise-flagpole")
     }
 
     showGameOverMenu(scene) {

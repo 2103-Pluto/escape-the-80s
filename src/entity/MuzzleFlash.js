@@ -7,7 +7,7 @@ export default class MuzzleFlash extends Phaser.Physics.Arcade.Sprite {
     this.scene = scene;
     // Add laser to scene and enable physics
     this.scene.physics.world.enable(this);
-    this.scene.add.existing(this);
+    this.scene.add.existing(this).setScale(2.5);
     this.facingLeft = facingLeft;
     if (this.facingLeft) this.flipX = !this.flipX
 
@@ -17,14 +17,6 @@ export default class MuzzleFlash extends Phaser.Physics.Arcade.Sprite {
     this.body.setAllowGravity(false);
   //  this.reset(x, y, facingLeft)
   }
-
-  // reset(x, y, facingLeft) {
-  //   this.setActive(true);
-  //   this.setVisible(true);
-  //   this.lifespan = 500;
-  //   this.facingLeft = facingLeft
-  //   this.setPosition(x, y)
-  // }
 
   update(delta) {
     this.lifespan -= delta;

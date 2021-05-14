@@ -27,7 +27,7 @@ export default class SoldierPlayer extends Phaser.Physics.Arcade.Sprite {
     this.emitMovement = this.emitMovement.bind(this)
     this.revive = this.revive.bind(this)
 
-    this.body.setSize(20,40)
+    this.body.setSize(12,40)
     this.bounceOff = this.bounceOff.bind(this)
     this.playDamageTween = this.playDamageTween.bind(this)
     this.previousCursor = null
@@ -58,7 +58,7 @@ export default class SoldierPlayer extends Phaser.Physics.Arcade.Sprite {
         this.facingLeft = true;
 
       }
-      this.setVelocityX(-360);
+      this.setVelocityX(-300);
       cam.scrollX -= speed;
       if (this.body.onFloor()) {
         this.play('run', true);
@@ -70,7 +70,7 @@ export default class SoldierPlayer extends Phaser.Physics.Arcade.Sprite {
         this.flipX = !this.flipX;
         this.facingLeft = false;
       }
-      this.setVelocityX(360);
+      this.setVelocityX(300);
       cam.scrollX += speed;
       if (this.body.onFloor()) {
         this.play('run', true);
