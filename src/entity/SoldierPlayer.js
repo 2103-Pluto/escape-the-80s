@@ -37,7 +37,10 @@ export default class SoldierPlayer extends Phaser.Physics.Arcade.Sprite {
 
     //crouching
     if (cursors.down.isDown){
+      
+      this.setVelocityX(0)
       this.play('crouch', true)
+      
     }
     // Move left
     else if (cursors.left.isDown) {
@@ -112,7 +115,7 @@ export default class SoldierPlayer extends Phaser.Physics.Arcade.Sprite {
 
   updateJump(cursors, jumpSound) {
     if (cursors.up.isDown && this.body.onFloor()) {
-      this.setVelocityY(-600);
+      this.setVelocityY(-750);
       jumpSound.play()
     }
   }

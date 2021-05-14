@@ -562,7 +562,6 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
     this.anims.create({
       key: 'crouch',
       frames: this.anims.generateFrameNumbers(`${this.color}SoldierCrouching`, {start:3}),
-      frameRate: 10,
     });
     this.anims.create({
       key: 'rotate-star',
