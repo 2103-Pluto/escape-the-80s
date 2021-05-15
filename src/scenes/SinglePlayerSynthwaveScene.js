@@ -139,7 +139,7 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
       frameWidth: 23,
       frameHeight: 32,
     });
-    
+
     this.load.spritesheet('flagpole', 'assets/spriteSheets/flagpoles_sheet.png', {
       frameWidth: 31.6,
       frameHeight: 168
@@ -242,7 +242,7 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
   }
 
   createPlayer(scene) {
-    scene.player = new SoldierPlayer(scene, scene.playerZones.start.x, scene.playerZones.start.y, `${scene.color}SoldierIdle`, scene.socket).setSize(28, 32).setOffset(12, 7).setScale(2.78);
+    scene.player = new SoldierPlayer(scene, scene.playerZones.start.x, scene.playerZones.start.y, `${scene.color}SoldierIdle`, scene.socket).setSize(14, 32).setOffset(15, 7).setScale(2.78);
     scene.player.color = scene.color;
   }
 
@@ -258,16 +258,16 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
     scene.physics.add.overlap(scene.player, scene.flagpole, function() {
       scene.raiseFlagpole() // If the player touches the flagpole it falls through the ground
     })
-    
+
   }
-  
+
   createFlagpole(scene) {
     scene.flagpole = new Flagpole(scene, scene.playerZones.end.x, 310, 'flagpole').setScale(2.78)
     scene.flagpole.body.immovable = true
     scene.flagpole.body.allowGravity = false
     
   }
-  
+
 
   createEnemies(scene, enemy, x, y, number){
     const enemies = {mario: Mario, terminator:Terminator}
@@ -401,6 +401,7 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
     this.height = this.game.config.height; //retrive width and height (careful--Has to be at the top of create)
     this.width = this.game.config.width;
     this.createSounds() //create all the sounds
+    this.createAnimations(); //create all animations
     this.createMap() //Set up background
     this.createZoneLayers(this)
     this.createPlayer(this) //create player
@@ -417,12 +418,9 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
     this.createBulletGroup() //create bullet group
     this.createFlagpole(this)
     this.createPhysics(this)
-
     this.pause(this) //creates pause functionality
     // --->
-
     this.cursors = this.input.keyboard.createCursorKeys();
-    this.createAnimations();
 
     //this.physics.add.collider(this.player, this.platforms)
 
@@ -440,7 +438,7 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
     this.createEnemies(this, 'mario', 1200, 400, 5)
 
     //this.createEnemies(this, 'terminator', 1800, 400, 1)
-    
+
     this.physics.add.collider(this.terminator, this.groundGroup);
     this.physics.add.collider(this.terminator, this.player);
 
@@ -675,7 +673,7 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
       this.player.bounceOff()
       this.player.decreaseHealth(1)
     }
-    
+
     raiseFlagpole() {
       this.flagpole.play("raise-flagpole", false)
     }

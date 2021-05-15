@@ -15,7 +15,7 @@ export default class MuzzleFlash extends Phaser.Physics.Arcade.Sprite {
     this.lifespan = 22;
 // Important to not apply gravity to the laser bolt!
     this.body.setAllowGravity(false);
-  //  this.reset(x, y, facingLeft)
+   //  this.reset(x, y, facingLeft)
   }
 
   update(delta) {
