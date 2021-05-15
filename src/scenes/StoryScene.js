@@ -9,12 +9,7 @@ export default class StoryScene extends Phaser.Scene {
     this.color = data.color //retrieve color
   }
 
-  preload() {
-
-  }
-
   create() {
-
     this.sound.pauseOnBlur = false; //prevent sound from cutting when you leave tab
 
     const width = this.game.config.width;

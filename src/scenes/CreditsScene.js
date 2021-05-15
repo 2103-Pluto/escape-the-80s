@@ -20,12 +20,12 @@ export default class CreditsScene extends Phaser.Scene {
     backgroundImage.alpha = 0.1;
 
     //addd text
-    this.add.text(width*0.5, height*0.30, 'This amazing game\n was created by:', { fontFamily: '"Press Start 2P"' }).setFontSize(28).setOrigin(0.5, 0.5)
+    this.add.text(width*0.5, height*0.25, 'This amazing game\n\n was created by:', { fontFamily: '"Press Start 2P"' }).setFontSize(28).setOrigin(0.5, 0.5)
     //our names
-    this.add.text(width*0.5, height*0.45, 'Isaac Easton', { fontFamily: '"Press Start 2P"' }).setFontSize(24).setOrigin(0.5, 0.5)
-    this.add.text(width*0.5, height*0.6, 'Brendan Bettencourt', { fontFamily: '"Press Start 2P"' }).setFontSize(24).setOrigin(0.5, 0.5)
-    this.add.text(width*0.5, height*0.75, 'Mahfouz Basith', { fontFamily: '"Press Start 2P"' }).setFontSize(24).setOrigin(0.5, 0.5)
-    this.add.text(width*0.5, height*0.9, 'Juan S. Auli', { fontFamily: '"Press Start 2P"' }).setFontSize(24).setOrigin(0.5, 0.5)
+    this.add.text(width*0.5, height*0.43, 'Isaac Easton', { fontFamily: '"Press Start 2P"' }).setFontSize(24).setOrigin(0.5, 0.5)
+    this.add.text(width*0.5, height*0.58, 'Brendan Bettencourt', { fontFamily: '"Press Start 2P"' }).setFontSize(24).setOrigin(0.5, 0.5)
+    this.add.text(width*0.5, height*0.73, 'Mahfouz Basith', { fontFamily: '"Press Start 2P"' }).setFontSize(24).setOrigin(0.5, 0.5)
+    this.add.text(width*0.5, height*0.89, 'Juan S. Auli', { fontFamily: '"Press Start 2P"' }).setFontSize(24).setOrigin(0.5, 0.5)
 
     this.createBack(this, 'MainMenuScene');
   }

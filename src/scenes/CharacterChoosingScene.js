@@ -26,7 +26,7 @@ export default class CharacterChoosingScene extends Phaser.Scene {
     const height = this.game.config.height;
 
     //add text
-    this.add.text(width*0.5, height*0.2, 'Player Select', { fontFamily: '"Press Start 2P"' }).setFontSize(28).setOrigin(0.5, 0.5)
+    this.add.text(width*0.5, height*0.2, 'PLAYER SELECT', { fontFamily: '"Press Start 2P"' }).setFontSize(28).setOrigin(0.5, 0.5)
 
     //add choices
     const options = {};

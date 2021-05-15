@@ -38,7 +38,8 @@ export default class SoldierPlayer extends Phaser.Physics.Arcade.Sprite {
     this.updateOtherPlayerMovement = this.updateOtherPlayerMovement.bind(this)
     this.revive = this.revive.bind(this)
 
-    this.body.setSize(12,40)
+    // this.body.setSize(5, 40, false)
+    // this.body.setOffset(30, 30) //testing
     this.bounceOff = this.bounceOff.bind(this)
     this.playDamageTween = this.playDamageTween.bind(this)
 
@@ -52,7 +53,6 @@ export default class SoldierPlayer extends Phaser.Physics.Arcade.Sprite {
     
     //crouching
     if (cursors.down.isDown){
-      
       this.setVelocityX(0)
       this.play('crouch', true)
     }
@@ -61,6 +61,7 @@ export default class SoldierPlayer extends Phaser.Physics.Arcade.Sprite {
       if (!this.facingLeft) {
         this.flipX = !this.flipX;
         this.facingLeft = true;
+        this.body.setOffset(19, 7)
       }
       this.setVelocityX(-300);
       cam.scrollX -= speed;
@@ -81,6 +82,7 @@ export default class SoldierPlayer extends Phaser.Physics.Arcade.Sprite {
       if (this.facingLeft) {
         this.flipX = !this.flipX;
         this.facingLeft = false;
+        this.body.setOffset(15, 7)
       }
       this.setVelocityX(300);
       cam.scrollX += speed;
@@ -100,18 +102,18 @@ export default class SoldierPlayer extends Phaser.Physics.Arcade.Sprite {
     // Neutral (no movement)
     else {
       this.setVelocityX(0);
-      // Whenever Josh is not moving, use the idleUnarmed animation
-        this.anims.play('idle', true);
-        if(this.socket){
-        this.moveState.left = false
-        this.moveState.right = false
-        this.moveState.up = false
-        this.emitMovement(this.moveState)
-        }
+      this.anims.play('idle', true);
+      
+      if(this.socket){
+      this.moveState.left = false
+      this.moveState.right = false
+      this.moveState.up = false
+      this.emitMovement(this.moveState)
+      }
     }
 
     //emit any movement
-    
+
     // let x = this.x
     // let y = this.y
     // if (
@@ -216,8 +218,6 @@ export default class SoldierPlayer extends Phaser.Physics.Arcade.Sprite {
       this.updateShoot(time, cursors, shootingFn, shootingSound);
     }
     this.updateBulletHits()
-    
-    
   }
 
   updateDying() {
