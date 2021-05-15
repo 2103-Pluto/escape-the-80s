@@ -27,6 +27,7 @@ import ControlsScene from './scenes/ControlsScene'
 import HighScoresScene from './scenes/HighScoresScene'
 import CharacterChoosingScene from './scenes/CharacterChoosingScene'
 import StoryScene from './scenes/StoryScene'
+import LevelCompletedScene from './scenes/LevelCompletedScene'
 import GameOverMenuScene from './scenes/GameOverMenuScene'
 import SinglePlayerSynthwaveScene from './scenes/SinglePlayerSynthwaveScene'
 
@@ -46,6 +47,7 @@ class Game extends Phaser.Game {
     this.scene.add('CreditsScene', CreditsScene)
     this.scene.add('MainMenuScene', MainMenuScene)
     this.scene.add('PauseScene', PauseScene)
+    this.scene.add('LevelCompletedScene', LevelCompletedScene)
     this.scene.add('ControlsScene', ControlsScene)
     this.scene.add('HighScoresScene', HighScoresScene)
     this.scene.add('CharacterChoosingScene', CharacterChoosingScene)

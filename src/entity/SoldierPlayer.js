@@ -41,15 +41,16 @@ export default class SoldierPlayer extends Phaser.Physics.Arcade.Sprite {
     const cam = this.scene.cameras.main;
     const speed = 3;
     this.previousCursor = this.cursorPosition
-    
+
     this.cursorPosition = cursors
-    
+
     //crouching
     if (cursors.down.isDown){
-      
+      console.log("onFloor-->", this.body.onFloor())
+      console.log("touching.down-->", this.body.touching.down)
       this.setVelocityX(0)
       this.play('crouch', true)
-      
+
     }
     // Move left
     else if (cursors.left.isDown) {
@@ -85,7 +86,7 @@ export default class SoldierPlayer extends Phaser.Physics.Arcade.Sprite {
     }
 
     //emit any movement
-    
+
     // let x = this.x
     // let y = this.y
     // if (
@@ -115,7 +116,7 @@ export default class SoldierPlayer extends Phaser.Physics.Arcade.Sprite {
       this.updateShoot(time, cursors, shootingFn, shootingSound);
     }
     this.updateBulletHits()
-    
+
   }
 
   updateDying() {
@@ -212,7 +213,7 @@ export default class SoldierPlayer extends Phaser.Physics.Arcade.Sprite {
 
   emitMovement(cursors){
     console.log('connected')
-    
+
     this.socket.emit("playerMovement", cursors)
   }
 }
