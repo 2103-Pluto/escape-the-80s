@@ -27,7 +27,8 @@ export default class SoldierPlayer extends Phaser.Physics.Arcade.Sprite {
     this.emitMovement = this.emitMovement.bind(this)
     this.revive = this.revive.bind(this)
 
-    this.body.setSize(12,40)
+    // this.body.setSize(5, 40, false)
+    // this.body.setOffset(30, 30) //testing
     this.bounceOff = this.bounceOff.bind(this)
     this.playDamageTween = this.playDamageTween.bind(this)
     this.previousCursor = null
@@ -46,8 +47,6 @@ export default class SoldierPlayer extends Phaser.Physics.Arcade.Sprite {
 
     //crouching
     if (cursors.down.isDown){
-      console.log("onFloor-->", this.body.onFloor())
-      console.log("touching.down-->", this.body.touching.down)
       this.setVelocityX(0)
       this.play('crouch', true)
 
@@ -57,7 +56,7 @@ export default class SoldierPlayer extends Phaser.Physics.Arcade.Sprite {
       if (!this.facingLeft) {
         this.flipX = !this.flipX;
         this.facingLeft = true;
-
+        this.body.setOffset(19, 7)
       }
       this.setVelocityX(-300);
       cam.scrollX -= speed;
@@ -70,6 +69,7 @@ export default class SoldierPlayer extends Phaser.Physics.Arcade.Sprite {
       if (this.facingLeft) {
         this.flipX = !this.flipX;
         this.facingLeft = false;
+        this.body.setOffset(15, 7)
       }
       this.setVelocityX(300);
       cam.scrollX += speed;
@@ -81,8 +81,7 @@ export default class SoldierPlayer extends Phaser.Physics.Arcade.Sprite {
     // Neutral (no movement)
     else {
       this.setVelocityX(0);
-      // Whenever Josh is not moving, use the idleUnarmed animation
-        this.anims.play('idle', true);
+      this.anims.play('idle', true);
     }
 
     //emit any movement

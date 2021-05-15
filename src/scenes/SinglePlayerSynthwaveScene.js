@@ -242,7 +242,7 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
   }
 
   createPlayer(scene) {
-    scene.player = new SoldierPlayer(scene, scene.playerZones.start.x, scene.playerZones.start.y, `${scene.color}SoldierIdle`, scene.socket).setSize(28, 32).setOffset(12, 7).setScale(2.78);
+    scene.player = new SoldierPlayer(scene, scene.playerZones.start.x, scene.playerZones.start.y, `${scene.color}SoldierIdle`, scene.socket).setSize(14, 32).setOffset(15, 7).setScale(2.78);
     scene.player.color = scene.color;
   }
 
