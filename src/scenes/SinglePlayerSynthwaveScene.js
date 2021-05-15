@@ -524,8 +524,8 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
       this.player.x + (this.player.facingLeft ? -offsetX : offsetX);
     const bulletY = this.player.y + offsetY*1.2;
     const muzzleX =
-      this.player.x + (this.player.facingLeft ? -offsetX*0.95 : offsetX*0.95);
-    const muzzleY = this.player.y - offsetY*1.2;
+      this.player.x + (this.player.facingLeft ? -offsetX*0.95 : offsetX*0.95); //adapts whether firing to left or right
+    const muzzleY = this.player.y - offsetY*1.2; //adapts whether firing to left or right
 
     //create muzzleFlash
     {this.muzzleFlash ? this.muzzleFlash.reset(muzzleX, muzzleY, this.player.facingLeft)

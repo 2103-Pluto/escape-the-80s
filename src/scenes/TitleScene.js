@@ -4,6 +4,8 @@ import WebFontFile from '../files/WebFontFile'
 export default class TitleScene extends Phaser.Scene {
   constructor() {
     super('TitleScene');
+
+    this.playStartTween = this.playStartTween.bind(this);
   }
 
   preload() {
@@ -27,7 +29,8 @@ export default class TitleScene extends Phaser.Scene {
     const height = this.game.config.height;
     this.add.image(width*0.5, height*0.5, "title-background").setOrigin(0.5, 0.5).setScale(1.2);
 
-    this.add.text(width*0.5, height*0.65, '- PRESS ENTER TO START -', { fontFamily: '"Press Start 2P"' }).setFontSize(18).setOrigin(0.5, 0.5)
+    this.startText = this.add.text(width*0.5, height*0.65, '- PRESS ENTER TO START -', { fontFamily: '"Press Start 2P"' }).setFontSize(18).setOrigin(0.5, 0.5)
+    this.playStartTween();
 
     //listen to event to transition to next scene
     this.input.keyboard.on('keydown-ENTER', () => {
@@ -35,6 +38,19 @@ export default class TitleScene extends Phaser.Scene {
       click.volume = 0.1;
       click.play();
       this.scene.start('MainMenuScene');
+    })
+  }
+
+  playStartTween() {
+    this.tweens.add({
+      targets: this.startText,
+      duration: 650,
+      delay: 300,
+      repeat: -1,
+      ease: Phaser.Math.Easing.Expo.InOut,
+      // ease: Phaser.Math.Easing.Cubic.Out,
+      alpha: 0,
+      yoyo: true
     })
   }
 }
