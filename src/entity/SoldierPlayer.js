@@ -61,7 +61,7 @@ export default class SoldierPlayer extends Phaser.Physics.Arcade.Sprite {
       if (!this.facingLeft) {
         this.flipX = !this.flipX;
         this.facingLeft = true;
-        this.body.setOffset(19, 7)
+        //this.body.setOffset(19, 7)
       }
       this.setVelocityX(-300);
       cam.scrollX -= speed;
@@ -70,7 +70,7 @@ export default class SoldierPlayer extends Phaser.Physics.Arcade.Sprite {
       }
       if(this.socket){
       this.moveState.x = this.x
-      
+      this.moveState.y = this.y
       this.moveState.left = true
       this.moveState.right = false
       this.moveState.up = false
@@ -82,7 +82,7 @@ export default class SoldierPlayer extends Phaser.Physics.Arcade.Sprite {
       if (this.facingLeft) {
         this.flipX = !this.flipX;
         this.facingLeft = false;
-        this.body.setOffset(15, 7)
+        //this.body.setOffset(15, 7)
       }
       this.setVelocityX(300);
       cam.scrollX += speed;
@@ -153,7 +153,6 @@ export default class SoldierPlayer extends Phaser.Physics.Arcade.Sprite {
         this.facingLeft = true;
       }
       this.setVelocityX(-300);
-      this.x = this.moveState.x
       cam.scrollX -= speed;
       if (this.body.onFloor()) {
         this.play('run', true);
@@ -168,7 +167,7 @@ export default class SoldierPlayer extends Phaser.Physics.Arcade.Sprite {
         this.flipX = !this.flipX;
         this.facingLeft = false;
       }
-      //this.setVelocityX(300);
+      this.setVelocityX(300);
       
       cam.scrollX += speed;
       if (this.body.onFloor()) {
@@ -176,7 +175,6 @@ export default class SoldierPlayer extends Phaser.Physics.Arcade.Sprite {
       }
       this.setPosition(moveState.x, moveState.y)
 
-    (console.log('otherplayer-->', this.x))
     }
      // Neutral (no movement)
      else {
