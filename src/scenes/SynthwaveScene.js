@@ -18,7 +18,7 @@ export default class SynthwaveScene extends Phaser.Scene {
 
     this.scene = this;
     this.fire = this.fire.bind(this);
-    this.hit = this.hit.bind(this);
+    // this.hit = this.hit.bind(this);
     this.createBackgroundElement = this.createBackgroundElement.bind(this);
     this.color = 'Blue';
 
@@ -94,9 +94,6 @@ export default class SynthwaveScene extends Phaser.Scene {
     }
   }
 
-  processCollide() {
-    console.log("Dude, stop it!")
-  }
 
   createBackgroundElement(imageWidth, texture, count, scrollFactor) {
     const height = this.game.config.height;
@@ -133,7 +130,7 @@ export default class SynthwaveScene extends Phaser.Scene {
       const  players  = arg;
       Object.keys(players).forEach(function (id) {
         if (players[id].playerId !== scene.socket.id) {
-          scene.otherPlayer = new SoldierPlayer(scene, 100, 400, `${scene.color}SoldierIdle`, scene.socket,).setScale(2.78);
+          scene.otherPlayer = new SoldierPlayer(scene, 60, 400, `${scene.color}SoldierIdle`, scene.socket,).setScale(2.78);
           //note: to address variable characters
           scene.add.existing(scene.otherPlayer)
           scene.physics.add.collider(scene.otherPlayer, scene.groundGroup)
@@ -145,17 +142,17 @@ export default class SynthwaveScene extends Phaser.Scene {
     this.socket.on("newPlayer", function (arg) {
       const playerInfo  = arg;
      //need to add socket id to player?
-      scene.otherPlayer = new SoldierPlayer(scene, 100, 400, `${scene.color}SoldierIdle`, scene.socket,).setScale(2.78);
+      scene.otherPlayer = new SoldierPlayer(scene, 60, 400, `${scene.color}SoldierIdle`, scene.socket,).setScale(2.78);
       //note: to address variable characters
       scene.add.existing(scene.otherPlayer)
       scene.physics.add.collider(scene.otherPlayer, scene.groundGroup)
     });
 
-    this.socket.on("playerMoved", function (cursors){
+    this.socket.on("playerMoved", function (moveState){
       
       //scene.otherPlayer.updateMovement({right: {isDown:true}})
-      scene.otherPlayer.updateOtherPlayerMovement(cursors)
-      if(cursors.up) scene.otherPlayer.updateOtherPlayerJump(cursors)
+      scene.otherPlayer.updateOtherPlayerMovement(moveState)
+      if(moveState.up) scene.otherPlayer.updateOtherPlayerJump(moveState)
       // scene.otherPlayer.x = data.x
       // scene.otherPlayer.y = data.y
       // scene.otherPlayer.setPosition(data.x, data.y)
@@ -199,15 +196,15 @@ export default class SynthwaveScene extends Phaser.Scene {
     this.cursors = this.input.keyboard.createCursorKeys();
     this.createAnimations();
 
-    this.enemy = new enemy(this, 600, 400, 'brandon').setScale(.25)
+    // this.enemy = new enemy(this, 600, 400, 'brandon').setScale(.25)
 
     this.createStar(600, 400); //create a star to test the Heart entity
     this.createHeart(100, 500);
     this.createHeart(120, 500);     //create a heart to test the Heart entity
 
     // ...
-    this.physics.add.collider(this.enemy, this.groundGroup);
-    this.physics.add.collider(this.enemy, this.player);
+    // this.physics.add.collider(this.enemy, this.groundGroup);
+    // this.physics.add.collider(this.enemy, this.player);
 
     // We're going to create a group for our lasers
     this.bullets = this.physics.add.group({
@@ -221,13 +218,13 @@ export default class SynthwaveScene extends Phaser.Scene {
     });
 
     // When the laser collides with the enemy
-    this.physics.add.overlap(
-      this.bullets,
-      this.enemy,
-      this.hit,
-      null,
-      this
-    );
+    // this.physics.add.overlap(
+    //   this.bullets,
+    //   this.enemy,
+    //   this.hit,
+    //   null,
+    //   this
+    // );
 
 
 
@@ -256,9 +253,9 @@ export default class SynthwaveScene extends Phaser.Scene {
 
     //create mario(enemy)
     // this.createMario(300,500)
-    this.mario = new Mario(this, 300, 400, 'mario').setScale(3.0)
-    this.physics.add.collider(this.mario, this.groundGroup);
-    this.physics.add.collider(this.mario, this.player);
+    // this.mario = new Mario(this, 300, 400, 'mario').setScale(3.0)
+    // this.physics.add.collider(this.mario, this.groundGroup);
+    // this.physics.add.collider(this.mario, this.player);
     
    
 
@@ -274,9 +271,9 @@ export default class SynthwaveScene extends Phaser.Scene {
     this.player.update(time, this.cursors, this.jumpSound, this.fire, this.shootingSound);
     if (this.muzzleFlash) this.muzzleFlash.update(delta)
 
-    this.enemy.update(this.screamSound);
+    // this.enemy.update(this.screamSound);
     
-    this.mario.update()
+    // this.mario.update()
 
     
   }
@@ -355,9 +352,9 @@ export default class SynthwaveScene extends Phaser.Scene {
 
 
     // make the laser inactive and insivible when it hits the enemy
-    hit(enemy, bullet) {
-      bullet.setActive(false);
-      bullet.setVisible(false);
-    }
+    // hit(enemy, bullet) {
+    //   bullet.setActive(false);
+    //   bullet.setVisible(false);
+    // }
 
 }

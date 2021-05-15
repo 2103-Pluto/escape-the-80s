@@ -47,13 +47,13 @@ serverSocket.on('connection', function (socket) {
     
   // });
 
-  socket.on("playerMovement", function (cursors) {
+  socket.on("playerMovement", function (moveState) {
     // emit a message to all players about the player that moved
     
     // players[socket.id].playerMovement = 
     //   {...players[socket.id].playerMovement, ...cursors}
    
-    socket.broadcast.emit("playerMoved", cursors)
+    socket.broadcast.emit("playerMoved", moveState)
     ;
     
   });
