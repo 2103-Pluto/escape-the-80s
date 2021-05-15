@@ -23,7 +23,13 @@ const serverSocket = io(server);
 serverSocket.on('connection', function (socket) {
   console.log('a user connected');
   players[socket.id] = {
-    playerId: socket.id
+    playerId: socket.id,
+    playerMovement: {
+      left: false,
+      right: false,
+      up: false,
+      down: false
+    }
   }
 
   socket.emit("currentPlayers", players);
@@ -44,7 +50,11 @@ serverSocket.on('connection', function (socket) {
   socket.on("playerMovement", function (cursors) {
     // emit a message to all players about the player that moved
     
-    socket.broadcast.emit("playerMoved", cursors);
+    // players[socket.id].playerMovement = 
+    //   {...players[socket.id].playerMovement, ...cursors}
+   
+    socket.broadcast.emit("playerMoved", cursors)
+    ;
     
   });
 

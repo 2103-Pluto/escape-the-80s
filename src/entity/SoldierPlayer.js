@@ -25,6 +25,7 @@ export default class SoldierPlayer extends Phaser.Physics.Arcade.Sprite {
     this.decreaseHealth = this.decreaseHealth.bind(this)
     this.decreaseScore = this.decreaseScore.bind(this)
     this.emitMovement = this.emitMovement.bind(this)
+    this.updateOtherPlayerMovement = this.updateOtherPlayerMovement.bind(this)
     this.revive = this.revive.bind(this)
 
     this.body.setSize(12,40)
@@ -49,6 +50,11 @@ export default class SoldierPlayer extends Phaser.Physics.Arcade.Sprite {
       
       this.setVelocityX(0)
       this.play('crouch', true)
+      // this.emitMovement({
+      //   up: false,
+      //   down: true,
+      //   right:false,
+      //   left: false})
       
     }
     // Move left
@@ -56,16 +62,98 @@ export default class SoldierPlayer extends Phaser.Physics.Arcade.Sprite {
       if (!this.facingLeft) {
         this.flipX = !this.flipX;
         this.facingLeft = true;
-
       }
       this.setVelocityX(-300);
       cam.scrollX -= speed;
       if (this.body.onFloor()) {
         this.play('run', true);
+        this.emitMovement({
+          up: false,
+          down: false,
+          right:false,
+          left: true})
+        
       }
     }
     // Move right
     else if (cursors.right.isDown) {
+      if (this.facingLeft) {
+        this.flipX = !this.flipX;
+        this.facingLeft = false;
+      }
+      this.setVelocityX(300);
+      cam.scrollX += speed;
+      if (this.body.onFloor()) {
+        this.play('run', true);
+        this.emitMovement({
+          up: false,
+          down: false,
+          right:true,
+          left: false})
+      }
+    }
+
+    // Neutral (no movement)
+    else {
+      this.setVelocityX(0);
+      // Whenever Josh is not moving, use the idleUnarmed animation
+        this.anims.play('idle', true);
+        this.emitMovement({
+          up: false,
+          down: false,
+          right:false,
+          left: false})
+    }
+
+    //emit any movement
+    
+    // let x = this.x
+    // let y = this.y
+    // if (
+    //   this.oldPosition && (x!=this.oldPosition.x ||
+    //   y!== this.oldPosition.y) && this.socket
+    // ) {
+    //   this.socket.emit("playerMovement", {
+    //     x: this.x,
+    //     y: this.y
+    //   })
+    // }
+    // this.oldPosition = {
+    //   x: this.x,
+    //   y: this.y
+    // }
+    //if(previousCursor!==this.cursorPosition) this.emitMovement(cursors)
+
+  }
+
+
+  updateOtherPlayerMovement(cursors) {
+    const cam = this.scene.cameras.main;
+    const speed = 3;
+    
+    
+    //crouching
+    if (cursors.down){
+      
+      this.setVelocityX(0)
+      this.play('crouch', true)
+      
+    }
+    // Move left
+    else if (cursors.left) {
+      if (!this.facingLeft) {
+        this.flipX = !this.flipX;
+        this.facingLeft = true;
+      }
+      this.setVelocityX(-300);
+      cam.scrollX -= speed;
+      if (this.body.onFloor()) {
+        this.play('run', true);
+        
+      }
+    }
+    // Move right
+    else if (cursors.right) {
       if (this.facingLeft) {
         this.flipX = !this.flipX;
         this.facingLeft = false;
@@ -137,6 +225,18 @@ export default class SoldierPlayer extends Phaser.Physics.Arcade.Sprite {
   }
   updateJump(cursors, jumpSound) {
     if (cursors.up.isDown && this.body.onFloor()) {
+      this.setVelocityY(-750);
+      jumpSound.play()
+      this.emitMovement({
+        up: true,
+        down: false,
+        right:false,
+        left: false})
+    }
+  }
+
+  updateOtherPlayerJump(cursors, jumpSound) {
+    if (cursors.up && this.body.onFloor()) {
       this.setVelocityY(-750);
       jumpSound.play()
     }
@@ -211,8 +311,6 @@ export default class SoldierPlayer extends Phaser.Physics.Arcade.Sprite {
   }
 
   emitMovement(cursors){
-    console.log('connected')
-    
     this.socket.emit("playerMovement", cursors)
   }
 }

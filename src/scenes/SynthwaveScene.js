@@ -151,6 +151,16 @@ export default class SynthwaveScene extends Phaser.Scene {
       scene.physics.add.collider(scene.otherPlayer, scene.groundGroup)
     });
 
+    this.socket.on("playerMoved", function (cursors){
+      
+      //scene.otherPlayer.updateMovement({right: {isDown:true}})
+      scene.otherPlayer.updateOtherPlayerMovement(cursors)
+      if(cursors.up) scene.otherPlayer.updateOtherPlayerJump(cursors)
+      // scene.otherPlayer.x = data.x
+      // scene.otherPlayer.y = data.y
+      // scene.otherPlayer.setPosition(data.x, data.y)
+      // scene.physics.add.collider(scene.player, scene.otherPlayer, scene.processCollide);
+    })
 
 
     //mute the previous scene
@@ -268,15 +278,6 @@ export default class SynthwaveScene extends Phaser.Scene {
     
     this.mario.update()
 
-    this.socket.on("playerMoved", function (cursors){
-
-      //scene.otherPlayer.updateMovement({right: {isDown:true}})
-      scene.otherPlayer.setPosition(600, 600)
-      // scene.otherPlayer.x = data.x
-      // scene.otherPlayer.y = data.y
-      // scene.otherPlayer.setPosition(data.x, data.y)
-      // scene.physics.add.collider(scene.player, scene.otherPlayer, scene.processCollide);
-    })
     
   }
 
