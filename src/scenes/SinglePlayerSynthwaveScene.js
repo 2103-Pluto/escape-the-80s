@@ -262,7 +262,10 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
   }
   
   createFlagpole(scene) {
-    scene.flagpole = new Flagpole(scene, 300, 400, 'flagpole')
+    scene.flagpole = new Flagpole(scene, scene.playerZones.end.x, 310, 'flagpole').setScale(2.78)
+    scene.flagpole.body.immovable = true
+    scene.flagpole.body.allowGravity = false
+    
   }
   
 
@@ -635,9 +638,9 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
     });
     this.anims.create({
       key: 'raise-flagpole',
-      frames: this.anims.generateFrameNumbers('heart'),
-      frameRate: 10,
-      repeat: -1,
+      frames: this.anims.generateFrameNumbers('flagpole'),
+      frameRate: 5,
+      repeat: 0,
     })
   }
 
@@ -674,7 +677,7 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
     }
     
     raiseFlagpole() {
-      this.flagpole.play("raise-flagpole")
+      this.flagpole.play("raise-flagpole", false)
     }
 
     showGameOverMenu(scene) {
