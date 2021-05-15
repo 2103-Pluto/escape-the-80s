@@ -41,8 +41,6 @@ export default class SoldierPlayer extends Phaser.Physics.Arcade.Sprite {
     this.body.setSize(12,40)
     this.bounceOff = this.bounceOff.bind(this)
     this.playDamageTween = this.playDamageTween.bind(this)
-    this.previousCursor = null
-    this.cursorPosition = null
 
     this.bulletHits = 0
     this.bulletDeath = 5
