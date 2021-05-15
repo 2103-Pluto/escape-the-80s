@@ -23,6 +23,7 @@ import TitleScene from './scenes/TitleScene'
 import PauseScene from './scenes/PauseScene'
 import CreditsScene from './scenes/CreditsScene'
 import MainMenuScene from './scenes/MainMenuScene'
+import ControlsScene from './scenes/ControlsScene'
 import HighScoresScene from './scenes/HighScoresScene'
 import CharacterChoosingScene from './scenes/CharacterChoosingScene'
 import StoryScene from './scenes/StoryScene'
@@ -45,6 +46,7 @@ class Game extends Phaser.Game {
     this.scene.add('CreditsScene', CreditsScene)
     this.scene.add('MainMenuScene', MainMenuScene)
     this.scene.add('PauseScene', PauseScene)
+    this.scene.add('ControlsScene', ControlsScene)
     this.scene.add('HighScoresScene', HighScoresScene)
     this.scene.add('CharacterChoosingScene', CharacterChoosingScene)
     this.scene.add('StoryScene', StoryScene)
