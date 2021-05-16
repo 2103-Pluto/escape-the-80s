@@ -62,6 +62,6 @@ export default class MainMenuScene extends Phaser.Scene {
 
   createClick(scene) {
     scene.click = this.sound.add('click');
-    scene.click.volume = 0.1;
+    scene.click.volume = 0.05;
   }
 }

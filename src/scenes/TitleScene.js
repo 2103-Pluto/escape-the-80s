@@ -19,7 +19,7 @@ export default class TitleScene extends Phaser.Scene {
     //add background music
     const backgroundMusic = this.sound.add('title-music');
     backgroundMusic.setLoop(true);
-    backgroundMusic.volume = 0.1;
+    backgroundMusic.volume = 0.03;
     backgroundMusic.play();
 
     this.sound.pauseOnBlur = false; //prevent sound from cutting when you leave tab
@@ -35,7 +35,7 @@ export default class TitleScene extends Phaser.Scene {
     //listen to event to transition to next scene
     this.input.keyboard.on('keydown-ENTER', () => {
       const click = this.sound.add('click');
-      click.volume = 0.1;
+      click.volume = 0.05;
       click.play();
       this.scene.start('MainMenuScene');
     })
