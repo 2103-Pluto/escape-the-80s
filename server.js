@@ -31,24 +31,12 @@ serverSocket.on('connection', function (socket) {
   socket.broadcast.emit("newPlayer", players[socket.id])
   
 
-  // when a player moves, update the player data
-  // socket.on("playerMovement", function (data) {
-  //   const { x, y } = data;
-  //   players[socket.id].x = x;
-  //   players[socket.id].y = y;
-  //   // emit a message to all players about the player that moved
-  //   socket.broadcast.emit("playerMoved", players[socket.id]);
-    
-  // });
-
   socket.on("playerMovement", function (moveState) {
     // emit a message to all players about the player that moved
     
-    // players[socket.id].playerMovement = 
-    //   {...players[socket.id].playerMovement, ...cursors}
     players[socket.id].moveState = moveState
     socket.broadcast.emit("playerMoved", moveState)
-    ;
+    
     
   });
 

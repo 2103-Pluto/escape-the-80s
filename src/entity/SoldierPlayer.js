@@ -37,6 +37,7 @@ export default class SoldierPlayer extends Phaser.Physics.Arcade.Sprite {
     this.decreaseScore = this.decreaseScore.bind(this)
     this.emitMovement = this.emitMovement.bind(this)
     this.updateOtherPlayerMovement = this.updateOtherPlayerMovement.bind(this)
+    this.updateOtherPlayerInAir = this.updateOtherPlayerInAir.bind(this)
     this.revive = this.revive.bind(this)
 
     // this.body.setSize(5, 40, false)
@@ -71,11 +72,12 @@ export default class SoldierPlayer extends Phaser.Physics.Arcade.Sprite {
     // Move left
     else if (cursors.left.isDown) {
       if (!this.facingLeft) {
+        
         this.flipX = !this.flipX;
         this.facingLeft = true;
-        //this.moveState.facingLeft = true
+        this.moveState.facingLeft = true
+        this.body.setOffset(19, 7)
         
-        //this.body.setOffset(19, 7)
       }
       this.setVelocityX(-300);
       cam.scrollX -= speed;
@@ -97,8 +99,7 @@ export default class SoldierPlayer extends Phaser.Physics.Arcade.Sprite {
       if (this.facingLeft) {
         this.flipX = !this.flipX;
         this.facingLeft = false;
-        // this.moveState.facingLeft = false
-        //this.body.setOffset(15, 7)
+        this.body.setOffset(15, 7)
       }
       this.setVelocityX(300);
       cam.scrollX += speed;
@@ -129,25 +130,6 @@ export default class SoldierPlayer extends Phaser.Physics.Arcade.Sprite {
       this.emitMovement(this.moveState)
       }
     }
-
-    //emit any movement
-
-    // let x = this.x
-    // let y = this.y
-    // if (
-    //   this.oldPosition && (x!=this.oldPosition.x ||
-    //   y!== this.oldPosition.y) && this.socket
-    // ) {
-    //   this.socket.emit("playerMovement", {
-    //     x: this.x,
-    //     y: this.y
-    //   })
-    // }
-    // this.oldPosition = {
-    //   x: this.x,
-    //   y: this.y
-    // }
-
   }
 
 
@@ -159,7 +141,6 @@ export default class SoldierPlayer extends Phaser.Physics.Arcade.Sprite {
    
     //crouching
     if (moveState.down){
-      console.log('STATE--->', moveState)
       this.setVelocityX(0)
       this.play('crouch', true)
       
@@ -169,6 +150,7 @@ export default class SoldierPlayer extends Phaser.Physics.Arcade.Sprite {
       if (!this.facingLeft) {
         this.flipX = !this.flipX;
         this.facingLeft = true;
+        this.body.setOffset(19, 7)
       }
       this.setVelocityX(-300);
       cam.scrollX -= speed;
@@ -184,6 +166,7 @@ export default class SoldierPlayer extends Phaser.Physics.Arcade.Sprite {
       if (this.facingLeft) {
         this.flipX = !this.flipX;
         this.facingLeft = false;
+        this.body.setOffset(15, 7)
       }
       this.setVelocityX(300);
       
@@ -201,26 +184,6 @@ export default class SoldierPlayer extends Phaser.Physics.Arcade.Sprite {
         this.anims.play('idle', true);
     }
 
-    
-
-    //emit any movement
-    
-    // let x = this.x
-    // let y = this.y
-    // if (
-    //   this.oldPosition && (x!=this.oldPosition.x ||
-    //   y!== this.oldPosition.y) && this.socket
-    // ) {
-    //   this.socket.emit("playerMovement", {
-    //     x: this.x,
-    //     y: this.y
-    //   })
-    // }
-    // this.oldPosition = {
-    //   x: this.x,
-    //   y: this.y
-    // }
-    //if(previousCursor!==this.cursorPosition) this.emitMovement(cursors)
 
   }
 
@@ -262,6 +225,7 @@ export default class SoldierPlayer extends Phaser.Physics.Arcade.Sprite {
       this.moveState.up = true
       this.moveState.right = false
       this.moveState.left = false
+      this.moveState.down = false
       this.emitMovement(this.moveState)
       }
     }
@@ -270,11 +234,17 @@ export default class SoldierPlayer extends Phaser.Physics.Arcade.Sprite {
   updateOtherPlayerJump(moveState, jumpSound) {
     if (moveState.up && this.body.onFloor()) {
       this.setVelocityY(-750);
-      //jumpSound.play()
+      jumpSound.play()
     }
   }
 
   updateInAir() {
+    if (!this.body.onFloor()) {
+      this.play('jump');
+    }
+  }
+
+  updateOtherPlayerInAir(){
     if (!this.body.onFloor()) {
       this.play('jump');
     }
