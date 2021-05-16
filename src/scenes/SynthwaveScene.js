@@ -47,6 +47,12 @@ export default class SynthwaveScene extends Phaser.Scene {
       frameHeight: 39,
     })
 
+     //Crouching Soldier
+     this.load.spritesheet(`${this.color}SoldierCrouching`, `assets/spriteSheets/${this.color}/Gunner_${this.color}_Crouch.png`, {
+      frameWidth: 48,
+      frameHeight: 39,
+    })
+    
     this.load.spritesheet('mario', 'assets/spriteSheets/mario_enemy.png', {
       frameWidth: 30,
       frameHeight: 37,
@@ -130,6 +136,7 @@ export default class SynthwaveScene extends Phaser.Scene {
       const  players  = arg;
       Object.keys(players).forEach(function (id) {
         if (players[id].playerId !== scene.socket.id) {
+          console.log(players[id].moveState)
           const x = players[id].moveState.x
           const y = players[id].moveState.y
           const facingLeft = players[id].moveState.facingLeft
@@ -351,6 +358,10 @@ export default class SynthwaveScene extends Phaser.Scene {
       frames: this.anims.generateFrameNumbers('mario', { start: 5, end: 8 }),
       frameRate: 5,
       repeat: -1,
+    });
+    this.anims.create({
+      key: 'crouch',
+      frames: this.anims.generateFrameNumbers(`${this.color}SoldierCrouching`, {start:3}),
     });
   }
 
