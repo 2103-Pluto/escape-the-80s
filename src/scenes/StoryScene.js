@@ -21,11 +21,11 @@ export default class StoryScene extends Phaser.Scene {
     //add back
     this.scene.get('CreditsScene').createBack(this, 'CharacterChoosingScene');
     // add skip
-    const skip = this.add.text(710, 40, 'Skip', { fontFamily: '"Press Start 2P"' }).setFontSize(28).setOrigin(0.5, 0.5)
+    const skip = this.add.text(710, 40, 'Skip', { fontFamily: '"Press Start 2P"' }).setFontSize(28).setOrigin(0.5, 0.5).setColor('#4DF3F5')
     skip.setInteractive();
     skip.on("pointerover", () => {
       this.hoverIcon.setVisible(true);
-      skip.setColor('yellow')
+      skip.setColor('#feff38')
       this.hoverIcon.x = skip.x - skip.width + 5;
       this.hoverIcon.y = skip.y;
     })

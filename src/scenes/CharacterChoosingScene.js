@@ -4,7 +4,6 @@ export default class CharacterChoosingScene extends Phaser.Scene {
   constructor() {
     super('CharacterChoosingScene');
     this.colors = ['Blue', 'Green', 'Red','Yellow'];
-    this.chose = false;
   }
 
   preload() {
@@ -32,7 +31,7 @@ export default class CharacterChoosingScene extends Phaser.Scene {
     const height = this.game.config.height;
 
     //add text
-    this.add.text(width*0.5, height*0.2, 'PLAYER SELECT', { fontFamily: '"Press Start 2P"' }).setFontSize(28).setOrigin(0.5, 0.5)
+    this.add.text(width*0.5, height*0.2, 'PLAYER SELECT', { fontFamily: '"Press Start 2P"' }).setFontSize(28).setOrigin(0.5, 0.5).setColor('#ED6BF3')
 
     //add choices
     const options = {};
@@ -53,7 +52,7 @@ export default class CharacterChoosingScene extends Phaser.Scene {
       audio['Blue'] = this.sound.add(`one-liner2`); //Rocky 0.17
       audio['Blue'].volume =0.17
       audio['Red'] = this.sound.add(`one-liner3`); //Airplane 0.15
-      audio['Red'].volume =0.15
+      audio['Red'].volume =0.17
       audio['Yellow'] = this.sound.add(`one-liner4`); //Terminator 0.12
       audio['Yellow'].volume =0.12
       // const audio5 = this.sound.add(`one-liner5`); //Incredible Hulk 0.2
@@ -63,28 +62,31 @@ export default class CharacterChoosingScene extends Phaser.Scene {
 
     //set interactivity and selection
     let selected;
+    let finalSelected;
     this.createAnimations()
     for (let key of Object.keys(options)) {
       options[key].setInteractive();
       options[key].play(`${key}Idle`)
       options[key].on("pointerover", () => {
-        options[key].play(`${key}Run`)
-        selected = key;
-        audio[key].play()
+        if (!finalSelected) {
+          options[key].play(`${key}Run`)
+          selected = key;
+          audio[key].play()
+        }
       })
       options[key].on("pointerout", () => {
-        if (!this.chose) {
+        if (!finalSelected) {
           options[key].play(`${key}Idle`)
           selected = ''
           audio[key].stop()
         }
       })
       options[key].on("pointerup", () => {
-        this.chose = true;
         if (selected) {
+          finalSelected = selected;
           click.play();
           audio[key].on('complete', () => {
-            this.scene.start('StoryScene', { color: selected })
+            this.scene.start('StoryScene', { color: finalSelected})
           })
         }
       })

@@ -41,7 +41,7 @@ export default class MainMenuScene extends Phaser.Scene {
       options[key].setInteractive();
       options[key].on("pointerover", () => {
         hoverIcon.setVisible(true);
-        options[key].setColor('yellow')
+        options[key].setColor('#feff38')
         selected = key;
         hoverIcon.x = options[key].x - 60;
         hoverIcon.y = options[key].y;

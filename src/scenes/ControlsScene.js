@@ -20,7 +20,7 @@ export default class ControlsScene extends Phaser.Scene {
     backgroundImage.alpha = 0.1;
 
     //addd text
-    this.add.text(width*0.5, height*0.2, 'CONTROLS', { fontFamily: '"Press Start 2P"' }).setFontSize(28).setOrigin(0.5, 0.5)
+    this.add.text(width*0.5, height*0.2, 'CONTROLS', { fontFamily: '"Press Start 2P"' }).setFontSize(28).setOrigin(0.5, 0.5).setColor('#ED6BF3')
     this.add.text(width*0.15, height*0.34, 'Run right --- Right Arrow', { fontFamily: '"Press Start 2P"' }).setFontSize(24).setOrigin(0, 0.5)
     this.add.text(width*0.15, height*0.45, 'Run left ---- Left Arrow', { fontFamily: '"Press Start 2P"' }).setFontSize(24).setOrigin(0, 0.5)
     this.add.text(width*0.15, height*0.56, 'Jump -------- Up Arrow', { fontFamily: '"Press Start 2P"' }).setFontSize(24).setOrigin(0, 0.5)

@@ -32,7 +32,7 @@ export default class GameOverMenuScene extends Phaser.Scene {
       scene.hoverIcon.setVisible(true);
       scene.hoverIcon.x = quit.x - 90;
       scene.hoverIcon.y = quit.y;
-      quit.setColor('yellow')
+      quit.setColor('#feff38')
     })
     quit.on("pointerout", () => {
       scene.hoverIcon.setVisible(false);
@@ -54,7 +54,7 @@ export default class GameOverMenuScene extends Phaser.Scene {
       scene.hoverIcon.setVisible(true);
       scene.hoverIcon.x = restart.x - 126;
       scene.hoverIcon.y = restart.y;
-      restart.setColor('yellow')
+      restart.setColor('#feff38')
     })
     restart.on("pointerout", () => {
       scene.hoverIcon.setVisible(false);
