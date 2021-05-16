@@ -4,6 +4,7 @@ export default class CharacterChoosingScene extends Phaser.Scene {
   constructor() {
     super('CharacterChoosingScene');
     this.colors = ['Blue', 'Green', 'Red','Yellow'];
+    this.chose = false;
   }
 
   preload() {
@@ -19,7 +20,7 @@ export default class CharacterChoosingScene extends Phaser.Scene {
       });
     }
     //load audio
-    for (let i=1; i<7; i++) {
+    for (let i=1; i<5; i++) {
       this.load.audio(`one-liner${i}`, `assets/audio/one_liners/one-liner${i}.wav`);
     }
   }
@@ -46,18 +47,19 @@ export default class CharacterChoosingScene extends Phaser.Scene {
     click.volume = 0.05;
 
     //add one liner audio files
-      const audio1 = this.sound.add(`one-liner1`); //Sudden Impact
-      audio1.volume =0.15
-      const audio2 = this.sound.add(`one-liner2`); //Rocky
-      audio2.volume =0.17
-      const audio3 = this.sound.add(`one-liner3`); //Airplane
-      audio3.volume =0.15
-      const audio4 = this.sound.add(`one-liner4`); //Terminator
-      audio4.volume =0.12
-      const audio5 = this.sound.add(`one-liner5`); //Incredible Hulk
-      audio5.volume =0.2
-      const audio6 = this.sound.add(`one-liner6`); //Scarface
-      audio6.volume =0.15
+    const audio = {}
+      audio['Green'] = this.sound.add(`one-liner1`); //Sudden Impact 0.15
+      audio['Green'].volume =0.15
+      audio['Blue'] = this.sound.add(`one-liner2`); //Rocky 0.17
+      audio['Blue'].volume =0.17
+      audio['Red'] = this.sound.add(`one-liner3`); //Airplane 0.15
+      audio['Red'].volume =0.15
+      audio['Yellow'] = this.sound.add(`one-liner4`); //Terminator 0.12
+      audio['Yellow'].volume =0.12
+      // const audio5 = this.sound.add(`one-liner5`); //Incredible Hulk 0.2
+      // audio5.volume =0.2
+      // const audio6 = this.sound.add(`one-liner6`); //Scarface 0.15
+      // audio6.volume =0.15
 
     //set interactivity and selection
     let selected;
@@ -68,41 +70,22 @@ export default class CharacterChoosingScene extends Phaser.Scene {
       options[key].on("pointerover", () => {
         options[key].play(`${key}Run`)
         selected = key;
-        switch (key) {
-          case 'Blue':
-            audio2.play();
-            break;
-          case 'Green':
-            audio5.play();
-            break;
-          case 'Red':
-            audio1.play();
-            break;
-          default: //this is Yellow
-            audio4.play()
-        }
+        audio[key].play()
       })
       options[key].on("pointerout", () => {
-        options[key].play(`${key}Idle`)
-        selected = ''
-        switch (key) {
-          case 'Blue':
-            audio2.stop();
-            break;
-          case 'Green':
-            audio5.stop();
-            break;
-          case 'Red':
-            audio1.stop();
-            break;
-          default: //this is Yellow
-            audio4.stop()
+        if (!this.chose) {
+          options[key].play(`${key}Idle`)
+          selected = ''
+          audio[key].stop()
         }
       })
       options[key].on("pointerup", () => {
+        this.chose = true;
         if (selected) {
           click.play();
-          this.scene.start('StoryScene', { color: selected })
+          audio[key].on('complete', () => {
+            this.scene.start('StoryScene', { color: selected })
+          })
         }
       })
     }
