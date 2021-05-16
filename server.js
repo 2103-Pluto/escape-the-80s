@@ -46,7 +46,7 @@ serverSocket.on('connection', function (socket) {
     
     // players[socket.id].playerMovement = 
     //   {...players[socket.id].playerMovement, ...cursors}
-   
+    players[socket.id].moveState = moveState
     socket.broadcast.emit("playerMoved", moveState)
     ;
     

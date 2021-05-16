@@ -130,7 +130,11 @@ export default class SynthwaveScene extends Phaser.Scene {
       const  players  = arg;
       Object.keys(players).forEach(function (id) {
         if (players[id].playerId !== scene.socket.id) {
-          scene.otherPlayer = new SoldierPlayer(scene, 60, 400, `${scene.color}SoldierIdle`, scene.socket,).setScale(2.78);
+          const x = players[id].moveState.x
+          const y = players[id].moveState.y
+          const facingLeft = players[id].moveState.facingLeft
+          scene.otherPlayer = new SoldierPlayer(scene, x, y, `${scene.color}SoldierIdle`, scene.socket,).setScale(2.78);
+          scene.otherPlayer.facingLeft = facingLeft
           //note: to address variable characters
           scene.add.existing(scene.otherPlayer)
           scene.physics.add.collider(scene.otherPlayer, scene.groundGroup)
