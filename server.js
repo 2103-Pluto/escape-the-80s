@@ -23,13 +23,7 @@ const serverSocket = io(server);
 serverSocket.on('connection', function (socket) {
   console.log('a user connected');
   players[socket.id] = {
-    playerId: socket.id,
-    playerMovement: {
-      left: false,
-      right: false,
-      up: false,
-      down: false
-    }
+    playerId: socket.id
   }
 
   socket.emit("currentPlayers", players);
