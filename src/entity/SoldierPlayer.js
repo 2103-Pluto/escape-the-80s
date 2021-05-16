@@ -47,9 +47,13 @@ export default class SoldierPlayer extends Phaser.Physics.Arcade.Sprite {
 
     //crouching
     if (cursors.down.isDown){
+      if (!this.facingLeft) {
+        this.body.setSize(16, 27).setOffset(17, 12)
+      } else {
+        this.body.setSize(16, 27).setOffset(15, 12)
+      }
       this.setVelocityX(0)
       this.play('crouch', true)
-
     }
     // Move left
     else if (cursors.left.isDown) {
@@ -82,6 +86,12 @@ export default class SoldierPlayer extends Phaser.Physics.Arcade.Sprite {
     else {
       this.setVelocityX(0);
       this.anims.play('idle', true);
+      this.body.setSize(14, 32)
+      if (!this.facingLeft) {
+        this.body.setOffset(15, 7)
+      } else {
+        this.body.setOffset(19, 7)
+      }
     }
 
     //emit any movement

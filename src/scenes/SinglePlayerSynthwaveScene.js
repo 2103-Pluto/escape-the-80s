@@ -256,9 +256,12 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
     scene.platforms.setCollisionBetween(1, 2)
     scene.physics.add.collider(scene.flagpole, scene.groundGroup)
     scene.physics.add.overlap(scene.player, scene.flagpole, function() {
-      scene.raiseFlagpole() // If the player touches the flagpole it falls through the ground
+      scene.raiseFlagpole()
     })
-
+    scene.physics.add.collider(scene.bullets, scene.platforms, function(bullet, platform) {
+      // bullet.destroy() // there is a bug with this code that makes it so that bullets are destroyed as soon as fired... what do??
+      console.log("bullet hit platform") 
+    })
   }
 
   createFlagpole(scene) {
@@ -419,9 +422,11 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
     this.createFlagpole(this)
     this.createPhysics(this)
     this.pause(this) //creates pause functionality
+  
     // --->
     this.cursors = this.input.keyboard.createCursorKeys();
-
+    
+    
     //this.physics.add.collider(this.player, this.platforms)
 
     // this.enemy = new enemy(this, 600, 400, 'brandon').setScale(.25) UNCOMMENT TO TEST BRANDON
@@ -525,7 +530,7 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
     const offsetY = 5.5;
     const bulletX =
       this.player.x + (this.player.facingLeft ? -offsetX : offsetX);
-    const bulletY = this.player.y + offsetY*1.2;
+    const bulletY = this.player.y - offsetY*1.2;
     const muzzleX =
       this.player.x + (this.player.facingLeft ? -offsetX*0.95 : offsetX*0.95);
     const muzzleY = this.player.y - offsetY*1.2;
