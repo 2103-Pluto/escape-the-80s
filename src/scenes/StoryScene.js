@@ -31,7 +31,7 @@ export default class StoryScene extends Phaser.Scene {
     })
     skip.on("pointerout", () => {
       this.hoverIcon.setVisible(false);
-      skip.setColor('white')
+      skip.setColor('#4DF3F5')
     })
     skip.on("pointerup", () => {
       this.click.play();

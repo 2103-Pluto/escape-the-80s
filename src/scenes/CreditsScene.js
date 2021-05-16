@@ -38,7 +38,7 @@ export default class CreditsScene extends Phaser.Scene {
     scene.hoverIcon.setVisible(false);
 
     //add option to return to menu
-    const back = scene.add.text(35, 40, 'Go back', { fontFamily: '"Press Start 2P"' }).setFontSize(28).setOrigin(0, 0.5).setColor('#4DF3F5')
+    const back = scene.add.text(35, 40, 'Go Back', { fontFamily: '"Press Start 2P"' }).setFontSize(28).setOrigin(0, 0.5).setColor('#4DF3F5')
 
     back.setInteractive();
     back.on("pointerover", () => {
