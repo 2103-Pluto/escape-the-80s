@@ -22,6 +22,7 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
     this.fire = this.fire.bind(this);
     this.terminatorFire = this.terminatorFire.bind(this)
     this.hit = this.hit.bind(this);
+    this.hitPlatform = this.hitPlatform.bind(this)
     this.createBackgroundElement = this.createBackgroundElement.bind(this);
     //bind functions
     this.createPlayer = this.createPlayer.bind(this);
@@ -41,6 +42,7 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
     this.raiseFlagpole = this.raiseFlagpole.bind(this)
     this.createFlagpole = this.createFlagpole.bind(this)
     this.pause = this.pause.bind(this)
+    this.createPhysics = this.createPhysics.bind(this)
   }
 
   init(data) {
@@ -258,10 +260,14 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
     scene.physics.add.overlap(scene.player, scene.flagpole, function() {
       scene.raiseFlagpole()
     })
-    scene.physics.add.collider(scene.bullets, scene.platforms, function(bullet, platform) {
-      // bullet.destroy() // there is a bug with this code that makes it so that bullets are destroyed as soon as fired... what do??
-      console.log("bullet hit platform") 
-    })
+    scene.physics.add.overlap(scene.platforms, scene.bullets, scene.hitPlatform, null, scene)
+  }
+  hitPlatform(bullet, platform) {
+    if (platform.index === 1) {
+      bullet.setActive(false)
+      bullet.destroy()
+    }
+    
   }
 
   createFlagpole(scene) {
@@ -364,36 +370,36 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
     )
   }
 
-  createBulletGroup() {
-    this.bullets = this.physics.add.group({
+  createBulletGroup(scene) {
+    scene.bullets = this.physics.add.group({
       classType: Bullet,
       runChildUpdate: true,
       allowGravity: false,
       maxSize: 40
     });
 
-    this.physics.add.overlap(
-      this.marios,
-      this.bullets,
-      this.hit,
+    scene.physics.add.overlap(
+      scene.marios,
+      scene.bullets,
+      scene.hit,
       null,
-      this
+      scene
     );
 
-    this.physics.add.overlap(
-      this.terminator,
-      this.bullets,
-      this.hit,
+    scene.physics.add.overlap(
+      scene.terminator,
+      scene.bullets,
+      scene.hit,
       null,
-      this
+      scene
     );
 
-    this.physics.add.overlap(
-      this.player,
-      this.bullets,
-      this.hit,
+    scene.physics.add.overlap(
+      scene.player,
+      scene.bullets,
+      scene.hit,
       null,
-      this
+      scene
     );
   }
 
@@ -418,7 +424,7 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
     this.marios=this.physics.add.group();
     //this.terminators=this.physics.add.group()
     this.terminator = new Terminator(this, 2800, 400, 'terminator').setScale(4.5)
-    this.createBulletGroup() //create bullet group
+    this.createBulletGroup(this) //create bullet group
     this.createFlagpole(this)
     this.createPhysics(this)
     this.pause(this) //creates pause functionality
