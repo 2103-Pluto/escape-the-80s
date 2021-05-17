@@ -54,13 +54,13 @@ export default class StoryScene extends Phaser.Scene {
     scene.next.setInteractive()
     scene.next.on("pointerover", () => {
       scene.hoverIcon.setVisible(true);
-      scene.next.setColor('yellow')
+      scene.next.setColor('#feff38')
       scene.hoverIcon.x = scene.next.x - scene.next.width + 5;
       scene.hoverIcon.y = scene.next.y;
     })
     scene.next.on("pointerout", () => {
       scene.hoverIcon.setVisible(false);
-      scene.next.setColor('white')
+      scene.next.setColor('#4DF3F5')
     })
     
     let idx = -1;
@@ -69,7 +69,7 @@ export default class StoryScene extends Phaser.Scene {
       idx++
       if (idx < this.storyArr.length) {
         scene.hoverIcon.setVisible(false);
-        scene.next.setColor('white')
+        scene.next.setColor('#4DF3F5')
         scene.next.text = 'Next'
         scene.story.text = ""
         scene.next.removeInteractive()
@@ -87,13 +87,13 @@ export default class StoryScene extends Phaser.Scene {
     scene.skip.setInteractive();
     scene.skip.on("pointerover", () => {
       scene.hoverIcon.setVisible(true);
-      scene.skip.setColor('yellow')
+      skip.setColor('#feff38')
       scene.hoverIcon.x = scene.skip.x - scene.skip.width + 5;
       scene.hoverIcon.y = scene.skip.y;
     })
     scene.skip.on("pointerout", () => {
       scene.hoverIcon.setVisible(false);
-      scene.skip.setColor('white')
+      skip.setColor('#4DF3F5')
     })
     scene.skip.on("pointerup", () => {
       scene.click.play();
