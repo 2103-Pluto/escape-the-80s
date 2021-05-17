@@ -8,7 +8,7 @@ router.get('/', async (req, res, next) => {
     const records = await Record.findAll({
       attributes: ['id', 'name', 'score', 'level']
     })
-    res.json(records)
+    res.status(200).send(records)
   } catch (err) {
     next(err)
   }
@@ -20,9 +20,23 @@ router.get('/:id', async (req, res, next) => {
     const record = await Record.findByPk(req.params.id, {
       attributes: ['id', 'name', 'score', 'level']
     })
-    res.json(record)
+    res.status(200).send(record)
   } catch (err) {
     next(err)
   }
 })
 
+//POST route to add a record
+router.post('/', async (req, res, next) => {
+  try {
+    const { name, score, level } = req.body;
+    const record = await Record.create({
+      name,
+      score,
+      level
+    })
+    res.status(201).send(record)
+  } catch (err) {
+    next(err)
+  }
+})
