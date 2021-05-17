@@ -209,7 +209,7 @@ export default class SoldierPlayer extends Phaser.Physics.Arcade.Sprite {
   }
 
   updateBulletHits(){
-    if(this.bulletHits===3){
+    if(this.bulletHits===1){
       this.decreaseHealth(1)
       this.bulletHits=0
     }

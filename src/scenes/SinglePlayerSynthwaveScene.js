@@ -651,6 +651,7 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
       }
       bullet.setActive(false);
       if(enemy!==this.player && enemy.bulletHits===enemy.bulletDeath){
+        enemy.playDamageTween()
         enemy.destroy()
         deathSounds[enemy.name].play()
       } else enemy.bulletHits+=1
