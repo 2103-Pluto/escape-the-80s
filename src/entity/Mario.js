@@ -13,7 +13,7 @@ export default class Mario extends Phaser.Physics.Arcade.Sprite {
     this.movingLeft = false
     this.setPushable(false)
     this.body.setSize(10,35)
-    // this.playDamageTween = this.playDamageTween.bind(this)
+    this.playDamageTween = this.playDamageTween.bind(this)
     // << INITIALIZE PLAYER ATTRIBUTES HERE >>
     this.bulletHits = 0
     this.bulletDeath = 5
@@ -57,19 +57,29 @@ export default class Mario extends Phaser.Physics.Arcade.Sprite {
     this.anims.play('walk', true)
     
     if(this.y>600) {
-      // this.playDamageTween()
+      this.playDamageTween()
       this.destroy()
       hitSound.play()
 
     }
   }
 
-  // playDamageTween() {
-  //   return this.scene.tweens.add({
-  //     targets: this,
-  //     duration: 100,
-  //     repeat: -1,
-  //     tint: 0xffffff
-  //   })
-  // }
+  playDamageTween() {
+    const hitAnim = this.scene.tweens.add({
+      targets: this,
+      duration: 100,
+      repeat: -1,
+      tint: 0xff0000
+    })
+    
+    this.scene.time.addEvent({
+      delay: 250,
+      callback: () => {
+        this.hasBeenHit = false;
+        hitAnim.stop();
+        this.clearTint();
+      },
+      loop: false
+    })
+  }
 }

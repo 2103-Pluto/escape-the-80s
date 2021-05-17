@@ -16,10 +16,12 @@ export default class Terminator extends Phaser.Physics.Arcade.Sprite {
     this.setPushable(false)
     this.timeFromLastAttack = 0
     this.attackDelay = this.getAttackDelay()
+    this.playDamageTween = this.playDamageTween.bind(this)
     // << INITIALIZE PLAYER ATTRIBUTES HERE >>
     this.bulletHits = 0
     this.bulletDeath = 20
     this.name = 'terminator'
+    
 
   }
 
@@ -72,6 +74,24 @@ export default class Terminator extends Phaser.Physics.Arcade.Sprite {
   getAttackDelay(){
       return Phaser.Math.Between(200, 400)
   }
-
+  
+  playDamageTween() {
+    const hitAnim = this.scene.tweens.add({
+      targets: this,
+      duration: 100,
+      repeat: -1,
+      tint: 0xff0000
+    })
+    
+    this.scene.time.addEvent({
+      delay: 250,
+      callback: () => {
+        this.hasBeenHit = false;
+        hitAnim.stop();
+        this.clearTint();
+      },
+      loop: false
+    })
+  }
   
 }

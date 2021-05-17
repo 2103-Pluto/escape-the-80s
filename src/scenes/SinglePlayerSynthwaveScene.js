@@ -662,11 +662,17 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
       }
       bullet.setActive(false);
       if(enemy!==this.player && enemy.bulletHits===enemy.bulletDeath){
-        // enemy.playDamageTween()
         enemy.destroy()
         deathSounds[enemy.name].play()
-      } else enemy.bulletHits+=1
-
+        if (enemy.name === 'mario') {
+          this.player.increaseScore(2)
+        } else if (enemy.name === 'terminator') {
+          this.player.increaseScore(10)
+        }
+      } else {
+        enemy.bulletHits+=1
+        enemy.playDamageTween() 
+      }
       bullet.destroy()
     }
 
