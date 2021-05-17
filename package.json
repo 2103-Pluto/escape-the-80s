@@ -6,6 +6,7 @@
   "scripts": {
     "start": "node server",
     "build": "npx webpack --config webpack.config.js",
+    "seed": "node script/seed.js",
     "start-dev": "npm run build-watch & nodemon server",
     "build-watch": "webpack -w"
   },
