@@ -1,11 +1,14 @@
 const router = require('express').Router()
+const Sequelize = require('sequelize')
 const { models: { Record }} = require('../db')
 module.exports = router
 
-//GET route for all records
+//GET route for top 10 records
 router.get('/', async (req, res, next) => {
   try {
     const records = await Record.findAll({
+      limit: 10,
+      order: Sequelize.literal('score DESC'),
       attributes: ['id', 'name', 'score', 'level']
     })
     res.status(200).send(records)
