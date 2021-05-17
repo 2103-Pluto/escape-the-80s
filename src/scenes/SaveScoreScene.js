@@ -38,7 +38,7 @@ export default class SaveScoreScene extends Phaser.Scene {
     save.setInteractive();
     save.on("pointerover", () => {
       this.hoverIcon.setVisible(true);
-      this.hoverIcon.x = save.x - 126;
+      this.hoverIcon.x = save.x - 100;
       this.hoverIcon.y = save.y;
       save.setColor('#feff38')
     })

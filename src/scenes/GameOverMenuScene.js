@@ -48,7 +48,7 @@ export default class GameOverMenuScene extends Phaser.Scene {
   }
 
   createRestart(scene, widthFraction, heightFraction) {
-    const restart = scene.add.text(scene.width*widthFraction, scene.height*heightFraction, 'Restart', { fontFamily: '"Press Start 2P"' }).setFontSize(24).setOrigin(0.5, 0.5)
+    const restart = scene.add.text(scene.width*widthFraction, scene.height*heightFraction, 'Restart Level', { fontFamily: '"Press Start 2P"' }).setFontSize(24).setOrigin(0.5, 0.5)
 
     restart.setInteractive();
     restart.on("pointerover", () => {
@@ -75,7 +75,7 @@ export default class GameOverMenuScene extends Phaser.Scene {
     save.setInteractive();
     save.on("pointerover", () => {
       scene.hoverIcon.setVisible(true);
-      scene.hoverIcon.x = save.x - 126;
+      scene.hoverIcon.x = save.x - 160;
       scene.hoverIcon.y = save.y;
       save.setColor('#feff38')
     })
