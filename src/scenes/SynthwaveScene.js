@@ -28,11 +28,13 @@ export default class SynthwaveScene extends Phaser.Scene {
   }
 
   preload() {
+    //loading bar
+    this.scene.get('TitleScene').displayLoadingBar(this)
     //Running Blue Soldier
-      this.load.spritesheet(`${this.color}SoldierRunning`, `assets/spriteSheets/${this.color}/Gunner_${this.color}_Run.png`, {
-        frameWidth: 48,
-        frameHeight: 39,
-      })
+    this.load.spritesheet(`${this.color}SoldierRunning`, `assets/spriteSheets/${this.color}/Gunner_${this.color}_Run.png`, {
+      frameWidth: 48,
+      frameHeight: 39,
+    })
 
 
     //Idle Blue Soldier
@@ -51,7 +53,7 @@ export default class SynthwaveScene extends Phaser.Scene {
       frameWidth: 30,
       frameHeight: 37,
     });
-    
+
     this.load.spritesheet('flagpole', 'assets/spriteSheets/flagpoles_sheet.png', {
       frameWidth: 32,
       frameHeight: 168,
@@ -121,7 +123,7 @@ export default class SynthwaveScene extends Phaser.Scene {
   //   this.physics.add.collider(this.mario, this.groundGroup);
   //   this.physics.add.collider(this.mario, this.player);
   //  }
-  
+
 
   create() {
     //socket logic
@@ -174,7 +176,7 @@ export default class SynthwaveScene extends Phaser.Scene {
     this.physics.world.setBounds(0, null, width * numberOfFrames, height, true, true, false, false) //set world bounds only on sides
 
     //check other players moves and if collision between players:
-      
+
 
 
 
@@ -249,8 +251,8 @@ export default class SynthwaveScene extends Phaser.Scene {
     this.mario = new Mario(this, 300, 400, 'mario').setScale(3.0)
     this.physics.add.collider(this.mario, this.groundGroup);
     this.physics.add.collider(this.mario, this.player);
-    
-   
+
+
 
     // Create collisions for all entities
     // << CREATE COLLISIONS HERE >>
@@ -265,7 +267,7 @@ export default class SynthwaveScene extends Phaser.Scene {
     if (this.muzzleFlash) this.muzzleFlash.update(delta)
 
     this.enemy.update(this.screamSound);
-    
+
     this.mario.update()
 
     this.socket.on("playerMoved", function (cursors){
@@ -277,7 +279,7 @@ export default class SynthwaveScene extends Phaser.Scene {
       // scene.otherPlayer.setPosition(data.x, data.y)
       // scene.physics.add.collider(scene.player, scene.otherPlayer, scene.processCollide);
     })
-    
+
   }
 
   fire(x, y, left) {
