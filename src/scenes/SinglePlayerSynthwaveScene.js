@@ -430,9 +430,8 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
     this.pause(this) //creates pause functionality
   
     // --->
+    
     this.cursors = this.input.keyboard.createCursorKeys();
-    
-    
     //this.physics.add.collider(this.player, this.platforms)
 
     // this.enemy = new enemy(this, 600, 400, 'brandon').setScale(.25) UNCOMMENT TO TEST BRANDON
