@@ -11,7 +11,7 @@ export default class TitleScene extends Phaser.Scene {
 
   preload() {
     //Loading bar
-    this.displayLoadingBar(this);
+    this.displayLoadingBar(this, 'I want my MTV!');
 
     //Load images, sprites, spritesheets
     for (let color of this.colors) {
@@ -78,14 +78,14 @@ export default class TitleScene extends Phaser.Scene {
     })
   }
 
-  displayLoadingBar(scene) {
-    const progressBar = scene.add.graphics();
-    const progressBox = scene.add.graphics();
+  displayLoadingBar(scene, phrase) {
+    var progressBar = scene.add.graphics();
+    var progressBox = scene.add.graphics();
     progressBox.fillStyle(0x222222, 0.8);
     progressBox.fillRect(240, 270, 320, 50);
-    const width = scene.cameras.main.width;
-    const height = scene.cameras.main.height;
-    const loadingText = scene.make.text({
+    var width = scene.cameras.main.width;
+    var height = scene.cameras.main.height;
+    var loadingText = scene.make.text({
         x: width / 2,
         y: height / 2 - 50,
         text: 'Loading...',
@@ -95,10 +95,10 @@ export default class TitleScene extends Phaser.Scene {
         }
     });
     loadingText.setOrigin(0.5, 0.5);
-    const percentText = scene.make.text({
+    var percentText = scene.make.text({
       x: width / 2,
       y: height / 2 - 5,
-      text: '0%',
+      text: phrase,
       style: {
         font: '18px monospace',
         fill: '#ffffff'
@@ -110,7 +110,7 @@ export default class TitleScene extends Phaser.Scene {
       progressBar.clear();
       progressBar.fillStyle(0xffffff, 1);
       progressBar.fillRect(250, 280, 300 * value, 30);
-      percentText.setText(parseInt(value * 100) + '%');
+      // percentText.setText(parseInt(value * 100) + '%');
     });
 
     scene.load.on('complete', function () {

@@ -29,7 +29,7 @@ export default class SynthwaveScene extends Phaser.Scene {
 
   preload() {
     //loading bar
-    this.scene.get('TitleScene').displayLoadingBar(this)
+    this.scene.get('TitleScene').displayLoadingBar(this, "ma, you've been bad")
     //Running Blue Soldier
     this.load.spritesheet(`${this.color}SoldierRunning`, `assets/spriteSheets/${this.color}/Gunner_${this.color}_Run.png`, {
       frameWidth: 48,

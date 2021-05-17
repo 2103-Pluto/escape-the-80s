@@ -114,7 +114,7 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
 
   preload() {
     //loading bar
-    this.scene.get('TitleScene').displayLoadingBar(this)
+    this.scene.get('TitleScene').displayLoadingBar(this, "where's the beef?")
 
     this.preloadSoldier() //load all the soldier things
     this.preloadSounds() //load all sounds

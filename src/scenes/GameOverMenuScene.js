@@ -53,7 +53,7 @@ export default class GameOverMenuScene extends Phaser.Scene {
     restart.setInteractive();
     restart.on("pointerover", () => {
       scene.hoverIcon.setVisible(true);
-      scene.hoverIcon.x = restart.x - 126;
+      scene.hoverIcon.x = restart.x - 200;
       scene.hoverIcon.y = restart.y;
       restart.setColor('#feff38')
     })
@@ -89,7 +89,6 @@ export default class GameOverMenuScene extends Phaser.Scene {
       scene.scene.stop(); //stop this menu scene
       scene.scene.start('SaveScoreScene', {
         score: this.previousScene.player.score,
-        health: this.previousScene.player.health,
         level: this.previousScene.level
       });
     })
