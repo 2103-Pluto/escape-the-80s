@@ -371,7 +371,7 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
   }
 
   createBulletGroup(scene) {
-    scene.bullets = this.physics.add.group({
+    scene.bullets = scene.physics.add.group({
       classType: Bullet,
       runChildUpdate: true,
       allowGravity: false,
@@ -387,7 +387,7 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
     );
 
     scene.physics.add.overlap(
-      scene.terminator,
+      scene.terminators,
       scene.bullets,
       scene.hit,
       null,
@@ -423,7 +423,7 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
     this.createHealthLabel(this) //create health
     this.marios=this.physics.add.group();
     this.terminators=this.physics.add.group()
-    this.createBulletGroup() //create bullet group
+    this.createBulletGroup(this) //create bullet group
     this.createFlagpole(this)
     this.createPhysics(this)
     this.pause(this) //creates pause functionality
@@ -661,7 +661,7 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
       }
       bullet.setActive(false);
       if(enemy!==this.player && enemy.bulletHits===enemy.bulletDeath){
-        enemy.playDamageTween()
+        // enemy.playDamageTween()
         enemy.destroy()
         deathSounds[enemy.name].play()
       } else enemy.bulletHits+=1
