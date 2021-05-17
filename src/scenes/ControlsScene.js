@@ -5,10 +5,6 @@ export default class ControlsScene extends Phaser.Scene {
     super('ControlsScene');
   }
 
-  preload() {
-
-  }
-
   create() {
 
     this.sound.pauseOnBlur = false; //prevent sound from cutting when you leave tab

@@ -6,24 +6,6 @@ export default class CharacterChoosingScene extends Phaser.Scene {
     this.colors = ['Blue', 'Green', 'Red','Yellow'];
   }
 
-  preload() {
-    //load animations
-    for (let color of this.colors) {
-      this.load.spritesheet(`${color}Idle`, `assets/spriteSheets/${color}/Gunner_${color}_Idle.png`, {
-        frameWidth: 48,
-        frameHeight: 48,
-      });
-      this.load.spritesheet(`${color}Run`, `assets/spriteSheets/${color}/Gunner_${color}_Run.png`, {
-        frameWidth: 48,
-        frameHeight: 48,
-      });
-    }
-    //load audio
-    for (let i=1; i<5; i++) {
-      this.load.audio(`one-liner${i}`, `assets/audio/one_liners/one-liner${i}.wav`);
-    }
-  }
-
   create() {
     this.sound.pauseOnBlur = false; //prevent sound from cutting when you leave tab
 

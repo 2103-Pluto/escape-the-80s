@@ -5,10 +5,6 @@ export default class CreditsScene extends Phaser.Scene {
     super('CreditsScene');
   }
 
-  preload() {
-
-  }
-
   create() {
 
     this.sound.pauseOnBlur = false; //prevent sound from cutting when you leave tab

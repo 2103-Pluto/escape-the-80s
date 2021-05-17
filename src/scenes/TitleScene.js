@@ -4,15 +4,39 @@ import WebFontFile from '../files/WebFontFile'
 export default class TitleScene extends Phaser.Scene {
   constructor() {
     super('TitleScene');
+    this.colors = ['Blue', 'Green', 'Red','Yellow'];
 
     this.playStartTween = this.playStartTween.bind(this);
   }
 
   preload() {
+    //Loading bar
+    this.displayLoadingBar(this);
+
+    //Load images, sprites, spritesheets
+    for (let color of this.colors) {
+      this.load.spritesheet(`${color}Idle`, `assets/spriteSheets/${color}/Gunner_${color}_Idle.png`, {
+        frameWidth: 48,
+        frameHeight: 48,
+      });
+      this.load.spritesheet(`${color}Run`, `assets/spriteSheets/${color}/Gunner_${color}_Run.png`, {
+        frameWidth: 48,
+        frameHeight: 48,
+      });
+    }
+
     this.load.image("title-background", "assets/backgrounds/title_scene/title-background.png");
+    this.load.image("cassette-tape", "assets/sprites/cassette-tape.png");
+
+    //load audio
+    for (let i=1; i<5; i++) {
+      this.load.audio(`one-liner${i}`, `assets/audio/one_liners/one-liner${i}.wav`);
+    }
     this.load.audio("title-music", "assets/audio/title_scene/title-music.wav");
-    this.load.addFile(new WebFontFile(this.load, 'Press Start 2P'))
     this.load.audio("click", "assets/audio/click.wav");
+
+    //load other files
+    this.load.addFile(new WebFontFile(this.load, 'Press Start 2P'))
   }
 
   create() {
@@ -52,5 +76,49 @@ export default class TitleScene extends Phaser.Scene {
       alpha: 0,
       yoyo: true
     })
+  }
+
+  displayLoadingBar(scene) {
+    const progressBar = scene.add.graphics();
+    const progressBox = scene.add.graphics();
+    progressBox.fillStyle(0x222222, 0.8);
+    progressBox.fillRect(240, 270, 320, 50);
+    const width = scene.cameras.main.width;
+    const height = scene.cameras.main.height;
+    const loadingText = scene.make.text({
+        x: width / 2,
+        y: height / 2 - 50,
+        text: 'Loading...',
+        style: {
+            font: '20px monospace',
+            fill: '#ffffff'
+        }
+    });
+    loadingText.setOrigin(0.5, 0.5);
+    const percentText = scene.make.text({
+      x: width / 2,
+      y: height / 2 - 5,
+      text: '0%',
+      style: {
+        font: '18px monospace',
+        fill: '#ffffff'
+      }
+    });
+    percentText.setOrigin(0.5, 0.5);
+
+    scene.load.on('progress', function (value) {
+      progressBar.clear();
+      progressBar.fillStyle(0xffffff, 1);
+      progressBar.fillRect(250, 280, 300 * value, 30);
+      percentText.setText(parseInt(value * 100) + '%');
+    });
+
+    scene.load.on('complete', function () {
+      progressBar.destroy();
+      progressBox.destroy();
+      loadingText.destroy();
+      percentText.destroy();
+    });
+
   }
 }

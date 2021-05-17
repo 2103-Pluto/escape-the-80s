@@ -5,10 +5,6 @@ export default class HighScoresScene extends Phaser.Scene {
     super('HighScoresScene');
   }
 
-  preload() {
-    this.load.image("title-background", "assets/backgrounds/title_scene/title-background.png");
-  }
-
   create() {
     this.sound.pauseOnBlur = false; //prevent sound from cutting when you leave tab
 
@@ -20,6 +16,7 @@ export default class HighScoresScene extends Phaser.Scene {
 
     //add text
     this.add.text(width*0.5, height*0.2, 'HIGH SCORES', { fontFamily: '"Press Start 2P"' }).setFontSize(28).setOrigin(0.5, 0.5).setColor('#ED6BF3')
+
     this.add.text(width*0.5, height*0.5, 'High Scores Will Go Here', { fontFamily: '"Press Start 2P"' }).setFontSize(28).setOrigin(0.5, 0.5)
 
     this.scene.get('CreditsScene').createBack(this, 'MainMenuScene'); //Going back

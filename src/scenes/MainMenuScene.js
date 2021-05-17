@@ -5,10 +5,6 @@ export default class MainMenuScene extends Phaser.Scene {
     super('MainMenuScene');
   }
 
-  preload() {
-    this.load.image("cassette-tape", "assets/sprites/cassette-tape.png");
-  }
-
   create() {
     const width = this.game.config.width;
     const height = this.game.config.height;
