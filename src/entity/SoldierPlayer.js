@@ -10,6 +10,7 @@ export default class SoldierPlayer extends Phaser.Physics.Arcade.Sprite {
     this.scene.add.existing(this)
     this.scene.physics.world.enable(this)
     this.facingLeft = false;
+    this.isCrouching = false;
     this.socket = socket
     this.color = 'Blue' //defaultColor
     this.bounceVelocity = 400;
@@ -55,11 +56,18 @@ export default class SoldierPlayer extends Phaser.Physics.Arcade.Sprite {
     
     //crouching
     if (cursors.down.isDown){
+      this.isCrouching = true
+      if (!this.facingLeft) {
+        this.body.setSize(16, 27).setOffset(17, 12)
+      } else {
+        this.body.setSize(16, 27).setOffset(15, 12)
+      }
       this.setVelocityX(0)
       this.play('crouch', true)
     }
     // Move left
     else if (cursors.left.isDown) {
+      this.isCrouching = false
       if (!this.facingLeft) {
         this.flipX = !this.flipX;
         this.facingLeft = true;
@@ -81,6 +89,7 @@ export default class SoldierPlayer extends Phaser.Physics.Arcade.Sprite {
     }
     // Move right
     else if (cursors.right.isDown) {
+      this.isCrouching = false
       if (this.facingLeft) {
         this.flipX = !this.flipX;
         this.facingLeft = false;
@@ -103,9 +112,16 @@ export default class SoldierPlayer extends Phaser.Physics.Arcade.Sprite {
 
     // Neutral (no movement)
     else {
+      this.isCrouching = false
       this.setVelocityX(0);
       this.anims.play('idle', true);
-      
+
+      this.body.setSize(14, 32)
+      if (!this.facingLeft) {
+        this.body.setOffset(15, 7)
+      } else {
+        this.body.setOffset(19, 7)
+      }
       if(this.socket){
       this.moveState.left = false
       this.moveState.right = false
