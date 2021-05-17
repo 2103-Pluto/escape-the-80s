@@ -49,7 +49,7 @@ export default class StoryScene extends Phaser.Scene {
   }
   
   nextButton(scene) {
-    scene.next = scene.add.text(400, 500, 'Start Story', { fontFamily: '"Press Start 2P"' }).setFontSize(28).setOrigin(0.5, 0.5)
+    scene.next = scene.add.text(400, 500, 'Start Story', { fontFamily: '"Press Start 2P"' }).setFontSize(28).setOrigin(0.5, 0.5).setColor('#4DF3F5')
     
     scene.next.setInteractive()
     scene.next.on("pointerover", () => {
@@ -67,7 +67,7 @@ export default class StoryScene extends Phaser.Scene {
     
     scene.next.on("pointerup", () => {
       idx++
-      if (idx < this.storyArr.length) {
+      if (idx < scene.storyArr.length) {
         scene.hoverIcon.setVisible(false);
         scene.next.setColor('#4DF3F5')
         scene.next.text = 'Next'
@@ -83,17 +83,17 @@ export default class StoryScene extends Phaser.Scene {
   }
   
   skipButton(scene) {
-    scene.skip = scene.add.text(710, 40, 'Skip', { fontFamily: '"Press Start 2P"' }).setFontSize(28).setOrigin(0.5, 0.5)
+    scene.skip = scene.add.text(710, 40, 'Skip', { fontFamily: '"Press Start 2P"' }).setFontSize(28).setOrigin(0.5, 0.5).setColor('#4DF3F5')
     scene.skip.setInteractive();
     scene.skip.on("pointerover", () => {
       scene.hoverIcon.setVisible(true);
-      skip.setColor('#feff38')
+      scene.skip.setColor('#feff38')
       scene.hoverIcon.x = scene.skip.x - scene.skip.width + 5;
       scene.hoverIcon.y = scene.skip.y;
     })
     scene.skip.on("pointerout", () => {
       scene.hoverIcon.setVisible(false);
-      skip.setColor('#4DF3F5')
+      scene.skip.setColor('#4DF3F5')
     })
     scene.skip.on("pointerup", () => {
       scene.click.play();
