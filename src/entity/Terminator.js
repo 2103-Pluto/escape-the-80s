@@ -1,4 +1,6 @@
 import 'phaser';
+import MuzzleFlash from './MuzzleFlash';
+import Bullet from './Bullet';
 //import { GetSpeed } from 'phaser/src/math';
 
 export default class Terminator extends Phaser.Physics.Arcade.Sprite {
@@ -18,6 +20,7 @@ export default class Terminator extends Phaser.Physics.Arcade.Sprite {
     this.bulletHits = 0
     this.bulletDeath = 20
     this.name = 'terminator'
+
   }
 
 
@@ -59,7 +62,7 @@ export default class Terminator extends Phaser.Physics.Arcade.Sprite {
 
     
     if(!dead && this.timeFromLastAttack + this.attackDelay <=time){
-        shootFn()
+        shootFn(this)
         this.timeFromLastAttack = time
         this.attackDelay = this.getAttackDelay()
     }
@@ -69,4 +72,6 @@ export default class Terminator extends Phaser.Physics.Arcade.Sprite {
   getAttackDelay(){
       return Phaser.Math.Between(200, 400)
   }
+
+  
 }
