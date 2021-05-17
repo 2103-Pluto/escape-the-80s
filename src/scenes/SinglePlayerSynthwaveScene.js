@@ -22,6 +22,7 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
     this.fire = this.fire.bind(this);
     this.terminatorFire = this.terminatorFire.bind(this)
     this.hit = this.hit.bind(this);
+    this.hitPlatform = this.hitPlatform.bind(this)
     this.createBackgroundElement = this.createBackgroundElement.bind(this);
     //bind functions
     this.createPlayer = this.createPlayer.bind(this);
@@ -41,6 +42,7 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
     this.raiseFlagpole = this.raiseFlagpole.bind(this)
     this.createFlagpole = this.createFlagpole.bind(this)
     this.pause = this.pause.bind(this)
+    this.createPhysics = this.createPhysics.bind(this)
   }
 
   init(data) {
@@ -256,9 +258,16 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
     scene.platforms.setCollisionBetween(1, 2)
     scene.physics.add.collider(scene.flagpole, scene.groundGroup)
     scene.physics.add.overlap(scene.player, scene.flagpole, function() {
-      scene.raiseFlagpole() // If the player touches the flagpole it falls through the ground
+      scene.raiseFlagpole()
     })
-
+    scene.physics.add.overlap(scene.platforms, scene.bullets, scene.hitPlatform, null, scene)
+  }
+  hitPlatform(bullet, platform) {
+    if (platform.index === 1) {
+      bullet.setActive(false)
+      bullet.destroy()
+    }
+    
   }
 
   createFlagpole(scene) {
@@ -361,36 +370,36 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
     )
   }
 
-  createBulletGroup() {
-    this.bullets = this.physics.add.group({
+  createBulletGroup(scene) {
+    scene.bullets = this.physics.add.group({
       classType: Bullet,
       runChildUpdate: true,
       allowGravity: false,
       maxSize: 40
     });
 
-    this.physics.add.overlap(
-      this.marios,
-      this.bullets,
-      this.hit,
+    scene.physics.add.overlap(
+      scene.marios,
+      scene.bullets,
+      scene.hit,
       null,
-      this
+      scene
     );
 
-    // this.physics.add.overlap(
-    //   this.terminator,
-    //   this.bullets,
-    //   this.hit,
-    //   null,
-    //   this
-    // );
-
-    this.physics.add.overlap(
-      this.player,
-      this.bullets,
-      this.hit,
+    scene.physics.add.overlap(
+      scene.terminator,
+      scene.bullets,
+      scene.hit,
       null,
-      this
+      scene
+    );
+
+    scene.physics.add.overlap(
+      scene.player,
+      scene.bullets,
+      scene.hit,
+      null,
+      scene
     );
   }
 
@@ -418,6 +427,7 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
     this.createFlagpole(this)
     this.createPhysics(this)
     this.pause(this) //creates pause functionality
+  
     // --->
     
     this.cursors = this.input.keyboard.createCursorKeys();
@@ -526,11 +536,11 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
     const offsetY = 5.5;
     const bulletX =
       this.player.x + (this.player.facingLeft ? -offsetX : offsetX);
-    const bulletY = this.player.y + offsetY*1.2;
+    const bulletY = this.player.isCrouching ? this.player.y + offsetY*3.1 : this.player.y - offsetY*1.2;
     const muzzleX =
       this.player.x + (this.player.facingLeft ? -offsetX*0.95 : offsetX*0.95);
-    const muzzleY = this.player.y - offsetY*1.2;
-
+    const muzzleY = this.player.isCrouching ? this.player.y + offsetY*3.1 : this.player.y - offsetY*1.2;
+  
     //create muzzleFlash
     {this.muzzleFlash ? this.muzzleFlash.reset(muzzleX, muzzleY, this.player.facingLeft)
       : this.muzzleFlash = new MuzzleFlash(this, muzzleX, muzzleY, 'muzzleFlash', this.player.facingLeft)}
