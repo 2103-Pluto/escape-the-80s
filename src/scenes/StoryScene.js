@@ -7,7 +7,8 @@ export default class StoryScene extends Phaser.Scene {
     //story array
     this.storyArr = [
       'Rex Schraeder was just a regular dude living in the third decade of the Twenty-First century.',
-      'He liked to do what most dudes do: workout and tan. He had aspirations of joining corporate media.',
+      'He liked to do what most dudes do: workout and tan.', 
+      'He aspired to be a news anchor.',
       'But life had other things in store…',
       'The morning of his big interview with Corporate Media Network (CMN), he woke up to find himself transported back to the year 1987.',
       'Help Rex escape the eighties and ace his interview.'
@@ -23,7 +24,6 @@ export default class StoryScene extends Phaser.Scene {
   }
   
   renderStory(scene, index) {
-    console.log(scene.story)
     
     scene.story.lineSpacing = 20
     const lines = scene.story.getWrappedText(scene.storyArr[index])
@@ -45,6 +45,7 @@ export default class StoryScene extends Phaser.Scene {
   
   enableNext() {
     const scene = this
+    this.typingSound.stop()
     this.next.setInteractive()
   }
   
@@ -73,6 +74,7 @@ export default class StoryScene extends Phaser.Scene {
         scene.next.text = 'Next'
         scene.story.text = ""
         scene.next.removeInteractive()
+        scene.typingSound.play()
         scene.renderStory(scene, idx)
       } else {
         scene.skip.text = 'Play'
@@ -105,6 +107,8 @@ export default class StoryScene extends Phaser.Scene {
   create() {
     
     this.sound.pauseOnBlur = false; //prevent sound from cutting when you leave tab
+    this.typingSound = this.sound.add("typing-sounds", {loop: true})
+    
     
     //set height and width
     this.width = this.game.config.width;
