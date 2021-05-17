@@ -60,6 +60,7 @@ export default class SaveScoreScene extends Phaser.Scene {
 
     //create input panel
     // this.createInputPanel()
+
     //add text for saving
     const save = this.add.text(this.width*0.5, this.height*0.6, 'Save', { fontFamily: '"Press Start 2P"' }).setFontSize(28).setOrigin(0.5).setColor('#4DF3F5')
 
@@ -97,7 +98,7 @@ export default class SaveScoreScene extends Phaser.Scene {
       }
     }
 
-    let text = this.add.bitmapText(30 + this.padding, 50, "arcade", characters);
+    let text = this.add.bitmapText(30 + this.padding, 50, 'Press Start 2P', characters);
 
     text.setLetterSpacing(this.letterSpacing);
     text.setInteractive();
