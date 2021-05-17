@@ -28,11 +28,13 @@ export default class SynthwaveScene extends Phaser.Scene {
   }
 
   preload() {
+    //loading bar
+    this.scene.get('TitleScene').displayLoadingBar(this, "ma, you've been bad")
     //Running Blue Soldier
-      this.load.spritesheet(`${this.color}SoldierRunning`, `assets/spriteSheets/${this.color}/Gunner_${this.color}_Run.png`, {
-        frameWidth: 48,
-        frameHeight: 39,
-      })
+    this.load.spritesheet(`${this.color}SoldierRunning`, `assets/spriteSheets/${this.color}/Gunner_${this.color}_Run.png`, {
+      frameWidth: 48,
+      frameHeight: 39,
+    })
 
 
     //Idle Blue Soldier
@@ -51,7 +53,7 @@ export default class SynthwaveScene extends Phaser.Scene {
       frameWidth: 30,
       frameHeight: 37,
     });
-    
+
     this.load.spritesheet('flagpole', 'assets/spriteSheets/flagpoles_sheet.png', {
       frameWidth: 32,
       frameHeight: 168,
@@ -118,7 +120,7 @@ export default class SynthwaveScene extends Phaser.Scene {
   //   this.physics.add.collider(this.mario, this.groundGroup);
   //   this.physics.add.collider(this.mario, this.player);
   //  }
-  
+
 
   create() {
     //socket logic
@@ -181,7 +183,7 @@ export default class SynthwaveScene extends Phaser.Scene {
     this.physics.world.setBounds(0, null, width * numberOfFrames, height, true, true, false, false) //set world bounds only on sides
 
     //check other players moves and if collision between players:
-      
+
 
 
 

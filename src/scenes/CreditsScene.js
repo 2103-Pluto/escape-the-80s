@@ -5,10 +5,6 @@ export default class CreditsScene extends Phaser.Scene {
     super('CreditsScene');
   }
 
-  preload() {
-
-  }
-
   create() {
 
     this.sound.pauseOnBlur = false; //prevent sound from cutting when you leave tab
@@ -20,7 +16,7 @@ export default class CreditsScene extends Phaser.Scene {
     backgroundImage.alpha = 0.1;
 
     //addd text
-    this.add.text(width*0.5, height*0.25, 'This amazing game\n\n was created by:', { fontFamily: '"Press Start 2P"' }).setFontSize(28).setOrigin(0.5, 0.5)
+    this.add.text(width*0.5, height*0.25, 'This amazing game\n\n was created by:', { fontFamily: '"Press Start 2P"' }).setFontSize(28).setOrigin(0.5, 0.5).setColor('#ED6BF3')
     //our names
     this.add.text(width*0.5, height*0.43, 'Isaac Easton', { fontFamily: '"Press Start 2P"' }).setFontSize(24).setOrigin(0.5, 0.5)
     this.add.text(width*0.5, height*0.58, 'Brendan Bettencourt', { fontFamily: '"Press Start 2P"' }).setFontSize(24).setOrigin(0.5, 0.5)
@@ -38,18 +34,18 @@ export default class CreditsScene extends Phaser.Scene {
     scene.hoverIcon.setVisible(false);
 
     //add option to return to menu
-    const back = scene.add.text(35, 40, 'Go back', { fontFamily: '"Press Start 2P"' }).setFontSize(28).setOrigin(0, 0.5)
+    const back = scene.add.text(35, 40, 'Go Back', { fontFamily: '"Press Start 2P"' }).setFontSize(28).setOrigin(0, 0.5).setColor('#4DF3F5')
 
     back.setInteractive();
     back.on("pointerover", () => {
       scene.hoverIcon.setVisible(true);
-      back.setColor('yellow')
+      back.setColor('#feff38')
       scene.hoverIcon.x = back.x + back.width + 50;
       scene.hoverIcon.y = back.y;
     })
     back.on("pointerout", () => {
       scene.hoverIcon.setVisible(false);
-      back.setColor('white')
+      back.setColor('#4DF3F5')
     })
     back.on("pointerup", () => {
       scene.click.play();

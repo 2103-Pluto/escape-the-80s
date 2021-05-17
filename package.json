@@ -1,17 +1,25 @@
 {
-  "name": "PhaserWorkshop",
+  "name": "escape-the-80s",
   "version": "1.0.0",
   "description": "A workshop for getting started with Phaser",
   "main": "src/index.js",
   "scripts": {
     "start": "node server",
     "build": "npx webpack --config webpack.config.js",
+    "seed": "node script/seed.js",
     "start-dev": "npm run build-watch & nodemon server",
     "build-watch": "webpack -w"
   },
   "dependencies": {
+    "axios": "^0.21.1",
     "express": "^4.17.1",
+    "morgan": "^1.10.0",
     "phaser": "^3.54.0",
+    "redux": "^4.1.0",
+    "redux-devtools-extension": "^2.13.9",
+    "redux-logger": "^3.0.6",
+    "redux-thunk": "^2.3.0",
+    "sequelize": "^6.6.2",
     "socket.io": "^4.0.2",
     "socket.io-client": "^4.0.2",
     "webfontloader": "^1.6.28"

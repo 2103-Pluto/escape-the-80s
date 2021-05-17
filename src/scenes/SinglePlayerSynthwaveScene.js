@@ -19,6 +19,7 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
     super('SinglePlayerSynthwaveScene');
 
     this.scene = this;
+    this.level = 1;
     this.fire = this.fire.bind(this);
     this.terminatorFire = this.terminatorFire.bind(this)
     this.hit = this.hit.bind(this);
@@ -113,10 +114,10 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
     });
   }
 
-
-
-
   preload() {
+    //loading bar
+    this.scene.get('TitleScene').displayLoadingBar(this, "where's the beef?")
+
     this.preloadSoldier() //load all the soldier things
     this.preloadSounds() //load all sounds
     this.preloadMap() //preload background
