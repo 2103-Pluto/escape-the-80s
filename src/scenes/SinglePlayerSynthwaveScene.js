@@ -406,7 +406,8 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
 
   create() {
    // const scene = this
-
+    
+    
     // ALL THESE ('--->') NEED TO BE IN ORDER
     this.height = this.game.config.height; //retrive width and height (careful--Has to be at the top of create)
     this.width = this.game.config.width;
@@ -428,9 +429,27 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
     this.createFlagpole(this)
     this.createPhysics(this)
     this.pause(this) //creates pause functionality
-  
-    // --->
     
+    // --->
+    const level1 = this.add.text(400, 300, 'LEVEL 1',{ fontFamily: '"Press Start 2P"' }).setFontSize(46).setOrigin(0.5, 0.5)
+    console.log('level1--->', level1)
+    const flash = this.tweens.add({
+      targets: level1,
+      duration: 100,
+      repeat: -1,
+      tint: 0xffffff
+  })
+  
+  
+  this.time.addEvent({
+    delay: 1000,
+    callback: () => {
+      flash.stop()
+      level1.setVisible(false)
+    },
+    loop: false
+  })
+
     this.cursors = this.input.keyboard.createCursorKeys();
     //this.physics.add.collider(this.player, this.platforms)
 
