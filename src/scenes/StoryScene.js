@@ -3,11 +3,11 @@ import Phaser from 'phaser'
 export default class StoryScene extends Phaser.Scene {
   constructor() {
     super('StoryScene');
-    
+
     //story array
     this.storyArr = [
       'Rex Schraeder was just a regular dude living in the third decade of the Twenty-First century.',
-      'He liked to do what most dudes do: workout and tan.', 
+      'He liked to do what most dudes do: workout and tan.',
       'He aspired to be a news anchor.',
       'But life had other things in store…',
       'The morning of his big interview with Corporate Media Network (CMN), he woke up to find himself transported back to the year 1987.',
@@ -22,15 +22,15 @@ export default class StoryScene extends Phaser.Scene {
   init(data) {
     this.color = data.color //retrieve color
   }
-  
+
   renderStory(scene, index) {
-    
+
     scene.story.lineSpacing = 20
     const lines = scene.story.getWrappedText(scene.storyArr[index])
     const wrappedText = lines.join('\n')
     const length = wrappedText.length
     let i = 0
-    
+
     scene.time.addEvent({
       callback: () => {
         scene.story.text += wrappedText[i]
@@ -40,32 +40,36 @@ export default class StoryScene extends Phaser.Scene {
       delay: 75
     })
     scene.time.delayedCall(75 * scene.storyArr[index].length, scene.enableNext, null, this)
-    
+
   }
-  
+
   enableNext() {
     const scene = this
     this.typingSound.stop()
     this.next.setInteractive()
   }
-  
+
   nextButton(scene) {
     scene.next = scene.add.text(400, 500, 'Start Story', { fontFamily: '"Press Start 2P"' }).setFontSize(28).setOrigin(0.5, 0.5).setColor('#4DF3F5')
-    
+
     scene.next.setInteractive()
     scene.next.on("pointerover", () => {
       scene.hoverIcon.setVisible(true);
       scene.next.setColor('#feff38')
-      scene.hoverIcon.x = scene.next.x - scene.next.width + 5;
+      if (scene.next.text === 'Start Story') {
+        scene.hoverIcon.x = scene.next.x - (scene.next.width/2) - 50;
+      } else {
+        scene.hoverIcon.x = scene.next.x - scene.next.width + 5;
+      }
       scene.hoverIcon.y = scene.next.y;
     })
     scene.next.on("pointerout", () => {
       scene.hoverIcon.setVisible(false);
       scene.next.setColor('#4DF3F5')
     })
-    
+
     let idx = -1;
-    
+
     scene.next.on("pointerup", () => {
       idx++
       if (idx < scene.storyArr.length) {
@@ -83,7 +87,7 @@ export default class StoryScene extends Phaser.Scene {
       }
     })
   }
-  
+
   skipButton(scene) {
     scene.skip = scene.add.text(710, 40, 'Skip', { fontFamily: '"Press Start 2P"' }).setFontSize(28).setOrigin(0.5, 0.5).setColor('#4DF3F5')
     scene.skip.setInteractive();
@@ -105,25 +109,25 @@ export default class StoryScene extends Phaser.Scene {
   }
 
   create() {
-    
+
     this.sound.pauseOnBlur = false; //prevent sound from cutting when you leave tab
     this.typingSound = this.sound.add("typing-sounds", {loop: true})
-    
-    
+    this.typingSound.volume = 0.3;
+
     //set height and width
     this.width = this.game.config.width;
     this.height = this.game.config.height;
-    
+
     //add story
     // this.renderStory(this, 0)
     this.story = this.add.text(this.width*0.5, this.height*0.5, '', { fontFamily: '"Press Start 2P"' }).setFontSize(20).setOrigin(0.5, 0.5).setWordWrapWidth(600)
-    
+
     //add next button
     this.nextButton(this)
-    
+
     //add back
     this.scene.get('CreditsScene').createBack(this, 'CharacterChoosingScene');
-    
+
     //add skip
     this.skipButton(this)
 
