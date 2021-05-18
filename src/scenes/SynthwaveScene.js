@@ -130,49 +130,51 @@ export default class SynthwaveScene extends Phaser.Scene {
     //
     
 
-    scene.otherPlayer=null;
-    // this.socket.on("currentPlayers", function (arg) {
-    //   const  players  = arg;
-    //   Object.keys(players).forEach(function (id) {
-    //     if (players[id].playerId !== scene.socket.id) {
-    //       console.log(players[id].moveState)
-    //       const x = players[id].moveState.x
-    //       const y = players[id].moveState.y
-    //       const facingLeft = players[id].moveState.facingLeft
-    //       scene.otherPlayer = new SoldierPlayer(scene, x, y, `${scene.color}SoldierIdle`, scene.socket,).setSize(14, 32).setOffset(15, 7).setScale(2.78);
-    //       scene.otherPlayer.facingLeft = facingLeft
-    //       if(facingLeft) {
-    //         scene.otherPlayer.flipX = !scene.otherPlayer.flipX
-    //       }
-    //       //note: to address variable characters
-    //       scene.add.existing(scene.otherPlayer)
-    //       scene.physics.add.collider(scene.otherPlayer, scene.groundGroup)
-    //       //'this' context here is the function; need to grab the 'this' that is the scene (i.e. 'scene')
-    //     }
-    //   });
-    // });
+    //scene.otherPlayer=null;
+    this.socket.on("currentPlayers", function (arg) {
+      const  players  = arg;
+      console.log('players--->', players)
+      Object.keys(players).forEach(function (id) {
+        if (players[id].playerId !== scene.socket.id) {
+          console.log('movestate--->', players[id].moveState)
+          const x = players[id].moveState.x
+          const y = players[id].moveState.y
+          const facingLeft = players[id].moveState.facingLeft
+          scene.otherPlayer = new SoldierPlayer(scene, x, y, `${scene.color}SoldierIdle`, scene.socket,).setSize(14, 32).setOffset(15, 7).setScale(2.78);
+          scene.otherPlayer.facingLeft = facingLeft
+          if(facingLeft) {
+            scene.otherPlayer.flipX = !scene.otherPlayer.flipX
+          }
+          //note: to address variable characters
+          scene.add.existing(scene.otherPlayer)
+          scene.physics.add.collider(scene.otherPlayer, scene.groundGroup)
+          //'this' context here is the function; need to grab the 'this' that is the scene (i.e. 'scene')
+        }
+      });
+    });
 
-    // this.socket.on("newPlayer", function (arg) {
-    //   const playerInfo  = arg;
-    //  //need to add socket id to player?
-    //   scene.otherPlayer = new SoldierPlayer(scene, 60, 400, `${scene.color}SoldierIdle`, scene.socket,).setSize(14, 32).setOffset(15, 7).setScale(2.78);
-    //   //note: to address variable characters
-    //   scene.add.existing(scene.otherPlayer)
-    //   scene.physics.add.collider(scene.otherPlayer, scene.groundGroup)
-    // });
+    this.socket.on("newPlayer", function (arg) {
+      const playerInfo  = arg;
+     //need to add socket id to player?
+      scene.otherPlayer = new SoldierPlayer(scene, 60, 400, `${scene.color}SoldierIdle`, scene.socket,).setSize(14, 32).setOffset(15, 7).setScale(2.78);
+      //note: to address variable characters
+      scene.add.existing(scene.otherPlayer)
+      scene.physics.add.collider(scene.otherPlayer, scene.groundGroup)
+    });
 
-    // this.socket.on("playerMoved", function (moveState){
+    this.socket.on("playerMoved", function (moveState){
       
-    //   //scene.otherPlayer.updateMovement({right: {isDown:true}})
-    //   scene.otherPlayer.updateOtherPlayerMovement(moveState)
-    //   if(moveState.up) {
-    //     scene.otherPlayer.updateOtherPlayerJump(moveState, scene.jumpSound)
-    //   }
-    //   scene.otherPlayer.updateOtherPlayerInAir()
+      //scene.otherPlayer.updateMovement({right: {isDown:true}})
+      if(scene.otherPlayer){
+      scene.otherPlayer.updateOtherPlayerMovement(moveState)
+      if(moveState.up) {
+        scene.otherPlayer.updateOtherPlayerJump(moveState, scene.jumpSound)
+      }
+      scene.otherPlayer.updateOtherPlayerInAir()
+    }
+    })
       
       
-    // })
-
 
     //mute the previous scene
     this.game.sound.stopAll();
@@ -252,7 +254,7 @@ export default class SynthwaveScene extends Phaser.Scene {
     this.jumpSound.volume = 0.2;
 
     this.shootingSound = this.sound.add('shooting');
-    // The laser sound is a bit too loud so we're going to turn it down
+    // // The laser sound is a bit too loud so we're going to turn it down
     this.shootingSound.volume = 0.03;
 
     this.screamSound = this.sound.add('scream');
@@ -268,6 +270,7 @@ export default class SynthwaveScene extends Phaser.Scene {
     // << DO UPDATE LOGIC HERE >>
     const scene = this
     this.player.update(time, this.cursors, this.jumpSound, this.fire, this.shootingSound);
+    //this.player.update(time, this.cursors, this.jumpSound);
     if (this.muzzleFlash) this.muzzleFlash.update(delta)
 
     // this.enemy.update(this.screamSound);
