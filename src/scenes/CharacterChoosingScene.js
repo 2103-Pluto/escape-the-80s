@@ -3,7 +3,7 @@ import Phaser from 'phaser'
 export default class CharacterChoosingScene extends Phaser.Scene {
   constructor() {
     super('CharacterChoosingScene');
-    this.colors = ['Blue', 'Green', 'Red','Yellow'];
+    this.colors = ['Blue', 'Green', 'Red', 'Yellow'];
   }
 
   create() {
@@ -67,9 +67,7 @@ export default class CharacterChoosingScene extends Phaser.Scene {
         if (selected) {
           finalSelected = selected;
           click.play();
-          audio[key].on('complete', () => {
-            this.scene.start('StoryScene', { color: finalSelected})
-          })
+          this.scene.start('StoryScene', { color: finalSelected})
         }
       })
     }
