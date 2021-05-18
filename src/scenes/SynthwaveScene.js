@@ -121,24 +121,22 @@ export default class SynthwaveScene extends Phaser.Scene {
     heart.play("rotate-heart")
   }
 
-  // createMario(x, y) {
-  //   this.mario = new Mario(this, x , y, 'mario').setScale(3.0)
-  //   this.physics.add.collider(this.mario, this.groundGroup);
-  //   this.physics.add.collider(this.mario, this.player);
-  //  }
 
 
   create() {
     //socket logic
     const scene = this
     this.socket = io();
+    //
+    
 
-    scene.otherPlayer=null;
+    //scene.otherPlayer=null;
     this.socket.on("currentPlayers", function (arg) {
       const  players  = arg;
+      console.log('players--->', players)
       Object.keys(players).forEach(function (id) {
         if (players[id].playerId !== scene.socket.id) {
-          console.log(players[id].moveState)
+          console.log('movestate--->', players[id].moveState)
           const x = players[id].moveState.x
           const y = players[id].moveState.y
           const facingLeft = players[id].moveState.facingLeft
@@ -167,15 +165,16 @@ export default class SynthwaveScene extends Phaser.Scene {
     this.socket.on("playerMoved", function (moveState){
       
       //scene.otherPlayer.updateMovement({right: {isDown:true}})
+      if(scene.otherPlayer){
       scene.otherPlayer.updateOtherPlayerMovement(moveState)
       if(moveState.up) {
         scene.otherPlayer.updateOtherPlayerJump(moveState, scene.jumpSound)
       }
       scene.otherPlayer.updateOtherPlayerInAir()
-      
-      
+    }
     })
-
+      
+      
 
     //mute the previous scene
     this.game.sound.stopAll();
@@ -215,9 +214,6 @@ export default class SynthwaveScene extends Phaser.Scene {
 
     // this.enemy = new enemy(this, 600, 400, 'brandon').setScale(.25)
 
-    this.createStar(600, 400); //create a star to test the Heart entity
-    this.createHeart(100, 500);
-    this.createHeart(120, 500);     //create a heart to test the Heart entity
 
     // ...
     // this.physics.add.collider(this.enemy, this.groundGroup);
@@ -258,24 +254,12 @@ export default class SynthwaveScene extends Phaser.Scene {
     this.jumpSound.volume = 0.2;
 
     this.shootingSound = this.sound.add('shooting');
-    // The laser sound is a bit too loud so we're going to turn it down
+    // // The laser sound is a bit too loud so we're going to turn it down
     this.shootingSound.volume = 0.03;
 
     this.screamSound = this.sound.add('scream');
 
-    const flagpoleX = 770*numberOfFrames
-    this.flagpole = new Flagpole(this, flagpoleX, 375, 'flagpole').setScale(2.0);
-    this.createHeart(100, 500);
-    this.createHeart(120, 500);     //create a heart to test the Heart entity
-
-    //create mario(enemy)
-    // this.createMario(300,500)
-    // this.mario = new Mario(this, 300, 400, 'mario').setScale(3.0)
-    // this.physics.add.collider(this.mario, this.groundGroup);
-    // this.physics.add.collider(this.mario, this.player);
-    
-   
-
+    scene.scene.launch("WaitingRoom", { socket: scene.socket })
     // Create collisions for all entities
     // << CREATE COLLISIONS HERE >>
   }
@@ -286,6 +270,7 @@ export default class SynthwaveScene extends Phaser.Scene {
     // << DO UPDATE LOGIC HERE >>
     const scene = this
     this.player.update(time, this.cursors, this.jumpSound, this.fire, this.shootingSound);
+    //this.player.update(time, this.cursors, this.jumpSound);
     if (this.muzzleFlash) this.muzzleFlash.update(delta)
 
     // this.enemy.update(this.screamSound);
