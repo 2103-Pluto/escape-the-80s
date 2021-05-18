@@ -10,11 +10,23 @@ export default class SoldierPlayer extends Phaser.Physics.Arcade.Sprite {
     this.scene.add.existing(this)
     this.scene.physics.world.enable(this)
     this.facingLeft = false;
+    this.isCrouching = false;
     this.socket = socket
     this.color = 'Blue' //defaultColor
     this.bounceVelocity = 400;
     this.hasBeenHit = false;
-
+    //track movements
+    this.setPosition(x,y)
+    this.moveState = {
+      x: x,
+      y: y,
+      facingLeft: this.facingLeft,
+      left: false,
+      right: false,
+      up: false,
+      down: false
+    }
+    
     //firing features
     this.fireDelay = 140;
     this.lastFired = 0;
@@ -25,13 +37,14 @@ export default class SoldierPlayer extends Phaser.Physics.Arcade.Sprite {
     this.decreaseHealth = this.decreaseHealth.bind(this)
     this.decreaseScore = this.decreaseScore.bind(this)
     this.emitMovement = this.emitMovement.bind(this)
+    this.updateOtherPlayerMovement = this.updateOtherPlayerMovement.bind(this)
+    this.updateOtherPlayerInAir = this.updateOtherPlayerInAir.bind(this)
     this.revive = this.revive.bind(this)
 
-    this.body.setSize(12,40)
+    // this.body.setSize(5, 40, false)
+    // this.body.setOffset(30, 30) //testing
     this.bounceOff = this.bounceOff.bind(this)
     this.playDamageTween = this.playDamageTween.bind(this)
-    this.previousCursor = null
-    this.cursorPosition = null
 
     this.bulletHits = 0
     this.bulletDeath = 5
@@ -40,68 +53,153 @@ export default class SoldierPlayer extends Phaser.Physics.Arcade.Sprite {
   updateMovement(cursors) {
     const cam = this.scene.cameras.main;
     const speed = 3;
-    this.previousCursor = this.cursorPosition
-    
-    this.cursorPosition = cursors
     
     //crouching
     if (cursors.down.isDown){
-      
+      this.isCrouching = true
+      if (!this.facingLeft) {
+        this.body.setSize(16, 27).setOffset(17, 12)
+      } else {
+        this.body.setSize(16, 27).setOffset(15, 12)
+      }
       this.setVelocityX(0)
       this.play('crouch', true)
-      
+
+      if(this.socket){
+        this.moveState.x = this.x
+        this.moveState.y = this.y
+        this.moveState.left = false
+        this.moveState.right = false
+        this.moveState.up = false
+        this.moveState.down = true
+        
+        this.emitMovement(this.moveState)
+        }
     }
     // Move left
     else if (cursors.left.isDown) {
+      this.isCrouching = false
       if (!this.facingLeft) {
+        
         this.flipX = !this.flipX;
         this.facingLeft = true;
-
+        this.moveState.facingLeft = true
+        this.body.setOffset(19, 7)
+        
       }
       this.setVelocityX(-300);
       cam.scrollX -= speed;
       if (this.body.onFloor()) {
         this.play('run', true);
       }
+      if(this.socket){
+      this.moveState.x = this.x
+      this.moveState.y = this.y
+      this.moveState.left = true
+      this.moveState.right = false
+      this.moveState.up = false
+      
+      this.emitMovement(this.moveState)
+      }
     }
     // Move right
     else if (cursors.right.isDown) {
+      this.isCrouching = false
       if (this.facingLeft) {
         this.flipX = !this.flipX;
         this.facingLeft = false;
+        this.body.setOffset(15, 7)
       }
       this.setVelocityX(300);
       cam.scrollX += speed;
       if (this.body.onFloor()) {
         this.play('run', true);
       }
+      if(this.socket){
+      this.moveState.x = this.x
+      this.moveState.y=this.y
+      this.moveState.right = true
+      this.moveState.left = false
+      this.moveState.up = false
+      
+      this.emitMovement(this.moveState)
+      }
     }
 
     // Neutral (no movement)
     else {
+      this.isCrouching = false
+      this.setVelocityX(0);
+      this.anims.play('idle', true);
+
+      this.body.setSize(14, 32)
+      if (!this.facingLeft) {
+        this.body.setOffset(15, 7)
+      } else {
+        this.body.setOffset(19, 7)
+      }
+      if(this.socket){
+      this.moveState.left = false
+      this.moveState.right = false
+      this.moveState.up = false
+      this.moveState.down = false
+      this.emitMovement(this.moveState)
+      }
+    }
+  }
+
+
+  updateOtherPlayerMovement(moveState) {
+    
+    const cam = this.scene.cameras.main;
+    const speed = 3;
+    
+   
+    //crouching
+    if (moveState.down){
+      this.setVelocityX(0)
+      this.play('crouch', true)
+      
+    }
+    // Move left
+   else if (moveState.left) {
+      if (!this.facingLeft) {
+        this.flipX = !this.flipX;
+        this.facingLeft = true;
+        this.body.setOffset(19, 7)
+      }
+      this.setVelocityX(-300);
+      cam.scrollX -= speed;
+      if (this.body.onFloor()) {
+        this.play('run', true);
+        
+      }
+      this.setPosition(moveState.x, moveState.y)
+    }
+    // Move right
+    else if (moveState.right) {
+      
+      if (this.facingLeft) {
+        this.flipX = !this.flipX;
+        this.facingLeft = false;
+        this.body.setOffset(15, 7)
+      }
+      this.setVelocityX(300);
+      
+      cam.scrollX += speed;
+      if (this.body.onFloor()) {
+        this.play('run', true);
+      }
+      this.setPosition(moveState.x, moveState.y)
+
+    }
+     // Neutral (no movement)
+     else {
       this.setVelocityX(0);
       // Whenever Josh is not moving, use the idleUnarmed animation
         this.anims.play('idle', true);
     }
 
-    //emit any movement
-    
-    // let x = this.x
-    // let y = this.y
-    // if (
-    //   this.oldPosition && (x!=this.oldPosition.x ||
-    //   y!== this.oldPosition.y) && this.socket
-    // ) {
-    //   this.socket.emit("playerMovement", {
-    //     x: this.x,
-    //     y: this.y
-    //   })
-    // }
-    // this.oldPosition = {
-    //   x: this.x,
-    //   y: this.y
-    // }
-    //if(previousCursor!==this.cursorPosition) this.emitMovement(cursors)
 
   }
 
@@ -115,7 +213,6 @@ export default class SoldierPlayer extends Phaser.Physics.Arcade.Sprite {
       this.updateShoot(time, cursors, shootingFn, shootingSound);
     }
     this.updateBulletHits()
-    
   }
 
   updateDying() {
@@ -128,7 +225,7 @@ export default class SoldierPlayer extends Phaser.Physics.Arcade.Sprite {
   }
 
   updateBulletHits(){
-    if(this.bulletHits===3){
+    if(this.bulletHits===1){
       this.decreaseHealth(1)
       this.bulletHits=0
     }
@@ -139,10 +236,31 @@ export default class SoldierPlayer extends Phaser.Physics.Arcade.Sprite {
     if (cursors.up.isDown && this.body.onFloor()) {
       this.setVelocityY(-750);
       jumpSound.play()
+      
+      if(this.socket){
+      this.moveState.up = true
+      this.moveState.right = false
+      this.moveState.left = false
+      this.moveState.down = false
+      this.emitMovement(this.moveState)
+      }
+    }
+  }
+
+  updateOtherPlayerJump(moveState, jumpSound) {
+    if (moveState.up && this.body.onFloor()) {
+      this.setVelocityY(-750);
+      jumpSound.play()
     }
   }
 
   updateInAir() {
+    if (!this.body.onFloor()) {
+      this.play('jump');
+    }
+  }
+
+  updateOtherPlayerInAir(){
     if (!this.body.onFloor()) {
       this.play('jump');
     }
@@ -211,8 +329,6 @@ export default class SoldierPlayer extends Phaser.Physics.Arcade.Sprite {
   }
 
   emitMovement(cursors){
-    console.log('connected')
-    
     this.socket.emit("playerMovement", cursors)
   }
 }

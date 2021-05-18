@@ -5,10 +5,6 @@ export default class MainMenuScene extends Phaser.Scene {
     super('MainMenuScene');
   }
 
-  preload() {
-    this.load.image("cassette-tape", "assets/sprites/cassette-tape.png");
-  }
-
   create() {
     const width = this.game.config.width;
     const height = this.game.config.height;
@@ -20,13 +16,15 @@ export default class MainMenuScene extends Phaser.Scene {
 
     //add text options
     const options = {};
-    options['CharacterChoosingScene'] = this.add.text(width*0.3, height*0.3, 'Campaign', { fontFamily: '"Press Start 2P"' }).setFontSize(32).setOrigin(0, 0.5)
+    options['CharacterChoosingScene'] = this.add.text(width*0.3, height*0.2, 'Campaign', { fontFamily: '"Press Start 2P"' }).setFontSize(32).setOrigin(0, 0.5)
 
-    options['SynthwaveScene'] = this.add.text(width*0.3, height*0.45, 'Multiplayer', { fontFamily: '"Press Start 2P"' }).setFontSize(32).setOrigin(0, 0.5)
+    options['SynthwaveScene'] = this.add.text(width*0.3, height*0.35, 'Multiplayer', { fontFamily: '"Press Start 2P"' }).setFontSize(32).setOrigin(0, 0.5)
 
-    options['HighScoresScene'] = this.add.text(width*0.3, height*0.6, 'High Scores', { fontFamily: '"Press Start 2P"' }).setFontSize(32).setOrigin(0, 0.5)
+    options['HighScoresScene'] = this.add.text(width*0.3, height*0.5, 'High Scores', { fontFamily: '"Press Start 2P"' }).setFontSize(32).setOrigin(0, 0.5)
 
-    options['CreditsScene'] = this.add.text(width*0.3, height*0.75, 'Credits', { fontFamily: '"Press Start 2P"' }).setFontSize(32).setOrigin(0, 0.5)
+    options['ControlsScene'] = this.add.text(width*0.3, height*0.65, 'Controls', { fontFamily: '"Press Start 2P"' }).setFontSize(32).setOrigin(0, 0.5)
+
+    options['CreditsScene'] = this.add.text(width*0.3, height*0.8, 'Credits', { fontFamily: '"Press Start 2P"' }).setFontSize(32).setOrigin(0, 0.5)
 
     //add hover icon
     const hoverIcon = this.add.sprite(100, 100, 'cassette-tape');
@@ -39,7 +37,7 @@ export default class MainMenuScene extends Phaser.Scene {
       options[key].setInteractive();
       options[key].on("pointerover", () => {
         hoverIcon.setVisible(true);
-        options[key].setColor('yellow')
+        options[key].setColor('#feff38')
         selected = key;
         hoverIcon.x = options[key].x - 60;
         hoverIcon.y = options[key].y;
@@ -60,6 +58,6 @@ export default class MainMenuScene extends Phaser.Scene {
 
   createClick(scene) {
     scene.click = this.sound.add('click');
-    scene.click.volume = 0.1;
+    scene.click.volume = 0.05;
   }
 }

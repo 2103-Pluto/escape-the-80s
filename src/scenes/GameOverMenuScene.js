@@ -20,50 +20,77 @@ export default class GameOverMenuScene extends Phaser.Scene {
     //add text
     this.add.text(this.width*0.5, this.height*0.3, 'GAME OVER', { fontFamily: '"Press Start 2P"' }).setFontSize(32).setOrigin(0.5, 0.5)
     //options
-    this.createQuit();
-    this.createRestart();
+    this.createRestart(this, 0.5, 0.45);
+    this.createSaveScore(this, 0.5, 0.6);
+    this.createQuit(this, 0.5, 0.75);
   }
 
-  createQuit() {
-    const quit = this.add.text(this.width*0.5, this.height*0.45, 'Quit', { fontFamily: '"Press Start 2P"' }).setFontSize(24).setOrigin(0.5, 0.5)
+  createQuit(scene, widthFraction, heightFraction) {
+    const quit = scene.add.text(scene.width*widthFraction, scene.height*heightFraction, 'Quit', { fontFamily: '"Press Start 2P"' }).setFontSize(24).setOrigin(0.5, 0.5)
 
     quit.setInteractive();
     quit.on("pointerover", () => {
-      this.hoverIcon.setVisible(true);
-      this.hoverIcon.x = quit.x - 90;
-      this.hoverIcon.y = quit.y;
-      quit.setColor('yellow')
+      scene.hoverIcon.setVisible(true);
+      scene.hoverIcon.x = quit.x - 90;
+      scene.hoverIcon.y = quit.y;
+      quit.setColor('#feff38')
     })
     quit.on("pointerout", () => {
-      this.hoverIcon.setVisible(false);
+      scene.hoverIcon.setVisible(false);
       quit.setColor('white')
     })
     quit.on("pointerup", () => {
-      this.click.play();
-      this.previousScene.scene.stop(); //stop the previous scene, which is running in parallel
-      this.scene.stop(); //stop this menu scene
-      this.scene.start('TitleScene') //go back to TitleScene
+      scene.click.play();
+      scene.previousScene.scene.stop(); //stop the previous scene, which is running in parallel
+      scene.scene.stop(); //stop this menu scene
+      scene.scene.start('TitleScene') //go back to TitleScene
     })
   }
 
-  createRestart() {
-    const restart = this.add.text(this.width*0.5, this.height*0.6, 'Restart', { fontFamily: '"Press Start 2P"' }).setFontSize(24).setOrigin(0.5, 0.5)
+  createRestart(scene, widthFraction, heightFraction) {
+    const restart = scene.add.text(scene.width*widthFraction, scene.height*heightFraction, 'Restart Level', { fontFamily: '"Press Start 2P"' }).setFontSize(24).setOrigin(0.5, 0.5)
 
     restart.setInteractive();
     restart.on("pointerover", () => {
-      this.hoverIcon.setVisible(true);
-      this.hoverIcon.x = restart.x - 126;
-      this.hoverIcon.y = restart.y;
-      restart.setColor('yellow')
+      scene.hoverIcon.setVisible(true);
+      scene.hoverIcon.x = restart.x - 200;
+      scene.hoverIcon.y = restart.y;
+      restart.setColor('#feff38')
     })
     restart.on("pointerout", () => {
-      this.hoverIcon.setVisible(false);
+      scene.hoverIcon.setVisible(false);
       restart.setColor('white')
     })
     restart.on("pointerup", () => {
-      this.click.play();
-      this.scene.stop(); //stop this menu scene
-      this.previousScene.scene.start(); //restart scene from the beginning
+      scene.click.play();
+      scene.previousScene.scene.stop();
+      scene.scene.stop(); //stop this menu scene
+      scene.previousScene.scene.start(); //restart scene from the beginning
+    })
+  }
+
+  createSaveScore(scene, widthFraction, heightFraction) {
+    const save = scene.add.text(scene.width*widthFraction, scene.height*heightFraction, 'Save Score', { fontFamily: '"Press Start 2P"' }).setFontSize(24).setOrigin(0.5, 0.5)
+
+    save.setInteractive();
+    save.on("pointerover", () => {
+      scene.hoverIcon.setVisible(true);
+      scene.hoverIcon.x = save.x - 160;
+      scene.hoverIcon.y = save.y;
+      save.setColor('#feff38')
+    })
+    save.on("pointerout", () => {
+      scene.hoverIcon.setVisible(false);
+      save.setColor('white')
+    })
+    save.on("pointerup", () => {
+      scene.click.play();
+      scene.previousScene.scene.stop();
+      scene.scene.stop(); //stop this menu scene
+      scene.scene.start('SaveScoreScene', {
+        score: this.previousScene.player.score,
+        level: this.previousScene.level
+      });
     })
   }
 }

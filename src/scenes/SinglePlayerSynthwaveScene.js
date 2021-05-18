@@ -19,9 +19,11 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
     super('SinglePlayerSynthwaveScene');
 
     this.scene = this;
+    this.level = 1;
     this.fire = this.fire.bind(this);
     this.terminatorFire = this.terminatorFire.bind(this)
     this.hit = this.hit.bind(this);
+    this.hitPlatform = this.hitPlatform.bind(this)
     this.createBackgroundElement = this.createBackgroundElement.bind(this);
     //bind functions
     this.createPlayer = this.createPlayer.bind(this);
@@ -41,6 +43,7 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
     this.raiseFlagpole = this.raiseFlagpole.bind(this)
     this.createFlagpole = this.createFlagpole.bind(this)
     this.pause = this.pause.bind(this)
+    this.createPhysics = this.createPhysics.bind(this)
   }
 
   init(data) {
@@ -111,10 +114,10 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
     });
   }
 
-
-
-
   preload() {
+    //loading bar
+    this.scene.get('TitleScene').displayLoadingBar(this, "where's the beef?")
+
     this.preloadSoldier() //load all the soldier things
     this.preloadSounds() //load all sounds
     this.preloadMap() //preload background
@@ -139,7 +142,7 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
       frameWidth: 23,
       frameHeight: 32,
     });
-    
+
     this.load.spritesheet('flagpole', 'assets/spriteSheets/flagpoles_sheet.png', {
       frameWidth: 31.6,
       frameHeight: 168
@@ -242,7 +245,7 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
   }
 
   createPlayer(scene) {
-    scene.player = new SoldierPlayer(scene, scene.playerZones.start.x, scene.playerZones.start.y, `${scene.color}SoldierIdle`, scene.socket).setSize(28, 32).setOffset(12, 7).setScale(2.78);
+    scene.player = new SoldierPlayer(scene, scene.playerZones.start.x, scene.playerZones.start.y, `${scene.color}SoldierIdle`, scene.socket).setSize(14, 32).setOffset(15, 7).setScale(2.78);
     scene.player.color = scene.color;
   }
 
@@ -256,24 +259,34 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
     scene.platforms.setCollisionBetween(1, 2)
     scene.physics.add.collider(scene.flagpole, scene.groundGroup)
     scene.physics.add.overlap(scene.player, scene.flagpole, function() {
-      scene.raiseFlagpole() // If the player touches the flagpole it falls through the ground
+      scene.raiseFlagpole()
     })
+    scene.physics.add.overlap(scene.platforms, scene.bullets, scene.hitPlatform, null, scene)
+  }
+  hitPlatform(bullet, platform) {
+    if (platform.index === 1) {
+      bullet.setActive(false)
+      bullet.destroy()
+    }
     
   }
-  
-  createFlagpole(scene) {
-    scene.flagpole = new Flagpole(scene, 300, 400, 'flagpole')
-  }
-  
 
-  createEnemies(scene, enemy, x, y, number){
+  createFlagpole(scene) {
+    scene.flagpole = new Flagpole(scene, scene.playerZones.end.x, 310, 'flagpole').setScale(2.78)
+    scene.flagpole.body.immovable = true
+    scene.flagpole.body.allowGravity = false
+    
+  }
+
+
+  createEnemies(scene, enemy, x, y, number, scale){
     const enemies = {mario: Mario, terminator:Terminator}
     let enemyX = x
     let enemyY = y
     let type = enemies[enemy]
     let groupType = scene[`${enemy}s`]
     for(let i = 0; i<number; i++){
-      let newEnemy = new type(scene, enemyX, enemyY, enemy).setScale(2.7)
+      let newEnemy = new type(scene, enemyX, enemyY, enemy).setScale(scale)
       groupType.add(newEnemy)
       scene.physics.add.collider(newEnemy, scene.groundGroup);
       scene.physics.add.collider(newEnemy, scene.player, function(newEnemy, player){
@@ -281,11 +294,11 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
           player.bounceOff()
           player.decreaseHealth(1)
         }
-        else  {
+        else if (enemy==='mario'){
           newEnemy.body.immovable = true
         }
       });
-      enemyX+=50
+      enemyX+=50 //if you create a troop of enemies, they'll be 50 pixels apart 
     }
     return scene.mario
   }
@@ -358,46 +371,48 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
     )
   }
 
-  createBulletGroup() {
-    this.bullets = this.physics.add.group({
+  createBulletGroup(scene) {
+    scene.bullets = scene.physics.add.group({
       classType: Bullet,
       runChildUpdate: true,
       allowGravity: false,
       maxSize: 40
     });
 
-    this.physics.add.overlap(
-      this.marios,
-      this.bullets,
-      this.hit,
+    scene.physics.add.overlap(
+      scene.marios,
+      scene.bullets,
+      scene.hit,
       null,
-      this
+      scene
     );
 
-    this.physics.add.overlap(
-      this.terminator,
-      this.bullets,
-      this.hit,
+    scene.physics.add.overlap(
+      scene.terminators,
+      scene.bullets,
+      scene.hit,
       null,
-      this
+      scene
     );
 
-    this.physics.add.overlap(
-      this.player,
-      this.bullets,
-      this.hit,
+    scene.physics.add.overlap(
+      scene.player,
+      scene.bullets,
+      scene.hit,
       null,
-      this
+      scene
     );
   }
 
   create() {
    // const scene = this
-
+    
+    
     // ALL THESE ('--->') NEED TO BE IN ORDER
     this.height = this.game.config.height; //retrive width and height (careful--Has to be at the top of create)
     this.width = this.game.config.width;
     this.createSounds() //create all the sounds
+    this.createAnimations(); //create all animations
     this.createMap() //Set up background
     this.createZoneLayers(this)
     this.createPlayer(this) //create player
@@ -409,18 +424,33 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
     this.createScoreLabel(this) //create score
     this.createHealthLabel(this) //create health
     this.marios=this.physics.add.group();
-    //this.terminators=this.physics.add.group()
-    this.terminator = new Terminator(this, 2800, 400, 'terminator').setScale(4.5)
-    this.createBulletGroup() //create bullet group
+    this.terminators=this.physics.add.group()
+    this.createBulletGroup(this) //create bullet group
     this.createFlagpole(this)
     this.createPhysics(this)
-
     this.pause(this) //creates pause functionality
+    
     // --->
+    const level1 = this.add.text(400, 300, 'LEVEL 1',{ fontFamily: '"Press Start 2P"' }).setFontSize(46).setOrigin(0.5, 0.5)
+    console.log('level1--->', level1)
+    const flash = this.tweens.add({
+      targets: level1,
+      duration: 100,
+      repeat: -1,
+      tint: 0xffffff
+  })
+  
+  
+  this.time.addEvent({
+    delay: 1000,
+    callback: () => {
+      flash.stop()
+      level1.setVisible(false)
+    },
+    loop: false
+  })
 
     this.cursors = this.input.keyboard.createCursorKeys();
-    this.createAnimations();
-
     //this.physics.add.collider(this.player, this.platforms)
 
     // this.enemy = new enemy(this, 600, 400, 'brandon').setScale(.25) UNCOMMENT TO TEST BRANDON
@@ -433,13 +463,15 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
 
 
 
-    this.createEnemies(this, 'mario', 800, 400, 3)
-    this.createEnemies(this, 'mario', 1200, 400, 5)
-
-    //this.createEnemies(this, 'terminator', 1800, 400, 1)
+    this.createEnemies(this, 'mario', 800, 400, 3, 2.7)
+    this.createEnemies(this, 'mario', 1200, 400, 5, 2.7)
+    //this.terminator = new Terminator(this, 2800, 400, 'terminator').setScale(4.5)
+    this.createEnemies(this, 'terminator', 2800, 400, 1, 4.5)
+    this.createEnemies(this, 'terminator', this.playerZones.end.x - 400, 400, 1, 4.5)
     
-    this.physics.add.collider(this.terminator, this.groundGroup);
-    this.physics.add.collider(this.terminator, this.player);
+
+    // this.physics.add.collider(this.terminator, this.groundGroup);
+    // this.physics.add.collider(this.terminator, this.player);
 
 
 
@@ -499,10 +531,10 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
     this.marios.getChildren().forEach(function (mario) {
       mario.update(scene.marioDeathSound)
     })
-    // this.terminators.getChildren().forEach(function (terminator) {
-    //   terminator.update(this.terminatorFire)
-    // })
-    this.terminator.update(time, delta, this.terminatorFire)
+    this.terminators.getChildren().forEach(function (terminator) {
+      terminator.update(time, delta, scene.terminatorFire)
+    })
+    //this.terminator.update(time, delta, this.terminatorFire)
 
 
   }
@@ -524,11 +556,11 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
     const offsetY = 5.5;
     const bulletX =
       this.player.x + (this.player.facingLeft ? -offsetX : offsetX);
-    const bulletY = this.player.y + offsetY*1.2;
+    const bulletY = this.player.isCrouching ? this.player.y + offsetY*3.1 : this.player.y - offsetY*1.2;
     const muzzleX =
       this.player.x + (this.player.facingLeft ? -offsetX*0.95 : offsetX*0.95);
-    const muzzleY = this.player.y - offsetY*1.2;
-
+    const muzzleY = this.player.isCrouching ? this.player.y + offsetY*3.1 : this.player.y - offsetY*1.2;
+  
     //create muzzleFlash
     {this.muzzleFlash ? this.muzzleFlash.reset(muzzleX, muzzleY, this.player.facingLeft)
       : this.muzzleFlash = new MuzzleFlash(this, muzzleX, muzzleY, 'muzzleFlash', this.player.facingLeft)}
@@ -550,19 +582,19 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
       bullet.reset(bulletX, bulletY, this.player.facingLeft);
   }
 
-  terminatorFire() {
+  terminatorFire(terminator) {
     const offsetX = 60;
     const offsetY = 5.5;
     const bulletX =
-      this.terminator.x + (this.terminator.movingLeft ? -offsetX : offsetX);
-    const bulletY = this.terminator.y + offsetY;
+      terminator.x + (terminator.movingLeft ? -offsetX : offsetX);
+    const bulletY = terminator.y + offsetY;
     const muzzleX =
-      this.terminator.x + (this.terminator.movingLeft ? -offsetX*0.82 : offsetX*0.82);
-      const muzzleY = this.terminator.y + offsetY*0.65;
+      terminator.x + (terminator.movingLeft ? -offsetX*0.82 : offsetX*0.82);
+      const muzzleY = terminator.y + offsetY*0.65;
 
     //create muzzleFlash
-    {this.muzzleFlash ? this.muzzleFlash.reset(muzzleX, muzzleY, this.terminator.movingLeft)
-      : this.muzzleFlash = new MuzzleFlash(this, muzzleX, muzzleY, 'muzzleFlash', this.player.facingLeft)}
+    {this.muzzleFlash ? this.muzzleFlash.reset(muzzleX, muzzleY, terminator.movingLeft)
+      : this.muzzleFlash = new MuzzleFlash(this, muzzleX, muzzleY, 'muzzleFlash', terminator.movingLeft)}
       // Get the first available laser object that has been set to inactive
       let bullet = this.bullets.getFirstDead();
       // Check if we can reuse an inactive laser in our pool of lasers
@@ -573,12 +605,12 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
           bulletX,
           bulletY,
           'bullet',
-          this.terminator.movingLeft
+          terminator.movingLeft
         ).setScale(3);
         this.bullets.add(bullet);
       }
       // Reset this laser to be used for the shot
-      bullet.reset(bulletX, bulletY, this.terminator.movingLeft);
+      bullet.reset(bulletX, bulletY, terminator.movingLeft);
 
   }
 
@@ -635,9 +667,9 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
     });
     this.anims.create({
       key: 'raise-flagpole',
-      frames: this.anims.generateFrameNumbers('heart'),
-      frameRate: 10,
-      repeat: -1,
+      frames: this.anims.generateFrameNumbers('flagpole'),
+      frameRate: 5,
+      repeat: 0,
     })
   }
 
@@ -651,8 +683,15 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
       if(enemy!==this.player && enemy.bulletHits===enemy.bulletDeath){
         enemy.destroy()
         deathSounds[enemy.name].play()
-      } else enemy.bulletHits+=1
-
+        if (enemy.name === 'mario') {
+          this.player.increaseScore(2)
+        } else if (enemy.name === 'terminator') {
+          this.player.increaseScore(10)
+        }
+      } else {
+        enemy.bulletHits+=1
+        enemy.playDamageTween() 
+      }
       bullet.destroy()
     }
 
@@ -672,9 +711,9 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
       this.player.bounceOff()
       this.player.decreaseHealth(1)
     }
-    
+
     raiseFlagpole() {
-      this.flagpole.play("raise-flagpole")
+      this.flagpole.play("raise-flagpole", false)
     }
 
     showGameOverMenu(scene) {
