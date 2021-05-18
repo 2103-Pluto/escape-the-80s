@@ -52,6 +52,7 @@ export default class CreditsScene extends Phaser.Scene {
       if (scene.unsubscribe) {
         scene.unsubscribe() //this is for the HighScoresScene (to ubsubscribe from store)
       }
+      scene.scene.stop();
       scene.scene.start(previousScene);
     })
   }
