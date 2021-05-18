@@ -690,7 +690,7 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
         }
       } else {
         enemy.bulletHits+=1
-        enemy.playDamageTween() 
+        enemy.bounceOff() 
       }
       bullet.destroy()
     }
