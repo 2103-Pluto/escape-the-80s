@@ -1,4 +1,6 @@
 import Phaser from 'phaser'
+import store from '../store'
+import { addRecord } from '../store/records'
 
 export default class SaveScoreScene extends Phaser.Scene {
   constructor() {
@@ -162,6 +164,11 @@ export default class SaveScoreScene extends Phaser.Scene {
   submitName(name) {
     if (name.length === 3) {
       this.click.play();
+      store.dispatch(addRecord( //create a new record
+        name,
+        this.score,
+        this.level
+      ))
       this.scene.start('HighScoresScene') //go to high scores
     } else {
       this.deniedSound.play() //name is not valid

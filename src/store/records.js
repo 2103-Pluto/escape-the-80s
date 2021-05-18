@@ -53,7 +53,7 @@ export default function recordsReducer (state = initState, action) {
     case SET_RECORDS:
       return Object.assign({}, state, {topRecords: action.records})
     case ADDED_RECORD:
-      return Object.assign({}, state, {topRecords: [state.topRecords, action.record]})
+      return Object.assign({}, state, {topRecords: [...state.topRecords, action.record]})
     default:
       return state;
   }
