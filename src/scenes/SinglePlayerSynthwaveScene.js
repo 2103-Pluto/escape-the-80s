@@ -431,7 +431,6 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
     this.pause(this) //creates pause functionality
     // --->
     const level1 = this.add.text(400, 300, 'LEVEL 1',{ fontFamily: '"Press Start 2P"' }).setFontSize(46).setOrigin(0.5, 0.5)
-    console.log('level1--->', level1)
     const flash = this.tweens.add({
       targets: level1,
       duration: 100,
