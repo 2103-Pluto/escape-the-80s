@@ -432,12 +432,13 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
 
     // --->
     const level1 = this.add.text(400, 300, 'LEVEL 1',{ fontFamily: '"Press Start 2P"' }).setFontSize(46).setOrigin(0.5, 0.5)
-    console.log('level1--->', level1)
     const flash = this.tweens.add({
       targets: level1,
       duration: 100,
       repeat: -1,
-      tint: 0xffffff
+      // tint: 0xffffff,
+      alpha: 0,
+      ease: Phaser.Math.Easing.Expo.InOut
   })
 
 
