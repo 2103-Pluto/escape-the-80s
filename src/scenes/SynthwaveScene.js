@@ -121,60 +121,57 @@ export default class SynthwaveScene extends Phaser.Scene {
     heart.play("rotate-heart")
   }
 
-  // createMario(x, y) {
-  //   this.mario = new Mario(this, x , y, 'mario').setScale(3.0)
-  //   this.physics.add.collider(this.mario, this.groundGroup);
-  //   this.physics.add.collider(this.mario, this.player);
-  //  }
 
 
   create() {
     //socket logic
     const scene = this
     this.socket = io();
+    //
+    
 
     scene.otherPlayer=null;
-    this.socket.on("currentPlayers", function (arg) {
-      const  players  = arg;
-      Object.keys(players).forEach(function (id) {
-        if (players[id].playerId !== scene.socket.id) {
-          console.log(players[id].moveState)
-          const x = players[id].moveState.x
-          const y = players[id].moveState.y
-          const facingLeft = players[id].moveState.facingLeft
-          scene.otherPlayer = new SoldierPlayer(scene, x, y, `${scene.color}SoldierIdle`, scene.socket,).setSize(14, 32).setOffset(15, 7).setScale(2.78);
-          scene.otherPlayer.facingLeft = facingLeft
-          if(facingLeft) {
-            scene.otherPlayer.flipX = !scene.otherPlayer.flipX
-          }
-          //note: to address variable characters
-          scene.add.existing(scene.otherPlayer)
-          scene.physics.add.collider(scene.otherPlayer, scene.groundGroup)
-          //'this' context here is the function; need to grab the 'this' that is the scene (i.e. 'scene')
-        }
-      });
-    });
+    // this.socket.on("currentPlayers", function (arg) {
+    //   const  players  = arg;
+    //   Object.keys(players).forEach(function (id) {
+    //     if (players[id].playerId !== scene.socket.id) {
+    //       console.log(players[id].moveState)
+    //       const x = players[id].moveState.x
+    //       const y = players[id].moveState.y
+    //       const facingLeft = players[id].moveState.facingLeft
+    //       scene.otherPlayer = new SoldierPlayer(scene, x, y, `${scene.color}SoldierIdle`, scene.socket,).setSize(14, 32).setOffset(15, 7).setScale(2.78);
+    //       scene.otherPlayer.facingLeft = facingLeft
+    //       if(facingLeft) {
+    //         scene.otherPlayer.flipX = !scene.otherPlayer.flipX
+    //       }
+    //       //note: to address variable characters
+    //       scene.add.existing(scene.otherPlayer)
+    //       scene.physics.add.collider(scene.otherPlayer, scene.groundGroup)
+    //       //'this' context here is the function; need to grab the 'this' that is the scene (i.e. 'scene')
+    //     }
+    //   });
+    // });
 
-    this.socket.on("newPlayer", function (arg) {
-      const playerInfo  = arg;
-     //need to add socket id to player?
-      scene.otherPlayer = new SoldierPlayer(scene, 60, 400, `${scene.color}SoldierIdle`, scene.socket,).setSize(14, 32).setOffset(15, 7).setScale(2.78);
-      //note: to address variable characters
-      scene.add.existing(scene.otherPlayer)
-      scene.physics.add.collider(scene.otherPlayer, scene.groundGroup)
-    });
+    // this.socket.on("newPlayer", function (arg) {
+    //   const playerInfo  = arg;
+    //  //need to add socket id to player?
+    //   scene.otherPlayer = new SoldierPlayer(scene, 60, 400, `${scene.color}SoldierIdle`, scene.socket,).setSize(14, 32).setOffset(15, 7).setScale(2.78);
+    //   //note: to address variable characters
+    //   scene.add.existing(scene.otherPlayer)
+    //   scene.physics.add.collider(scene.otherPlayer, scene.groundGroup)
+    // });
 
-    this.socket.on("playerMoved", function (moveState){
+    // this.socket.on("playerMoved", function (moveState){
       
-      //scene.otherPlayer.updateMovement({right: {isDown:true}})
-      scene.otherPlayer.updateOtherPlayerMovement(moveState)
-      if(moveState.up) {
-        scene.otherPlayer.updateOtherPlayerJump(moveState, scene.jumpSound)
-      }
-      scene.otherPlayer.updateOtherPlayerInAir()
+    //   //scene.otherPlayer.updateMovement({right: {isDown:true}})
+    //   scene.otherPlayer.updateOtherPlayerMovement(moveState)
+    //   if(moveState.up) {
+    //     scene.otherPlayer.updateOtherPlayerJump(moveState, scene.jumpSound)
+    //   }
+    //   scene.otherPlayer.updateOtherPlayerInAir()
       
       
-    })
+    // })
 
 
     //mute the previous scene
@@ -215,9 +212,6 @@ export default class SynthwaveScene extends Phaser.Scene {
 
     // this.enemy = new enemy(this, 600, 400, 'brandon').setScale(.25)
 
-    this.createStar(600, 400); //create a star to test the Heart entity
-    this.createHeart(100, 500);
-    this.createHeart(120, 500);     //create a heart to test the Heart entity
 
     // ...
     // this.physics.add.collider(this.enemy, this.groundGroup);
@@ -263,19 +257,7 @@ export default class SynthwaveScene extends Phaser.Scene {
 
     this.screamSound = this.sound.add('scream');
 
-    const flagpoleX = 770*numberOfFrames
-    this.flagpole = new Flagpole(this, flagpoleX, 375, 'flagpole').setScale(2.0);
-    this.createHeart(100, 500);
-    this.createHeart(120, 500);     //create a heart to test the Heart entity
-
-    //create mario(enemy)
-    // this.createMario(300,500)
-    // this.mario = new Mario(this, 300, 400, 'mario').setScale(3.0)
-    // this.physics.add.collider(this.mario, this.groundGroup);
-    // this.physics.add.collider(this.mario, this.player);
-    
-   
-
+    scene.scene.launch("WaitingRoom", { socket: scene.socket })
     // Create collisions for all entities
     // << CREATE COLLISIONS HERE >>
   }
