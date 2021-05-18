@@ -268,14 +268,14 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
       bullet.setActive(false)
       bullet.destroy()
     }
-    
+
   }
 
   createFlagpole(scene) {
     scene.flagpole = new Flagpole(scene, scene.playerZones.end.x, 310, 'flagpole').setScale(2.78)
     scene.flagpole.body.immovable = true
     scene.flagpole.body.allowGravity = false
-    
+
   }
 
 
@@ -298,7 +298,7 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
           newEnemy.body.immovable = true
         }
       });
-      enemyX+=50 //if you create a troop of enemies, they'll be 50 pixels apart 
+      enemyX+=50 //if you create a troop of enemies, they'll be 50 pixels apart
     }
     return scene.mario
   }
@@ -406,8 +406,8 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
 
   create() {
    // const scene = this
-    
-    
+
+
     // ALL THESE ('--->') NEED TO BE IN ORDER
     this.height = this.game.config.height; //retrive width and height (careful--Has to be at the top of create)
     this.width = this.game.config.width;
@@ -437,8 +437,8 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
       repeat: -1,
       tint: 0xffffff
   })
-  
-  
+
+
   this.time.addEvent({
     delay: 1000,
     callback: () => {
@@ -466,7 +466,7 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
     //this.terminator = new Terminator(this, 2800, 400, 'terminator').setScale(4.5)
     this.createEnemies(this, 'terminator', 2800, 400, 1, 4.5)
     this.createEnemies(this, 'terminator', this.playerZones.end.x - 400, 400, 1, 4.5)
-    
+
 
     // this.physics.add.collider(this.terminator, this.groundGroup);
     // this.physics.add.collider(this.terminator, this.player);
@@ -558,7 +558,7 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
     const muzzleX =
       this.player.x + (this.player.facingLeft ? -offsetX*0.95 : offsetX*0.95);
     const muzzleY = this.player.isCrouching ? this.player.y + offsetY*3.1 : this.player.y - offsetY*1.2;
-  
+
     //create muzzleFlash
     {this.muzzleFlash ? this.muzzleFlash.reset(muzzleX, muzzleY, this.player.facingLeft)
       : this.muzzleFlash = new MuzzleFlash(this, muzzleX, muzzleY, 'muzzleFlash', this.player.facingLeft)}
@@ -693,7 +693,6 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
         } else {
           enemy.bounceOff()
         }
-        
       }
       bullet.destroy()
     }
