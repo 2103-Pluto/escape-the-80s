@@ -239,7 +239,7 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
   }
 
   createGoo(x, y, scene) {
-    const goo = new Goo(scene, x, y, 'goo').setScale(2.8) //we can custom this
+    const goo = new Goo(scene, x, y, 'goo').setScale(2) //we can custom this
     // goo.alpha = 0.8 //we can custom this
     scene.goos.add(goo)
   }
@@ -689,7 +689,7 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
       } else {
         enemy.bulletHits+=1
         if (enemy!==this.player) {
-          enemy.playDamageTween() 
+          enemy.playDamageTween()
         } else {
           enemy.bounceOff()
         }
