@@ -1,6 +1,6 @@
 # Escape the 80s
 
-Escape the 80s is a web-based game with both campaign and multiplayer modes. The (soldier) players must fight their way back from the 80s if they don't wish to be forever trapped in a world of fanny packs, leg warmers, and neon fashion!
+Escape the 80s is a web-based side-scrolling game with both campaign and multiplayer modes. The (soldier) players must fight their way back from the 80s if they don't wish to be forever trapped in a world of fanny packs, leg warmers, and neon fashion!
 
 ## Checkout the Deployed Game
 

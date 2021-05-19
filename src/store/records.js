@@ -24,7 +24,7 @@ export const fetchRecords = () => {
   return async (dispatch) => {
     try {
       const { data: records } = await axios.get("/api/records")
-      dispatch(setrecords(records))
+      dispatch(setRecords(records))
     } catch (error) {
       console.log(error)
     }
@@ -44,17 +44,14 @@ export const addRecord = (name, score, level) => {
 
 //INITIAL STATE
 const initState = {
-  allRecords: [],
-  newRecordId: 0
+  topRecords: [],
 }
 
 //RECORDS REDUCER
 export default function recordsReducer (state = initState, action) {
   switch (action.type) {
     case SET_RECORDS:
-      return { ...state, allRecords: [...action.records]}
-    case ADDED_RECORD:
-      return { ...state, allRecords: [...allRecords, action.record], newRecordId: action.record.id }
+      return Object.assign({}, state, {topRecords: action.records})
     default:
       return state;
   }

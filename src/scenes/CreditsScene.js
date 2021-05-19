@@ -49,6 +49,10 @@ export default class CreditsScene extends Phaser.Scene {
     })
     back.on("pointerup", () => {
       scene.click.play();
+      if (scene.unsubscribe) {
+        scene.unsubscribe() //this is for the HighScoresScene (to ubsubscribe from store)
+      }
+      scene.scene.stop();
       scene.scene.start(previousScene);
     })
   }

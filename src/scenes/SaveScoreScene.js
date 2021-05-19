@@ -1,34 +1,25 @@
 import Phaser from 'phaser'
+import store from '../store'
+import { addRecord } from '../store/records'
 
 export default class SaveScoreScene extends Phaser.Scene {
   constructor() {
     super('SaveScoreScene');
 
     this.chars = [
-      ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J"],
-      ["K", "L", "M", "N", "O", "P", "Q", "R", "S", "T"],
-      ["U", "V", "W", "X", "Y", "Z", ".", "-", "<", ">"]
+      [ 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J' ],
+      [ 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T' ],
+      [ 'U', 'V', 'W', 'X', 'Y', 'Z', '.', '-', '<', '>']
     ];
-
-    /*this.chars = [
-      ["A", "B", "C", "D", "E"],
-      ["F", "G", "H", "I", "J"],
-      ["K", "L", "M", "N", "O"],
-      ["P", "Q", "R", "S", "T"],
-      ["U", "V", "W", "X", "Y"],
-      ["Z", ".", "-", "<", ">"]
-    ];*/
-
-    this.rows = this.chars.length;
-    this.columns = this.chars[0].length;
 
     this.cursor = new Phaser.Math.Vector2();
 
     this.text;
     this.block;
 
-    this.name = "";
+    this.name = '';
     this.charLimit = 3;
+    this.playerText;
   }
 
   init(data) {
@@ -36,11 +27,25 @@ export default class SaveScoreScene extends Phaser.Scene {
     this.level = data.level; //initialize level
   }
 
+  preload() {
+    this.load.image('block', 'assets/input/block.png');
+    this.load.image('rub', 'assets/input/rub.png');
+    this.load.image('end', 'assets/input/end.png');
+
+    this.load.bitmapFont('arcade', 'assets/input/arcade.png', 'assets/input/arcade.xml');
+
+    this.load.audio("denied", "assets/audio/denied.wav");
+  }
+
   create() {
     this.width = this.game.config.width;
     this.height = this.game.config.height;
     const backgroundImage = this.add.image(this.width*0.5, this.height*0.5, "title-background").setOrigin(0.5, 0.5).setScale(1.2);
     backgroundImage.alpha = 0.1;
+
+    //add denied sound
+    this.deniedSound = this.sound.add('denied');
+    this.deniedSound.volume = 0.07;
 
     //add background music
     const backgroundMusic = this.sound.add('title-music');
@@ -58,174 +63,61 @@ export default class SaveScoreScene extends Phaser.Scene {
     //add title
     this.add.text(this.width*0.5, this.height*0.1, 'SAVE SCORE', { fontFamily: '"Press Start 2P"' }).setFontSize(28).setOrigin(0.5).setColor('#ED6BF3')
 
+    //score
+    this.add.text(this.width*0.25, this.height*0.25, `Score: ${this.score}`, { fontFamily: '"Press Start 2P"' }).setFontSize(26).setOrigin(0.5).setColor('#4DF3F5')
+
+    //level
+    this.add.text(this.width*0.75, this.height*0.25, `Level: ${this.level}`, { fontFamily: '"Press Start 2P"' }).setFontSize(26).setOrigin(0.5).setColor('#4DF3F5')
+
+    //instructions
+    this.add.text(this.width*0.5, this.height*0.4, 'Enter your name (3 characters)', { fontFamily: '"Press Start 2P"' }).setFontSize(24).setOrigin(0.5)
+
+    this.playerText = this.add.text(this.width*0.5, this.height*0.5, '', { fontFamily: '"Press Start 2P"' }).setFontSize(28).setOrigin(0.5).setColor('#feff38')
+
     //create input panel
-    // this.createInputPanel()
-
-    //add text for saving
-    const save = this.add.text(this.width*0.5, this.height*0.6, 'Save', { fontFamily: '"Press Start 2P"' }).setFontSize(28).setOrigin(0.5).setColor('#4DF3F5')
-
-    save.setInteractive();
-    save.on("pointerover", () => {
-      this.hoverIcon.setVisible(true);
-      this.hoverIcon.x = save.x - 100;
-      this.hoverIcon.y = save.y;
-      save.setColor('#feff38')
-    })
-    save.on("pointerout", () => {
-      this.hoverIcon.setVisible(false);
-      save.setColor('#4DF3F5')
-    })
-    save.on("pointerup", () => {
-      this.click.play();
-      this.scene.start('HighScoresScene') //go to high scores
-    })
+    this.createInputPanel()
   }
 
   createInputPanel() {
-    this.padding = 25;
-    this.letterSpacing = 20;
-    var charWidth = 32;
-    var charHeight = 32;
-    var lineHeight = 2;
-    this.xSpacing = charWidth + this.letterSpacing;
-    this.ySpacing = charHeight * lineHeight;
+    let text = this.add.bitmapText(150, 350, 'arcade', 'ABCDEFGHIJ\n\nKLMNOPQRST\n\nUVWXYZ.-');
 
-    var characters = "";
-    for (let i = 0; i < this.chars.length; i++) {
-      characters += this.chars[i].join("");
-      if (i !== this.chars.length - 1) {
-        characters += "\n".repeat(lineHeight);
-      }
-    }
-
-    let text = this.add.bitmapText(30 + this.padding, 50, 'Press Start 2P', characters);
-
-    text.setLetterSpacing(this.letterSpacing);
+    text.setLetterSpacing(20);
     text.setInteractive();
 
-    this.add.image(
-      text.x +
-        charWidth * (this.columns - 1) -
-        20 +
-        this.letterSpacing * (this.columns - 2),
-      text.y + charWidth * (lineHeight * (this.chars.length - 1)) + 20,
-      "rub"
-    );
-    this.add.image(
-      text.x +
-        charWidth * this.columns -
-        20 +
-        this.letterSpacing * (this.columns - 1),
-      text.y + charWidth * (lineHeight * (this.chars.length - 1)) + 20,
-      "end"
-    );
+    this.add.image(text.x + 430, text.y + 148, 'rub');
+    this.add.image(text.x + 482, text.y + 148, 'end');
 
-    this.block = this.add.image(text.x - 10, text.y - 2, "block").setOrigin(0);
+    this.block = this.add.image(text.x - 10, text.y - 2, 'block').setOrigin(0);
 
     this.text = text;
+    this.text.setInteractive();
 
-    this.input.keyboard.on("keyup_LEFT", this.moveLeft, this);
-    this.input.keyboard.on("keyup_RIGHT", this.moveRight, this);
-    this.input.keyboard.on("keyup_UP", this.moveUp, this);
-    this.input.keyboard.on("keyup_DOWN", this.moveDown, this);
-    this.input.keyboard.on("keyup_ENTER", this.pressKey, this);
-    this.input.keyboard.on("keyup_SPACE", this.pressKey, this);
-    this.input.keyboard.on("keyup", this.anyKey, this);
+    //listen to events
+    this.events.on('updateName', this.updateName, this)
+    this.events.on('submitName', this.submitName, this)
+    this.text.on('pointermove', this.moveBlock, this)
+    this.text.on('pointerup', this.pressKey, this)
 
-    text.on("pointermove", this.moveBlock, this);
-    text.on("pointerup", this.pressKey, this);
 
     this.tweens.add({
       targets: this.block,
       alpha: 0.2,
       yoyo: true,
       repeat: -1,
-      ease: "Sine.easeInOut",
+      ease: 'Sine.easeInOut',
       duration: 350
     });
   }
 
   moveBlock(pointer, x, y) {
-    let cx = Phaser.Math.Snap.Floor(x, this.xSpacing, 0, true);
-    let cy = Phaser.Math.Snap.Floor(y, this.ySpacing, 0, true);
+    let cx = Phaser.Math.Snap.Floor(x, 52, 0, true);
+    let cy = Phaser.Math.Snap.Floor(y, 64, 0, true);
+    let char = this.chars[cy][cx];
 
-    if (cy <= this.rows - 1 && cx <= this.columns - 1) {
-      this.cursor.set(cx, cy);
+    this.cursor.set(cx, cy);
 
-      this.block.x = this.text.x - 10 + cx * this.xSpacing;
-      this.block.y = this.text.y - 2 + cy * this.ySpacing;
-    }
-  }
-
-  moveLeft() {
-    if (this.cursor.x > 0) {
-      this.cursor.x--;
-      this.block.x -= this.xSpacing;
-    } else {
-      this.cursor.x = 9;
-      this.block.x += this.xSpacing * 9;
-    }
-  }
-
-  moveRight() {
-    if (this.cursor.x < 9) {
-      this.cursor.x++;
-      this.block.x += this.xSpacing;
-    } else {
-      this.cursor.x = 0;
-      this.block.x -= this.xSpacing * 9;
-    }
-  }
-
-  moveUp() {
-    if (this.cursor.y > 0) {
-      this.cursor.y--;
-      this.block.y -= this.ySpacing;
-    } else {
-      this.cursor.y = 2;
-      this.block.y += this.ySpacing * 2;
-    }
-  }
-
-  moveDown() {
-    if (this.cursor.y < 2) {
-      this.cursor.y++;
-      this.block.y += this.ySpacing;
-    } else {
-      this.cursor.y = 0;
-      this.block.y -= this.ySpacing * 2;
-    }
-  }
-
-  anyKey(event) {
-    //  Only allow A-Z . and -
-
-    let code = event.keyCode;
-
-    if (code === Phaser.Input.Keyboard.KeyCodes.PERIOD) {
-      this.cursor.set(6, 2);
-      this.pressKey();
-    } else if (code === Phaser.Input.Keyboard.KeyCodes.MINUS) {
-      this.cursor.set(7, 2);
-      this.pressKey();
-    } else if (
-      code === Phaser.Input.Keyboard.KeyCodes.BACKSPACE ||
-      code === Phaser.Input.Keyboard.KeyCodes.DELETE
-    ) {
-      this.cursor.set(8, 2);
-      this.pressKey();
-    } else if (
-      code >= Phaser.Input.Keyboard.KeyCodes.A &&
-      code <= Phaser.Input.Keyboard.KeyCodes.Z
-    ) {
-      code -= 65;
-
-      let y = Math.floor(code / 10);
-      let x = code - y * 10;
-
-      this.cursor.set(x, y);
-      this.pressKey();
-    }
+    this.block.x = this.text.x - 10 + (cx * 52);
+    this.block.y = this.text.y - 2 + (cy * 64);
   }
 
   pressKey() {
@@ -233,26 +125,53 @@ export default class SaveScoreScene extends Phaser.Scene {
     let y = this.cursor.y;
     let nameLength = this.name.length;
 
-    this.block.x = this.text.x - 10 + x * this.xSpacing;
-    this.block.y = this.text.y - 2 + y * this.ySpacing;
+    this.block.x = this.text.x - 10 + (x * 52);
+    this.block.y = this.text.y - 2 + (y * 64);
 
-    if (x === this.columns - 1 && y === this.rows - 1 && nameLength > 0) {
-      //  Submit
-      this.events.emit("submitName", this.name);
-    } else if (
-      x === this.columns - 2 &&
-      y === this.rows - 1 &&
-      nameLength > 0
-    ) {
+    if (x === 9 && y === 2) {
+        //  Submit
+        this.events.emit('submitName', this.name);
+    }
+    else if (x === 8 && y === 2) {
       //  Rub
-      this.name = this.name.substr(0, nameLength - 1);
+      if (nameLength > 0) {
+        this.name = this.name.substr(0, nameLength - 1);
 
-      this.events.emit("updateName", this.name);
-    } else if (this.name.length < this.charLimit) {
+        this.events.emit('updateName', this.name);
+      } else {
+        this.deniedSound.play()
+      }
+    }
+    else {
       //  Add
-      this.name = this.name.concat(this.chars[y][x]);
+      if (this.name.length < this.charLimit) {
+        this.name = this.name.concat(this.chars[y][x]);
+        this.events.emit('updateName', this.name);
+        this.click.play();
+      }
+      else {
+        this.deniedSound.play()
+      }
+    }
+  }
 
-      this.events.emit("updateName", this.name);
+  updateName(name) {
+    name.includes('>') ?
+    this.deniedSound.play()
+    : this.playerText.setText(name)
+  }
+
+  submitName(name) {
+    if (name.length === 3) {
+      this.click.play();
+      store.dispatch(addRecord( //create a new record
+        name,
+        this.score,
+        this.level
+      ))
+      this.scene.start('HighScoresScene') //go to high scores
+    } else {
+      this.deniedSound.play() //name is not valid
     }
   }
 }
