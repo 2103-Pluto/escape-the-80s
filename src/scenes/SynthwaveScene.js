@@ -127,8 +127,9 @@ export default class SynthwaveScene extends Phaser.Scene {
     //socket logic
     const scene = this
     this.socket = io();
-    //
     
+    //timer
+   
 
     //scene.otherPlayer=null;
     this.socket.on("currentPlayers", function (arg) {
@@ -136,19 +137,21 @@ export default class SynthwaveScene extends Phaser.Scene {
       console.log('players--->', players)
       Object.keys(players).forEach(function (id) {
         if (players[id].playerId !== scene.socket.id) {
-          console.log('movestate--->', players[id].moveState)
-          const x = players[id].moveState.x
-          const y = players[id].moveState.y
-          const facingLeft = players[id].moveState.facingLeft
-          scene.otherPlayer = new SoldierPlayer(scene, x, y, `${scene.color}SoldierIdle`, scene.socket,).setSize(14, 32).setOffset(15, 7).setScale(2.78);
-          scene.otherPlayer.facingLeft = facingLeft
-          if(facingLeft) {
-            scene.otherPlayer.flipX = !scene.otherPlayer.flipX
-          }
+          //console.log('movestate--->', players[id].moveState)
+          // const x = players[id].moveState.x
+          // const y = players[id].moveState.y
+          //const facingLeft = players[id].moveState.facingLeft
+          scene.otherPlayer = new SoldierPlayer(scene, 60, 400, `${scene.color}SoldierIdle`, scene.socket,).setSize(14, 32).setOffset(15, 7).setScale(2.78);
+          // scene.otherPlayer.facingLeft = facingLeft
+          // if(facingLeft) {
+          //   scene.otherPlayer.flipX = !scene.otherPlayer.flipX
+          // }
           //note: to address variable characters
           scene.add.existing(scene.otherPlayer)
           scene.physics.add.collider(scene.otherPlayer, scene.groundGroup)
           //'this' context here is the function; need to grab the 'this' that is the scene (i.e. 'scene')
+          //turn game on
+          //if(Object.keys(players).length===2) scene.scene.resume()
         }
       });
     });
@@ -258,6 +261,7 @@ export default class SynthwaveScene extends Phaser.Scene {
     this.shootingSound.volume = 0.03;
 
     this.screamSound = this.sound.add('scream');
+   
     scene.scene.pause()
     scene.scene.launch("WaitingRoom", { socket: scene.socket })
 
@@ -265,7 +269,6 @@ export default class SynthwaveScene extends Phaser.Scene {
       scene.scene.resume()
       //console.log('testing')
     })
-   
     
     
     // Create collisions for all entities

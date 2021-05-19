@@ -27,11 +27,7 @@ module.exports = (io) => {
       roomInfo.numPlayers = Object.keys(roomInfo.players).length;
 
       socket.emit("currentPlayers", roomInfo.players);
-      if(roomInfo.numPlayers===2) {
-        // socket.emit("startGame")
-        // socket.to(roomKey).emit("startGame")
-        io.in(roomKey).emit("startGame")
-      }
+     
       //socket.broadcast.emit("newPlayer", roomInfo.players[socket.id])
       socket.on("playerMovement", function (moveState) {
         // emit a message to all players about the player that moved
@@ -43,6 +39,11 @@ module.exports = (io) => {
       socket.to(roomKey).emit("newPlayer", {
         playerInfo: roomInfo.players[socket.id],
       });
+
+       if(roomInfo.numPlayers===2) {
+        socket.emit("startGame")
+        socket.to(roomKey).emit("startGame")
+      }
       
     });
 

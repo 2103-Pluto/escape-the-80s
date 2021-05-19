@@ -20,7 +20,7 @@ export default class SoldierPlayer extends Phaser.Physics.Arcade.Sprite {
     this.moveState = {
       x: x,
       y: y,
-      facingLeft: this.facingLeft,
+      // facingLeft: this.facingLeft,
       left: false,
       right: false,
       up: false,
@@ -83,7 +83,7 @@ export default class SoldierPlayer extends Phaser.Physics.Arcade.Sprite {
         
         this.flipX = !this.flipX;
         this.facingLeft = true;
-        this.moveState.facingLeft = true
+        // this.moveState.facingLeft = true
         this.body.setOffset(19, 7)
         
       }
