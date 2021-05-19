@@ -184,6 +184,7 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
     scene.zonesT = map.getObjectLayer('Terminator_Spawn')
     scene.zonesM = map.getObjectLayer('Mario_Spawn')
     scene.terminatorSpawns = this.getTerminatorSpawns(scene)
+    scene.marioSpawns = this.getMarioSpawns(scene)
   }
 
   getTerminatorSpawns(scene){
@@ -195,12 +196,15 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
   }
 
   getMarioSpawns(scene){
-    const markers = scene.zonesT.objects
-    const a = {
-      t1: markers.find(m => m.name === 'Terminator1'),
-      t2: markers.find(m => m.name === 'Terminator2')
+    const markers = scene.zonesM.objects
+   return {
+      m1: markers.find(m => m.name === 'Mario1'),
+      m2: markers.find(m => m.name === 'Mario2'),
+      m3: markers.find(m => m.name === 'M3'),
+      m4: markers.find(m => m.name === 'M4'),
+      m5: markers.find(m => m.name === 'M5'),
+      m6: markers.find(m => m.name === 'M6'),
     }
-    console.log(a)
   }
 
 
@@ -314,7 +318,7 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
       scene.physics.add.collider(newEnemy, scene.groundGroup);
       scene.physics.add.collider(newEnemy, scene.platforms)
       scene.physics.add.collider(newEnemy, scene.player, function(newEnemy, player){
-        if (player.body.touching.right || player.body.touching.left){
+        if (player.body.touching.right || player.body.touching.left){   /// CHECK THIS WITH MARIOS ON PLATFORMS
           player.bounceOff()
           player.decreaseHealth(1)
         }
@@ -484,21 +488,16 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
 
 
 
-    this.createEnemies(this, 'mario', 800, 400, 3, 2.7)
-    this.createEnemies(this, 'mario', 1200, 400, 5, 2.7)
-    //this.terminator = new Terminator(this, 2800, 400, 'terminator').setScale(4.5)
+    this.createEnemies(this, 'mario', this.marioSpawns.m1.x, this.marioSpawns.m1.y, 2, 2.7)
+    this.createEnemies(this, 'mario', this.marioSpawns.m2.x, this.marioSpawns.m2.y, 5, 2.7)
+    this.createEnemies(this, 'mario', this.marioSpawns.m3.x, this.marioSpawns.m3.y, 6, 2.7)
+    this.createEnemies(this, 'mario', this.marioSpawns.m4.x, this.marioSpawns.m4.y, 2, 2.7)
+    this.createEnemies(this, 'mario', this.marioSpawns.m5.x, this.marioSpawns.m5.y, 2, 2.7)
+    this.createEnemies(this, 'mario', this.marioSpawns.m6.x, this.marioSpawns.m6.y, 2, 2.7)
+
     this.createEnemies(this, 'terminator', this.terminatorSpawns.t1.x, this.terminatorSpawns.t1.y, 1, 4.5)
     this.createEnemies(this, 'terminator', this.terminatorSpawns.t2.x, this.terminatorSpawns.t2.y, 1, 4.5)
 
-
-    // this.physics.add.collider(this.terminator, this.groundGroup);
-    // this.physics.add.collider(this.terminator, this.player);
-
-
-
-    // ...
-    //this.physics.add.collider(this.enemy, this.groundGroup);
-    //this.physics.add.collider(this.enemy, this.player);
   }
 
   createSounds() {
