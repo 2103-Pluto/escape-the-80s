@@ -9,6 +9,12 @@ export default class NeonAlleyScene extends Phaser.Scene {
     this.createBackgroundElement = this.createBackgroundElement.bind(this);
   }
 
+  init(data) {
+    this.initialScore = data.score,
+    this.initialHealth = data.health,
+    this.color = data.color
+  }
+
   preload() {
     // Preload Sprites
     // << LOAD SPRITES HERE >>

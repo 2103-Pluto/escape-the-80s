@@ -25,6 +25,7 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
     this.hit = this.hit.bind(this);
     this.hitPlatform = this.hitPlatform.bind(this)
     this.createBackgroundElement = this.createBackgroundElement.bind(this);
+    this.flagpoleIsUp = false;
     //bind functions
     this.createPlayer = this.createPlayer.bind(this);
     this.createEnemies = this.createEnemies.bind(this)
@@ -260,7 +261,7 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
     scene.platforms.setCollisionBetween(1, 2)
     scene.physics.add.collider(scene.flagpole, scene.groundGroup)
     scene.physics.add.overlap(scene.player, scene.flagpole, function() {
-      scene.raiseFlagpole()
+      scene.raiseFlagpole(scene)
     })
     scene.physics.add.overlap(scene.platforms, scene.bullets, scene.hitPlatform, null, scene)
   }
@@ -273,10 +274,12 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
   }
 
   createFlagpole(scene) {
-    scene.flagpole = new Flagpole(scene, scene.playerZones.end.x, 310, 'flagpole').setScale(2.78)
+    // scene.flagpole = new Flagpole(scene, scene.playerZones.end.x, 310, 'flagpole').setScale(2.78)
+    scene.flagpole = new Flagpole(scene, 300, 310, 'flagpole').setScale(2.78) //testing mode
+    scene.flagpole.body.setSize(2, 160)
+    scene.flagpole.body.setOffset(16, 0)
     scene.flagpole.body.immovable = true
     scene.flagpole.body.allowGravity = false
-
   }
 
 
@@ -537,8 +540,22 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
       terminator.update(time, delta, scene.terminatorFire)
     })
     //this.terminator.update(time, delta, this.terminatorFire)
+    this.updateLevelEnded(this) //testing mode
 
+  }
 
+  updateLevelEnded(scene) { //testing mode
+    if (scene.flagpoleIsUp) {
+      scene.scene.pause()
+      scene.backgroundSound.pause()
+      scene.scene.launch('LevelCompletedScene', {
+        level: scene.level,
+        score: scene.player.score,
+        health: scene.player.health,
+        color: scene.color
+      })
+      scene.scene.moveAbove(scene, 'LevelCompletedScene')
+    }
   }
 
   updateHealth(scene) {
@@ -554,15 +571,6 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
   }
 
   fire() {
-    //-------->testing mode
-    this.scene.launch('LevelCompletedScene', {
-      level: this.level,
-      score: this.player.score,
-      health: this.player.health,
-      color: this.color
-    })
-    this.scene.moveAbove(this, 'LevelCompletedScene')
-    //<--------testing mode
     const offsetX = 60;
     const offsetY = 5.5;
     const bulletX =
@@ -679,7 +687,7 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
     this.anims.create({
       key: 'raise-flagpole',
       frames: this.anims.generateFrameNumbers('flagpole'),
-      frameRate: 5,
+      frameRate: 10,
       repeat: 0,
     })
   }
@@ -723,8 +731,13 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
       this.player.decreaseHealth(1)
     }
 
-    raiseFlagpole() {
-      this.flagpole.play("raise-flagpole", false)
+    raiseFlagpole(scene) {//testing mode
+      if (!this.flagpoleIsUp) {
+        scene.flagpole.play("raise-flagpole", false)
+      }
+      scene.flagpole.on('animationcomplete-raise-flagpole', () => {
+        this.flagpoleIsUp = true
+      })
     }
 
     showGameOverMenu(scene) {
