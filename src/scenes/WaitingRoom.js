@@ -75,8 +75,8 @@ export default class WaitingRoom extends Phaser.Scene {
       fontSize: "15px",
     });
     scene.roomKeyText = scene.add.text(210, 250, "", {
-      fill: "#00ff00",
-      fontSize: "20px",
+      fill: "#000000",
+      fontSize: "25px",
       fontStyle: "bold",
     });
 
@@ -91,6 +91,7 @@ export default class WaitingRoom extends Phaser.Scene {
     scene.socket.on("keyIsValid", function (input) {
       scene.socket.emit("joinRoom", input);
       scene.scene.stop("WaitingRoom");
+      //scene.scene.resume('SynthwaveScene')
     });
   }
   update() {}

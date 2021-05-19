@@ -258,8 +258,16 @@ export default class SynthwaveScene extends Phaser.Scene {
     this.shootingSound.volume = 0.03;
 
     this.screamSound = this.sound.add('scream');
-
+    scene.scene.pause()
     scene.scene.launch("WaitingRoom", { socket: scene.socket })
+
+    this.socket.on("startGame", function () {
+      scene.scene.resume()
+      //console.log('testing')
+    })
+   
+    
+    
     // Create collisions for all entities
     // << CREATE COLLISIONS HERE >>
   }
