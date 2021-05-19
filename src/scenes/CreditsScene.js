@@ -34,20 +34,20 @@ export default class CreditsScene extends Phaser.Scene {
     scene.hoverIcon.setVisible(false);
 
     //add option to return to menu
-    const back = scene.add.text(35, 40, 'Go Back', { fontFamily: '"Press Start 2P"' }).setFontSize(28).setOrigin(0, 0.5).setColor('#4DF3F5')
+    scene.back = scene.add.text(35, 40, 'Go Back', { fontFamily: '"Press Start 2P"' }).setFontSize(28).setOrigin(0, 0.5).setColor('#4DF3F5')
 
-    back.setInteractive();
-    back.on("pointerover", () => {
+    scene.back.setInteractive();
+    scene.back.on("pointerover", () => {
       scene.hoverIcon.setVisible(true);
-      back.setColor('#feff38')
-      scene.hoverIcon.x = back.x + back.width + 50;
-      scene.hoverIcon.y = back.y;
+      scene.back.setColor('#feff38')
+      scene.hoverIcon.x = scene.back.x + scene.back.width + 50;
+      scene.hoverIcon.y = scene.back.y;
     })
-    back.on("pointerout", () => {
+    scene.back.on("pointerout", () => {
       scene.hoverIcon.setVisible(false);
-      back.setColor('#4DF3F5')
+      scene.back.setColor('#4DF3F5')
     })
-    back.on("pointerup", () => {
+    scene.back.on("pointerup", () => {
       scene.click.play();
       if (scene.unsubscribe) {
         scene.unsubscribe() //this is for the HighScoresScene (to ubsubscribe from store)
