@@ -1,9 +1,11 @@
 import Phaser from 'phaser'
+import SinglePlayerSynthwaveScene from './SinglePlayerSynthwaveScene'
+import NeonAlleyScene from './NeonAlleyScene'
 
 export default class LevelCompletedScene extends Phaser.Scene {
   constructor() {
     super('LevelCompletedScene');
-    this.activeGoToNextLevelButton = true;
+    this.activeGoToNextLevelButton = false;
     this.scoreTweenDuration = 2000;
 
     this.createScoreLabel = this.createScoreLabel.bind(this)
@@ -14,7 +16,8 @@ export default class LevelCompletedScene extends Phaser.Scene {
     this.score = data.score,
     this.health = data.health,
     this.color = data.color,
-    this.level = data.level
+    this.level = data.level,
+    this.previousSceneName = data.previousSceneName
   }
 
   create() {
@@ -30,11 +33,11 @@ export default class LevelCompletedScene extends Phaser.Scene {
     this.coinSound.volume = 0.1;
 
     //add text
-    this.add.text(this.width*0.5, this.height*0.2, `Level ${this.level} completed!`, { fontFamily: '"Press Start 2P"' }).setFontSize(32).setOrigin(0.5)
+    this.add.text(this.width*0.5, this.height*0.2, `Level ${this.level} completed!`, { fontFamily: '"Press Start 2P"' }).setFontSize(32).setOrigin(0.5).setColor('#ED6BF3')
 
-    this.add.text(this.width*0.5, this.height*0.4, "You're one step closer", { fontFamily: '"Press Start 2P"' }).setFontSize(26).setOrigin(0.5)
+    this.add.text(this.width*0.5, this.height*0.4, "You're one step closer", { fontFamily: '"Press Start 2P"' }).setFontSize(26).setOrigin(0.5).setColor('#4DF3F5')
 
-    this.add.text(this.width*0.5, this.height*0.5, "to escaping the 80s", { fontFamily: '"Press Start 2P"' }).setFontSize(26).setOrigin(0.5)
+    this.add.text(this.width*0.5, this.height*0.5, "to escaping the 80s", { fontFamily: '"Press Start 2P"' }).setFontSize(26).setOrigin(0.5).setColor('#4DF3F5')
 
     this.createGoToNextLevelButton()
     this.createScoreLabel()
@@ -71,6 +74,7 @@ export default class LevelCompletedScene extends Phaser.Scene {
       onComplete: () => {
         this.powerUpSound.play()
         this.goToNextLevelButton.setVisible(true);
+        this.activeGoToNextLevelButton = true;
       }
     });
   }
@@ -96,7 +100,24 @@ export default class LevelCompletedScene extends Phaser.Scene {
     })
     this.goToNextLevelButton.on("pointerup", () => {
       if (this.activeGoToNextLevelButton) {
+        this.activeGoToNextLevelButton = false;
+        const game = this.game;
         this.click.play();
+
+        if (this.previousSceneName === 'SinglePlayerSynthwaveScene') {
+          this.scene.remove('SinglePlayerSynthwaveScene') //remove previous scene instance
+          game.scene.add('SinglePlayerSynthwaveScene', SinglePlayerSynthwaveScene) //add previous scene new instance
+          this.scene.start('NeonAlleyScene', { //start neon alley
+            score: this.score,
+            health: this.health,
+            color: this.color
+          })
+        } else if (this.previousSceneName === 'NeonAlleyScene') {
+          this.scene.remove('NeonAlleyScene') //remove previous scene instance
+          game.scene.add('NeonAlleyScene', NeonAlleyScene) //add previous scene new instance
+        }
+        this.scene.remove('LevelCompletedScene') //remove this scene
+        game.scene.add('LevelCompletedScene', LevelCompletedScene) //add new instance of level completed
       }
     })
   }

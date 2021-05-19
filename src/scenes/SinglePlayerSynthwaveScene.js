@@ -552,7 +552,8 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
         level: scene.level,
         score: scene.player.score,
         health: scene.player.health,
-        color: scene.color
+        color: scene.color,
+        previousSceneName: scene.data.systems.config
       })
       scene.scene.moveAbove(scene, 'LevelCompletedScene')
     }
