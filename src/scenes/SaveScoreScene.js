@@ -20,6 +20,8 @@ export default class SaveScoreScene extends Phaser.Scene {
     this.name = '';
     this.charLimit = 3;
     this.playerText;
+    this.activeToHighScores = false;
+    this.savedRecord = false;
   }
 
   init(data) {
@@ -70,16 +72,20 @@ export default class SaveScoreScene extends Phaser.Scene {
     this.add.text(this.width*0.75, this.height*0.25, `Level: ${this.level}`, { fontFamily: '"Press Start 2P"' }).setFontSize(26).setOrigin(0.5).setColor('#4DF3F5')
 
     //instructions
-    this.add.text(this.width*0.5, this.height*0.4, 'Enter your name (3 characters)', { fontFamily: '"Press Start 2P"' }).setFontSize(24).setOrigin(0.5)
+    this.add.text(this.width*0.5, this.height*0.35, 'Enter your name (3 characters)', { fontFamily: '"Press Start 2P"' }).setFontSize(24).setOrigin(0.5)
 
-    this.playerText = this.add.text(this.width*0.5, this.height*0.5, '', { fontFamily: '"Press Start 2P"' }).setFontSize(28).setOrigin(0.5).setColor('#feff38')
+    //leters entered
+    this.playerText = this.add.text(this.width*0.5, this.height*0.45, '', { fontFamily: '"Press Start 2P"' }).setFontSize(28).setOrigin(0.5).setColor('#feff38')
 
     //create input panel
     this.createInputPanel()
+
+    //create go to high scores button
+    this.createToHighScores()
   }
 
   createInputPanel() {
-    let text = this.add.bitmapText(150, 350, 'arcade', 'ABCDEFGHIJ\n\nKLMNOPQRST\n\nUVWXYZ.-');
+    let text = this.add.bitmapText(150, 300, 'arcade', 'ABCDEFGHIJ\n\nKLMNOPQRST\n\nUVWXYZ.-');
 
     text.setLetterSpacing(20);
     text.setInteractive();
@@ -162,16 +168,50 @@ export default class SaveScoreScene extends Phaser.Scene {
   }
 
   submitName(name) {
-    if (name.length === 3) {
+    if (name.length === 3 && !this.savedRecord) {
       this.click.play();
+      this.score = 98; //TESTING MODE
       store.dispatch(addRecord( //create a new record
         name,
         this.score,
         this.level
       ))
-      this.scene.start('HighScoresScene') //go to high scores
+      this.activeToHighScores = true;
+      this.toHighScores.setVisible(true)
+      this.savedRecord = true;
     } else {
       this.deniedSound.play() //name is not valid
     }
+
+  }
+
+  createToHighScores() {
+    this.toHighScores = this.add.text(this.width*0.5, this.height*0.9, 'Go to High Scores', { fontFamily: '"Press Start 2P"' }).setFontSize(28).setOrigin(0.5).setColor('#4DF3F5')
+    this.toHighScores.setVisible(false)
+
+    this.toHighScores.setInteractive();
+    this.toHighScores.on("pointerover", () => {
+      if (this.activeToHighScores) {
+        this.hoverIcon.setVisible(true);
+        this.toHighScores.setColor('#feff38')
+        this.hoverIcon.x = this.toHighScores.x - this.toHighScores.width/2 - 45;
+        this.hoverIcon.y = this.toHighScores.y;
+      }
+    })
+    this.toHighScores.on("pointerout", () => {
+      if (this.activeToHighScores) {
+        this.hoverIcon.setVisible(false);
+        this.toHighScores.setColor('#4DF3F5')
+      }
+    })
+    this.toHighScores.on("pointerup", () => {
+      if (this.activeToHighScores) {
+        const game = this.game;
+        this.click.play();
+        this.scene.start('HighScoresScene')
+        this.scene.remove('SaveScoreScene')
+        game.scene.add('SaveScoreScene', SaveScoreScene)
+      }
+    })
   }
 }

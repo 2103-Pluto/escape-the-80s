@@ -72,6 +72,7 @@ export default class StoryScene extends Phaser.Scene {
 
     scene.next.on("pointerup", () => {
       idx++
+      scene.click.play();
       if (idx < scene.storyArr.length) {
         scene.hoverIcon.setVisible(false);
         scene.next.setColor('#4DF3F5')
@@ -112,7 +113,7 @@ export default class StoryScene extends Phaser.Scene {
 
     this.sound.pauseOnBlur = false; //prevent sound from cutting when you leave tab
     this.typingSound = this.sound.add("typing-sounds", {loop: true})
-    this.typingSound.volume = 0.3;
+    this.typingSound.volume = 0.2;
 
     //set height and width
     this.width = this.game.config.width;
