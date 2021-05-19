@@ -221,6 +221,7 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
 
     // this.groundGroup = this.physics.add.staticGroup({classType: Ground});
     this.groundGroup = this.physics.add.group()
+
     this.createGround(168, 5*numberOfFrames);
     this.physics.world.setBounds(0, null, this.width * numberOfFrames, this.height, true, true, false, false) //set world bounds only on sides
   }
@@ -553,6 +554,15 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
   }
 
   fire() {
+    //-------->testing mode
+    this.scene.launch('LevelCompletedScene', {
+      level: this.level,
+      score: this.player.score,
+      health: this.player.health,
+      color: this.color
+    })
+    this.scene.moveAbove(this, 'LevelCompletedScene')
+    //<--------testing mode
     const offsetX = 60;
     const offsetY = 5.5;
     const bulletX =

@@ -46,6 +46,12 @@ export default class GameOverMenuScene extends Phaser.Scene {
       scene.scene.start('TitleScene') //go back to TitleScene
     })
   }
+  // this.scene.data.systems.config
+  // const game = this.game;
+  // this.click.play();
+  // this.scene.start('HighScoresScene')
+  // this.scene.remove('SaveScoreScene')
+  // game.scene.add('SaveScoreScene', SaveScoreScene)
 
   createRestart(scene, widthFraction, heightFraction) {
     const restart = scene.add.text(scene.width*widthFraction, scene.height*heightFraction, 'Restart Level', { fontFamily: '"Press Start 2P"' }).setFontSize(24).setOrigin(0.5, 0.5)

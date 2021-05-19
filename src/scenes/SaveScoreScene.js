@@ -170,7 +170,6 @@ export default class SaveScoreScene extends Phaser.Scene {
   submitName(name) {
     if (name.length === 3 && !this.savedRecord) {
       this.click.play();
-      this.score = 98; //TESTING MODE
       store.dispatch(addRecord( //create a new record
         name,
         this.score,
