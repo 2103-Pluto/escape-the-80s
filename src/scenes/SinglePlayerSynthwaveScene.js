@@ -165,6 +165,8 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
 
   createLayers(scene) {
     const map = this.make.tilemap({key: 'map'})
+    //const groundTileset = map.addTilesetImage('Ground', 'road')
+    //scene.ground = map.createStaticLayer('Ground', ground, 0, 0)
     const platformTileset = map.addTilesetImage('Platform', 'platform') // First name is form tiled, Second name is key above
     scene.platforms = map.createStaticLayer("Tile Layer 1", platformTileset, 0, -100)
     scene.heartsLayer = map.getObjectLayer('Heart_Layer')
@@ -179,7 +181,28 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
     const map = this.make.tilemap({key: 'map'})
     scene.zonesOne = map.getObjectLayer('player_zones');
     scene.playerZones = this.getPlayerZones(scene.zonesOne)
+    scene.zonesT = map.getObjectLayer('Terminator_Spawn')
+    scene.zonesM = map.getObjectLayer('Mario_Spawn')
+    scene.terminatorSpawns = this.getTerminatorSpawns(scene)
   }
+
+  getTerminatorSpawns(scene){
+    const markers = scene.zonesT.objects
+    return {
+      t1: markers.find(m => m.name === 'Terminator1'),
+      t2: markers.find(m => m.name === 'Terminator2')
+    }
+  }
+
+  getMarioSpawns(scene){
+    const markers = scene.zonesT.objects
+    const a = {
+      t1: markers.find(m => m.name === 'Terminator1'),
+      t2: markers.find(m => m.name === 'Terminator2')
+    }
+    console.log(a)
+  }
+
 
   createGooFromLayer(scene){
     const gooArr = scene.gooLayer.objects
@@ -272,7 +295,7 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
   }
 
   createFlagpole(scene) {
-    scene.flagpole = new Flagpole(scene, scene.playerZones.end.x, 310, 'flagpole').setScale(2.78)
+    scene.flagpole = new Flagpole(scene, scene.playerZones.end.x + 200, 310, 'flagpole').setScale(2.78)
     scene.flagpole.body.immovable = true
     scene.flagpole.body.allowGravity = false
 
@@ -289,6 +312,7 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
       let newEnemy = new type(scene, enemyX, enemyY, enemy).setScale(scale)
       groupType.add(newEnemy)
       scene.physics.add.collider(newEnemy, scene.groundGroup);
+      scene.physics.add.collider(newEnemy, scene.platforms)
       scene.physics.add.collider(newEnemy, scene.player, function(newEnemy, player){
         if (player.body.touching.right || player.body.touching.left){
           player.bounceOff()
@@ -406,8 +430,7 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
 
   create() {
    // const scene = this
-
-
+   console.log(this)
     // ALL THESE ('--->') NEED TO BE IN ORDER
     this.height = this.game.config.height; //retrive width and height (careful--Has to be at the top of create)
     this.width = this.game.config.width;
@@ -464,8 +487,8 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
     this.createEnemies(this, 'mario', 800, 400, 3, 2.7)
     this.createEnemies(this, 'mario', 1200, 400, 5, 2.7)
     //this.terminator = new Terminator(this, 2800, 400, 'terminator').setScale(4.5)
-    this.createEnemies(this, 'terminator', 2800, 400, 1, 4.5)
-    this.createEnemies(this, 'terminator', this.playerZones.end.x - 400, 400, 1, 4.5)
+    this.createEnemies(this, 'terminator', this.terminatorSpawns.t1.x, this.terminatorSpawns.t1.y, 1, 4.5)
+    this.createEnemies(this, 'terminator', this.terminatorSpawns.t2.x, this.terminatorSpawns.t2.y, 1, 4.5)
 
 
     // this.physics.add.collider(this.terminator, this.groundGroup);
