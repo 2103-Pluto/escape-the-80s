@@ -1,7 +1,7 @@
 import 'phaser'
 
 export default class SoldierPlayer extends Phaser.Physics.Arcade.Sprite {
-  constructor(scene, x, y, spriteKey, socket /*, color */) {
+  constructor(scene, x, y, spriteKey, socket, color) {
     super(scene, x, y, spriteKey)
     this.scene = scene;
     this.score = 0; //player's score
@@ -12,7 +12,7 @@ export default class SoldierPlayer extends Phaser.Physics.Arcade.Sprite {
     this.facingLeft = false;
     this.isCrouching = false;
     this.socket = socket
-    this.color = 'Blue' //defaultColor
+    this.color = color || 'Blue' //defaultColor
     this.bounceVelocity = 400;
     this.hasBeenHit = false;
     //track movements
@@ -63,9 +63,9 @@ export default class SoldierPlayer extends Phaser.Physics.Arcade.Sprite {
       } else {
         this.body.setOffset(15, 12) 
       }
-      
 
-      this.play('crouch', true)
+      this.play(`${this.color}Crouch`, true)
+
 
       if(this.socket){
         this.moveState.x = this.x
@@ -93,7 +93,7 @@ export default class SoldierPlayer extends Phaser.Physics.Arcade.Sprite {
       this.setVelocityX(-300);
       cam.scrollX -= speed;
       if (this.body.onFloor()) {
-        this.play('run', true);
+        this.play(`${this.color}Run`, true);
       }
       if(this.socket){
       this.moveState.x = this.x
@@ -117,7 +117,7 @@ export default class SoldierPlayer extends Phaser.Physics.Arcade.Sprite {
       this.setVelocityX(300);
       cam.scrollX += speed;
       if (this.body.onFloor()) {
-        this.play('run', true);
+        this.play(`${this.color}Run`, true);
       }
       if(this.socket){
       this.moveState.x = this.x
@@ -134,7 +134,7 @@ export default class SoldierPlayer extends Phaser.Physics.Arcade.Sprite {
     else {
       this.isCrouching = false
       this.setVelocityX(0);
-      this.anims.play('idle', true);
+      this.anims.play(`${this.color}Idle`, true);
 
       this.body.setSize(14, 32)
       if (!this.facingLeft) {
@@ -162,7 +162,9 @@ export default class SoldierPlayer extends Phaser.Physics.Arcade.Sprite {
     //crouching
     if (moveState.down){
       this.setVelocityX(0)
-      this.play('crouch', true)
+
+      this.play(`${this.color}Crouch`, true)
+
 
     }
     // Move left
@@ -175,8 +177,7 @@ export default class SoldierPlayer extends Phaser.Physics.Arcade.Sprite {
       this.setVelocityX(-300);
       cam.scrollX -= speed;
       if (this.body.onFloor()) {
-        this.play('run', true);
-
+        this.play(`${this.color}Run`, true);
       }
       this.setPosition(moveState.x, moveState.y)
     }
@@ -192,7 +193,7 @@ export default class SoldierPlayer extends Phaser.Physics.Arcade.Sprite {
 
       cam.scrollX += speed;
       if (this.body.onFloor()) {
-        this.play('run', true);
+        this.play(`${this.color}Run`, true);
       }
       this.setPosition(moveState.x, moveState.y)
 
@@ -201,7 +202,7 @@ export default class SoldierPlayer extends Phaser.Physics.Arcade.Sprite {
      else {
       this.setVelocityX(0);
       // Whenever Josh is not moving, use the idleUnarmed animation
-        this.anims.play('idle', true);
+        this.anims.play(`${this.color}Idle`, true);
     }
 
 
@@ -221,8 +222,8 @@ export default class SoldierPlayer extends Phaser.Physics.Arcade.Sprite {
 
   updateDying() {
     if (this.dead) {
-      this.play('die', true) //play dying animation
-      if (this.anims.currentAnim.key === 'die' && this.anims.getProgress() > 0.6) {
+      this.play(`${this.color}Die`, true) //play dying animation
+      if (this.anims.currentAnim.key === `${this.color}Die` && this.anims.getProgress() > 0.6) {
         this.scene.showGameOverMenu(this.scene);
       }
     }
@@ -260,13 +261,13 @@ export default class SoldierPlayer extends Phaser.Physics.Arcade.Sprite {
 
   updateInAir() {
     if (!this.body.onFloor()) {
-      this.play('jump');
+      this.play(`${this.color}Jump`);
     }
   }
 
   updateOtherPlayerInAir(){
     if (!this.body.onFloor()) {
-      this.play('jump');
+      this.play(`${this.color}Jump`);
     }
   }
 

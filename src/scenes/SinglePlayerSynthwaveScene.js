@@ -10,6 +10,8 @@ import Mario from '../entity/Mario'
 import Goo from '../entity/Goo'
 import Terminator from '../entity/Terminator'
 import Flagpole from '../entity/Flagpole'
+import CharacterChoosingScene from './CharacterChoosingScene'
+import StoryScene from './StoryScene'
 
 
 const numberOfFrames = 15;
@@ -25,6 +27,8 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
     this.hit = this.hit.bind(this);
     this.hitPlatform = this.hitPlatform.bind(this)
     this.createBackgroundElement = this.createBackgroundElement.bind(this);
+    this.flagpoleIsUp = false;
+    this.touchingFlagpole = false;
     //bind functions
     this.createPlayer = this.createPlayer.bind(this);
     this.createEnemies = this.createEnemies.bind(this)
@@ -44,8 +48,10 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
     this.createFlagpole = this.createFlagpole.bind(this)
     this.pause = this.pause.bind(this)
     this.createPhysics = this.createPhysics.bind(this)
+    this.clearCharacterChoosing = this.clearCharacterChoosing.bind(this)
     this.createSpeechBubble = this.createSpeechBubble.bind(this)
     this.preloadSpeaker = this.preloadSpeaker.bind(this)
+
   }
 
   init(data) {
@@ -96,6 +102,7 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
     this.load.audio('pause', 'assets/audio/pause.wav');
     this.load.audio('mario-dead', 'assets/audio/mario_hurt.wav')
     this.load.audio('terminator-dead', 'assets/audio/be_back.wav')
+    this.load.audio('celebration', 'assets/audio/celebration.wav')
   }
 
   preloadMap() {
@@ -249,12 +256,13 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
   }
 
   createMap() {
-    this.add.image(this.width * 0.5, this.height * 0.46, 'sky').setOrigin(0.5).setScale(3.5).setScrollFactor(0)
+    this.sky = this.add.image(this.width * 0.5, this.height * 0.46, 'sky').setOrigin(0.5).setScale(3.5).setScrollFactor(0)
     this.createBackgroundElement(504, 'mountains', 2*numberOfFrames, 0.15)
     this.createBackgroundElement(168, 'palms-back', 5*numberOfFrames, 0.3)
     this.createBackgroundElement(448, 'palms', 2*numberOfFrames, 0.45)
 
     // this.groundGroup = this.physics.add.staticGroup({classType: Ground});
+
     this.groundGroup = this.physics.add.staticGroup()
     this.createGround(168, 5*numberOfFrames);
     this.physics.world.setBounds(0, null, this.width * numberOfFrames, this.height, true, true, false, false) //set world bounds only on sides
@@ -280,8 +288,7 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
   }
 
   createPlayer(scene) {
-    scene.player = new SoldierPlayer(scene, scene.playerZones.start.x, scene.playerZones.start.y, `${scene.color}SoldierIdle`, scene.socket).setSize(14, 32).setOffset(15, 7).setScale(2.78);
-    scene.player.color = scene.color;
+    scene.player = new SoldierPlayer(scene, scene.playerZones.start.x, scene.playerZones.start.y, `${scene.color}SoldierIdle`, scene.socket, scene.color).setSize(14, 32).setOffset(15, 7).setScale(2.78);
   }
 
   createPhysics(scene){
@@ -294,7 +301,10 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
     scene.platforms.setCollisionBetween(1, 2)
     scene.physics.add.collider(scene.flagpole, scene.groundGroup)
     scene.physics.add.overlap(scene.player, scene.flagpole, function() {
-      scene.raiseFlagpole()
+      if (!scene.touchingFlagpole){
+        scene.touchingFlagpole = true;
+        scene.raiseFlagpole(scene)
+      }
     })
     scene.physics.add.overlap(scene.platforms, scene.bullets, scene.hitPlatform, null, scene)
   }
@@ -307,10 +317,12 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
   }
 
   createFlagpole(scene) {
-    scene.flagpole = new Flagpole(scene, scene.playerZones.end.x + 200, 310, 'flagpole').setScale(2.78)
+    scene.flagpole = new Flagpole(scene, scene.playerZones.end.x, 310, 'flagpole').setScale(2.78)
+    scene.flagpole.body.setSize(2, 160)
+    scene.flagpole.body.setOffset(16, 0)
+
     scene.flagpole.body.immovable = true
     scene.flagpole.body.allowGravity = false
-
   }
 
 
@@ -447,6 +459,7 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
     const bubblePadding = 10;
     const arrowHeight = bubbleHeight / 4;
 
+  
     let bubble = scene.add.graphics({ x: x, y: y });
 
     //  Bubble shado
@@ -483,13 +496,23 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
 
     const content = this.add.text(0, 0, quote, { fontFamily: '"Press Start 2P"', fontSize: 20, color: '#000000', align: 'center', wordWrap: { width: bubbleWidth - (bubblePadding * 2) } });
 
+
     const b = content.getBounds();
 
     content.setPosition(bubble.x + (bubbleWidth / 2) - (b.width / 2), bubble.y + (bubbleHeight / 2) - (b.height / 2));
     return {bubble, content}
 }
+  
+clearCharacterChoosing() {
+    this.scene.remove('CharacterChoosingScene')
+    this.scene.remove('StoryScene')
+    this.game.scene.add('CharacterChoosingScene', CharacterChoosingScene)
+    this.game.scene.add('StoryScene', StoryScene)
+  }
 
   create() {
+   // const scene = this
+   this.clearCharacterChoosing() //this clears player chosen from the CharacterSelectionScene so that we can choose again if we quit)
    // const scene = this
    console.log(this)
     // ALL THESE ('--->') NEED TO BE IN ORDER
@@ -515,12 +538,15 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
     this.pause(this) //creates pause functionality
     // --->
     const level1 = this.add.text(400, 300, 'LEVEL 1',{ fontFamily: '"Press Start 2P"' }).setFontSize(46).setOrigin(0.5, 0.5)
+
     const flashLevel1 = this.tweens.add({
       targets: level1,
       duration: 100,
       repeat: -1,
-      tint: 0xffffff
-    })
+      alpha: 0,
+      ease: Phaser.Math.Easing.Expo.InOut
+  })
+   
   
   
     this.time.addEvent({
@@ -542,7 +568,6 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
       },
       loop: false
     })
-
 
     this.cursors = this.input.keyboard.createCursorKeys();
     
@@ -682,8 +707,26 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
       terminator.update(time, delta, scene.terminatorFire)
     })
     //this.terminator.update(time, delta, this.terminatorFire)
+    this.updateLevelEnded(this)
 
+  }
 
+  updateLevelEnded(scene) {
+    if (scene.flagpoleIsUp) {
+      scene.sky.setTint(0x004c99)
+      scene.time.delayedCall(200, () => {
+        scene.scene.pause()
+        scene.backgroundSound.pause()
+        scene.scene.launch('LevelCompletedScene', {
+          level: scene.level,
+          score: scene.player.score,
+          health: scene.player.health,
+          color: scene.color,
+          previousSceneName: scene.data.systems.config
+        })
+        scene.scene.moveAbove(scene, 'LevelCompletedScene')
+      }, null, this)
+    }
   }
 
   updateHealth(scene) {
@@ -763,29 +806,29 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
 
   createAnimations() {
     this.anims.create({
-      key: 'run',
+      key: `${this.color}Run`,
       frames: this.anims.generateFrameNumbers(`${this.color}SoldierRunning`),
       frameRate: 10,
       repeat: -1,
     });
     this.anims.create({
-      key: 'jump',
+      key: `${this.color}Jump`,
       frames: this.anims.generateFrameNumbers(`${this.color}SoldierJumping`),
       frameRate: 20,
     });
     this.anims.create({
-      key: 'idle',
+      key: `${this.color}Idle`,
       frames: this.anims.generateFrameNumbers(`${this.color}SoldierIdle`),
       frameRate: 10,
       repeat: -1,
     });
     this.anims.create({
-      key: 'die',
+      key: `${this.color}Die`,
       frames: this.anims.generateFrameNumbers(`${this.color}SoldierDying`),
       frameRate: 10,
     });
     this.anims.create({
-      key: 'crouch',
+      key: `${this.color}Crouch`,
       frames: this.anims.generateFrameNumbers(`${this.color}SoldierCrouching`, {start:3}),
     });
     this.anims.create({
@@ -815,7 +858,7 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
     this.anims.create({
       key: 'raise-flagpole',
       frames: this.anims.generateFrameNumbers('flagpole'),
-      frameRate: 5,
+      frameRate: 10,
       repeat: 0,
     })
   }
@@ -864,8 +907,13 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
       this.player.decreaseHealth(1)
     }
 
-    raiseFlagpole() {
-      this.flagpole.play("raise-flagpole", false)
+    raiseFlagpole(scene) {
+      if (!this.flagpoleIsUp) {
+        scene.flagpole.play("raise-flagpole", false)
+      }
+      scene.flagpole.on('animationcomplete-raise-flagpole', () => {
+        this.flagpoleIsUp = true
+      })
     }
 
     showGameOverMenu(scene) {

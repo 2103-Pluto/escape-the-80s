@@ -47,6 +47,8 @@ export default class StoryScene extends Phaser.Scene {
     const scene = this
     this.typingSound.stop()
     this.next.setInteractive()
+    this.skip.setInteractive() //added this to enable skip again
+    this.back.setInteractive() //added this to enable back again
   }
 
   nextButton(scene) {
@@ -72,12 +74,15 @@ export default class StoryScene extends Phaser.Scene {
 
     scene.next.on("pointerup", () => {
       idx++
+      scene.click.play();
       if (idx < scene.storyArr.length) {
         scene.hoverIcon.setVisible(false);
         scene.next.setColor('#4DF3F5')
         scene.next.text = 'Next'
         scene.story.text = ""
         scene.next.removeInteractive()
+        scene.skip.removeInteractive() //added this to disable skip again
+        scene.back.removeInteractive() //added this to disable back temporarily (led to a bug)
         scene.typingSound.play()
         scene.renderStory(scene, idx)
       } else {
@@ -112,7 +117,7 @@ export default class StoryScene extends Phaser.Scene {
 
     this.sound.pauseOnBlur = false; //prevent sound from cutting when you leave tab
     this.typingSound = this.sound.add("typing-sounds", {loop: true})
-    this.typingSound.volume = 0.3;
+    this.typingSound.volume = 0.2;
 
     //set height and width
     this.width = this.game.config.width;
@@ -122,14 +127,13 @@ export default class StoryScene extends Phaser.Scene {
     // this.renderStory(this, 0)
     this.story = this.add.text(this.width*0.5, this.height*0.5, '', { fontFamily: '"Press Start 2P"' }).setFontSize(20).setOrigin(0.5, 0.5).setWordWrapWidth(600)
 
-    //add next button
-    this.nextButton(this)
-
     //add back
     this.scene.get('CreditsScene').createBack(this, 'CharacterChoosingScene');
 
     //add skip
     this.skipButton(this)
 
+    //add next button
+    this.nextButton(this)
   }
 }
