@@ -1,12 +1,19 @@
 import Ground from '../entity/Ground';
 import Phaser from 'phaser'
+import SoldierPlayer from '../entity/SoldierPlayer'
 
-const numberOfFrames = 15;
+const numberOfFrames = 3;
 
 export default class NeonAlleyScene extends Phaser.Scene {
   constructor() {
     super('NeonAlleyScene');
+
+    //bind functions
     this.createBackgroundElement = this.createBackgroundElement.bind(this);
+    this.preloadSounds = this.preloadSounds.bind(this)
+    this.preloadMap = this.preloadMap.bind(this)
+    this.createMap = this.createMap.bind(this)
+    this.createPhysics = this.createPhysics.bind(this)
   }
 
   init(data) {
@@ -15,27 +22,25 @@ export default class NeonAlleyScene extends Phaser.Scene {
     this.color = data.color
   }
 
-  preload() {
-    // Preload Sprites
-    // << LOAD SPRITES HERE >>
-
-    this.load.image('ground', 'assets/sprites/ground-juan-test.png');
-
-    //preload background
-    this.load.image("back", "assets/backgrounds/neon_alley_scene/back.png");
-    this.load.image("middle", "assets/backgrounds/neon_alley_scene/middle.png");
-    this.load.image("front", "assets/backgrounds/neon_alley_scene/front.png");
-    this.load.image("road", "assets/backgrounds/synthwave_scene/road.png");
-
-    // Preload Sounds
-    // << LOAD SOUNDS HERE >>
+  preloadSounds() {
     this.load.audio('background-music-neon-alley', 'assets/audio/neon_alley_scene/neon-alley.wav');
   }
 
+  preloadMap() {
+    this.load.image("back", "assets/backgrounds/neon_alley_scene/back.png");
+    this.load.image("middle", "assets/backgrounds/neon_alley_scene/middle.png");
+    this.load.image("front", "assets/backgrounds/neon_alley_scene/front.png");
+  }
+
+  preload() {
+    this.scene.get('TitleScene').displayLoadingBar(this, "I want my MTV!")
+    this.preloadSounds();
+    this.preloadMap()
+  }
+
   createGround(tileWidth, count) {
-    const height = this.game.config.height;
     for (let i=0; i<count; i++) {
-      this.groundGroup.create(i*tileWidth, height, 'road').setOrigin(0, 1).setScale(3.5).refreshBody();
+      this.groundGroup.create(i*tileWidth, this.height, 'road').setOrigin(0, 1).setScale(3.5).refreshBody();
     }
   }
 
@@ -46,42 +51,47 @@ export default class NeonAlleyScene extends Phaser.Scene {
   }
 
   create() {
-    //mute the previous scene
-    this.game.sound.stopAll();
+    this.height = this.game.config.height;
+    this.width = this.game.config.width;
 
-    //Set up background
-    const width = this.game.config.width;
-    const height = this.game.config.height;
+     //---------->These shoulds be in order
+    this.createSounds()
+    this.createMap()
+    this.createPlayer(this)
+    this.createPhysics(this)
+    //<-----------
+  }
+
+  createMap() {
     this.createBackgroundElement(128*3.5, 'back', 2, 0, 0, 0, 0, 1)
-    this.createBackgroundElement(128*3.5, 'middle', 2*numberOfFrames, 0.25, 0, 1, height, 1)
-    this.createBackgroundElement(176*3.5, 'front', 3, 0.5, 0, 1, height, 5)
+    this.createBackgroundElement(128*3.5, 'middle', 2*numberOfFrames, 0.25, 0, 1, this.height, 1)
+    this.createBackgroundElement(176*3.5, 'front', 3, 0.5, 0, 1, this.height, 5)
     // this.createBackgroundElement(448, 'palms', 2*numberOfFrames, 0.75)
 
-    this.groundGroup = this.physics.add.staticGroup({ classType: Ground });
+    this.groundGroup = this.physics.add.staticGroup();
     this.createGround(168, 5*numberOfFrames);
+    this.physics.world.setBounds(0, null, this.width * numberOfFrames, this.height, true, true, false, false)
+  }
 
-    // Create game entities
-    // << CREATE GAME ENTITIES HERE >>
-
-    // Create sounds
-    // << CREATE SOUNDS HERE >>
-    this.backgroundSound = this.sound.add('background-music-neon-alley'); //add background music for this level
+  createSounds() {
+    //mute the previous scene
+    this.game.sound.stopAll();
+    this.backgroundSound = this.sound.add('background-music-neon-alley');
+    //add background music for this level
     this.backgroundSound.setLoop(true);
     this.backgroundSound.volume = 0.1;
     this.backgroundSound.play();
 
-    this.sound.pauseOnBlur = false; //prevent sound from cutting when you leave tab
-
-    // Create collisions for all entities
-    // << CREATE COLLISIONS HERE >>
+    this.sound.pauseOnBlur = false;
   }
 
-  // time: total time elapsed (ms)
-  // delta: time elapsed (ms) since last update() call. 16.666 ms @ 60fps
-  update(time, delta) {
-    // << DO UPDATE LOGIC HERE >>
-
+  createPhysics(scene) {
+    scene.player.setCollideWorldBounds(true);
+    scene.physics.add.collider(scene.player, scene.groundGroup)
   }
 
+  createPlayer(scene) {
+    scene.player = new SoldierPlayer(scene, 200, 310, `${scene.color}SoldierIdle`, scene.socket, scene.color).setSize(14, 32).setOffset(15, 7).setScale(2.78);
+  }
 
 }
