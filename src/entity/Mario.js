@@ -18,23 +18,23 @@ export default class Mario extends Phaser.Physics.Arcade.Sprite {
     this.bulletHits = 0
     this.bulletDeath = 5
     this.name = 'mario'
-    
+
   }
 
 
-  
+
 
   patrol(){
     const speed = 1
- 
-    this.leftDest = this.initialX-100
-    this.rightDest = this.initialX+100
+
+    this.leftDest = this.initialX-64
+    this.rightDest = this.initialX+64
 
     if(this.x<=this.rightDest && this.movingLeft===false){
-      
+
       this.x+=speed
-      
-      
+
+
     } else if(this.x>this.rightDest){
       this.movingLeft=true
       this.flipX = !this.flipX
@@ -42,20 +42,20 @@ export default class Mario extends Phaser.Physics.Arcade.Sprite {
 
     if(this.x>=this.leftDest && this.movingLeft===true){
       this.x-=speed
-    
-      
+
+
     } else if (this.x<this.leftDest){
       this.movingLeft=false
       this.flipX = !this.flipX
     }
-    
+
 }
 
   // Check which controller button is being pushed and execute movement & animation
   update(hitSound) {
     this.patrol()
     this.anims.play('walk', true)
-    
+
     if(this.y>600) {
       this.playDamageTween()
       this.destroy()
@@ -71,7 +71,7 @@ export default class Mario extends Phaser.Physics.Arcade.Sprite {
       repeat: -1,
       tint: 0xff0000
     })
-    
+
     this.scene.time.addEvent({
       delay: 250,
       callback: () => {

@@ -10,6 +10,8 @@ import Mario from '../entity/Mario'
 import Goo from '../entity/Goo'
 import Terminator from '../entity/Terminator'
 import Flagpole from '../entity/Flagpole'
+import CharacterChoosingScene from './CharacterChoosingScene'
+import StoryScene from './StoryScene'
 
 
 const numberOfFrames = 15;
@@ -25,6 +27,8 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
     this.hit = this.hit.bind(this);
     this.hitPlatform = this.hitPlatform.bind(this)
     this.createBackgroundElement = this.createBackgroundElement.bind(this);
+    this.flagpoleIsUp = false;
+    this.touchingFlagpole = false;
     //bind functions
     this.createPlayer = this.createPlayer.bind(this);
     this.createEnemies = this.createEnemies.bind(this)
@@ -44,6 +48,10 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
     this.createFlagpole = this.createFlagpole.bind(this)
     this.pause = this.pause.bind(this)
     this.createPhysics = this.createPhysics.bind(this)
+    this.clearCharacterChoosing = this.clearCharacterChoosing.bind(this)
+    this.createSpeechBubble = this.createSpeechBubble.bind(this)
+    this.preloadSpeaker = this.preloadSpeaker.bind(this)
+
   }
 
   init(data) {
@@ -76,7 +84,7 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
     //Crouching Soldier
     this.load.spritesheet(`${this.color}SoldierCrouching`, `assets/spriteSheets/${this.color}/Gunner_${this.color}_Crouch.png`, {
       frameWidth: 48,
-      frameHeight: 39,
+      frameHeight: 48,
     })
 
     this.load.image('bullet', 'assets/sprites/SpongeBullet.png');
@@ -94,6 +102,7 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
     this.load.audio('pause', 'assets/audio/pause.wav');
     this.load.audio('mario-dead', 'assets/audio/mario_hurt.wav')
     this.load.audio('terminator-dead', 'assets/audio/be_back.wav')
+    this.load.audio('celebration', 'assets/audio/celebration.wav')
   }
 
   preloadMap() {
@@ -113,6 +122,13 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
       frameHeight: 37,
     });
   }
+  
+  preloadSpeaker() {
+    this.load.image("speakerOn", "assets/sprites/speaker_on.png");
+    this.load.image("speakerOff", "assets/sprites/speaker_off.png");
+    this.load.image("volumeUp", "assets/sprites/volume_up.png");
+    this.load.image("volumeDown", "assets/sprites/volume_down.png");
+  }
 
   preload() {
     //loading bar
@@ -122,6 +138,7 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
     this.preloadSounds() //load all sounds
     this.preloadMap() //preload background
     // this.preloadMario()
+    this.preloadSpeaker()
 
     this.load.spritesheet('heart', 'assets/spriteSheets/heart.png', {
       frameWidth: 16,
@@ -152,8 +169,6 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
   createGround(tileWidth, count) {
     for (let i=0; i<count; i++) {
       let newGround = this.groundGroup.create(i*tileWidth, this.height, 'road').setOrigin(0, 1).setScale(3.5).refreshBody();
-      newGround.body.allowGravity = false
-      newGround.body.immovable = true
     }
   }
 
@@ -165,6 +180,8 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
 
   createLayers(scene) {
     const map = this.make.tilemap({key: 'map'})
+    //const groundTileset = map.addTilesetImage('Ground', 'road')
+    //scene.ground = map.createStaticLayer('Ground', ground, 0, 0)
     const platformTileset = map.addTilesetImage('Platform', 'platform') // First name is form tiled, Second name is key above
     scene.platforms = map.createStaticLayer("Tile Layer 1", platformTileset, 0, -100)
     scene.heartsLayer = map.getObjectLayer('Heart_Layer')
@@ -179,7 +196,32 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
     const map = this.make.tilemap({key: 'map'})
     scene.zonesOne = map.getObjectLayer('player_zones');
     scene.playerZones = this.getPlayerZones(scene.zonesOne)
+    scene.zonesT = map.getObjectLayer('Terminator_Spawn')
+    scene.zonesM = map.getObjectLayer('Mario_Spawn')
+    scene.terminatorSpawns = this.getTerminatorSpawns(scene)
+    scene.marioSpawns = this.getMarioSpawns(scene)
   }
+
+  getTerminatorSpawns(scene){
+    const markers = scene.zonesT.objects
+    return {
+      t1: markers.find(m => m.name === 'Terminator1'),
+      t2: markers.find(m => m.name === 'Terminator2')
+    }
+  }
+
+  getMarioSpawns(scene){
+    const markers = scene.zonesM.objects
+   return {
+      m1: markers.find(m => m.name === 'Mario1'),
+      m2: markers.find(m => m.name === 'Mario2'),
+      m3: markers.find(m => m.name === 'M3'),
+      m4: markers.find(m => m.name === 'M4'),
+      m5: markers.find(m => m.name === 'M5'),
+      m6: markers.find(m => m.name === 'M6'),
+    }
+  }
+
 
   createGooFromLayer(scene){
     const gooArr = scene.gooLayer.objects
@@ -214,13 +256,11 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
   }
 
   createMap() {
-    this.add.image(this.width * 0.5, this.height * 0.46, 'sky').setOrigin(0.5).setScale(3.5).setScrollFactor(0)
+    this.sky = this.add.image(this.width * 0.5, this.height * 0.46, 'sky').setOrigin(0.5).setScale(3.5).setScrollFactor(0)
     this.createBackgroundElement(504, 'mountains', 2*numberOfFrames, 0.15)
     this.createBackgroundElement(168, 'palms-back', 5*numberOfFrames, 0.3)
     this.createBackgroundElement(448, 'palms', 2*numberOfFrames, 0.45)
-
-    //this.groundGroup = this.physics.add.staticGroup({classType: Ground});
-    this.groundGroup = this.physics.add.group()
+    this.groundGroup = this.physics.add.staticGroup()
     this.createGround(168, 5*numberOfFrames);
     this.physics.world.setBounds(0, null, this.width * numberOfFrames, this.height, true, true, false, false) //set world bounds only on sides
   }
@@ -239,14 +279,13 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
   }
 
   createGoo(x, y, scene) {
-    const goo = new Goo(scene, x, y, 'goo').setScale(2.8) //we can custom this
+    const goo = new Goo(scene, x, y, 'goo').setScale(2) //we can custom this
     // goo.alpha = 0.8 //we can custom this
     scene.goos.add(goo)
   }
 
   createPlayer(scene) {
-    scene.player = new SoldierPlayer(scene, scene.playerZones.start.x, scene.playerZones.start.y, `${scene.color}SoldierIdle`, scene.socket).setSize(14, 32).setOffset(15, 7).setScale(2.78);
-    scene.player.color = scene.color;
+    scene.player = new SoldierPlayer(scene, scene.playerZones.start.x, scene.playerZones.start.y, `${scene.color}SoldierIdle`, scene.socket, scene.color).setSize(14, 32).setOffset(15, 7).setScale(2.78);
   }
 
   createPhysics(scene){
@@ -259,7 +298,10 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
     scene.platforms.setCollisionBetween(1, 2)
     scene.physics.add.collider(scene.flagpole, scene.groundGroup)
     scene.physics.add.overlap(scene.player, scene.flagpole, function() {
-      scene.raiseFlagpole()
+      if (!scene.touchingFlagpole){
+        scene.touchingFlagpole = true;
+        scene.raiseFlagpole(scene)
+      }
     })
     scene.physics.add.overlap(scene.platforms, scene.bullets, scene.hitPlatform, null, scene)
   }
@@ -273,9 +315,11 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
 
   createFlagpole(scene) {
     scene.flagpole = new Flagpole(scene, scene.playerZones.end.x, 310, 'flagpole').setScale(2.78)
+    scene.flagpole.body.setSize(2, 160)
+    scene.flagpole.body.setOffset(16, 0)
+
     scene.flagpole.body.immovable = true
     scene.flagpole.body.allowGravity = false
-
   }
 
 
@@ -289,22 +333,16 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
       let newEnemy = new type(scene, enemyX, enemyY, enemy).setScale(scale)
       groupType.add(newEnemy)
       scene.physics.add.collider(newEnemy, scene.groundGroup);
+      scene.physics.add.collider(newEnemy, scene.platforms)
       scene.physics.add.collider(newEnemy, scene.player, function(newEnemy, player){
         if (enemy==='mario' && newEnemy.body.touching.up){
-          newEnemy.body.immovable = true
+            newEnemy.destroy()
+           scene.marioDeathSound.play()
         }
         else {
           player.bounceOff()
           player.decreaseHealth(1)
         }
-        // else if (enemy==='terminator' && newEnemy.body.touching.up){
-        //   player.bounceOff()
-        //   player.decreaseHealth(1)
-        // }
-        // if (player.body.touching.right || player.body.touching.left){
-        //   player.bounceOff()
-        //   player.decreaseHealth(1)
-        // }
       });
       enemyX+=70 //if you create a troop of enemies, they'll be 50 pixels apart
     }
@@ -411,15 +449,72 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
       scene
     );
   }
+  
+  createSpeechBubble (x, y, width, height, quote, scene) {
+    const bubbleWidth = width;
+    const bubbleHeight = height;
+    const bubblePadding = 10;
+    const arrowHeight = bubbleHeight / 4;
+
+  
+    let bubble = scene.add.graphics({ x: x, y: y });
+
+    //  Bubble shado
+    bubble.fillStyle(0x222222, 0.5);
+    bubble.fillRoundedRect(6, 6, bubbleWidth, bubbleHeight, 16);
+
+    //  Bubble color
+    bubble.fillStyle(0xffffff, 1);
+
+    //  Bubble outline line style
+    bubble.lineStyle(4, 0x565656, 1);
+
+    //  Bubble shape and outline
+    bubble.strokeRoundedRect(0, 0, bubbleWidth, bubbleHeight, 16);
+    bubble.fillRoundedRect(0, 0, bubbleWidth, bubbleHeight, 16);
+
+    //  Calculate arrow coordinates
+    const point1X = Math.floor(bubbleWidth / 7);
+    const point1Y = bubbleHeight;
+    const point2X = Math.floor((bubbleWidth / 7) * 2);
+    const point2Y = bubbleHeight;
+    const point3X = Math.floor(bubbleWidth / 7);
+    const point3Y = Math.floor(bubbleHeight + arrowHeight);
+
+    //  Bubble arrow shadow
+    bubble.lineStyle(4, 0x222222, 0.5);
+    bubble.lineBetween(point2X - 1, point2Y + 6, point3X + 2, point3Y);
+
+    //  Bubble arrow fill
+    bubble.fillTriangle(point1X, point1Y, point2X, point2Y, point3X, point3Y);
+    bubble.lineStyle(2, 0x565656, 1);
+    bubble.lineBetween(point2X, point2Y, point3X, point3Y);
+    bubble.lineBetween(point1X, point1Y, point3X, point3Y);
+
+    const content = this.add.text(0, 0, quote, { fontFamily: '"Press Start 2P"', fontSize: 20, color: '#000000', align: 'center', wordWrap: { width: bubbleWidth - (bubblePadding * 2) } });
+
+
+    const b = content.getBounds();
+
+    content.setPosition(bubble.x + (bubbleWidth / 2) - (b.width / 2), bubble.y + (bubbleHeight / 2) - (b.height / 2));
+    return {bubble, content}
+}
+  
+clearCharacterChoosing() {
+    this.scene.remove('CharacterChoosingScene')
+    this.scene.remove('StoryScene')
+    this.game.scene.add('CharacterChoosingScene', CharacterChoosingScene)
+    this.game.scene.add('StoryScene', StoryScene)
+  }
 
   create() {
    // const scene = this
-
-
+   this.clearCharacterChoosing() //this clears player chosen from the CharacterSelectionScene so that we can choose again if we quit)
+   // const scene = this
+   console.log(this)
     // ALL THESE ('--->') NEED TO BE IN ORDER
     this.height = this.game.config.height; //retrive width and height (careful--Has to be at the top of create)
     this.width = this.game.config.width;
-    this.createSounds() //create all the sounds
     this.createAnimations(); //create all animations
     this.createMap() //Set up background
     this.createZoneLayers(this)
@@ -436,54 +531,55 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
     this.createBulletGroup(this) //create bullet group
     this.createFlagpole(this)
     this.createPhysics(this)
+    this.createSounds() //create all the sounds
     this.pause(this) //creates pause functionality
     // --->
     const level1 = this.add.text(400, 300, 'LEVEL 1',{ fontFamily: '"Press Start 2P"' }).setFontSize(46).setOrigin(0.5, 0.5)
-    const flash = this.tweens.add({
+
+    const flashLevel1 = this.tweens.add({
       targets: level1,
       duration: 100,
       repeat: -1,
-      tint: 0xffffff
+      alpha: 0,
+      ease: Phaser.Math.Easing.Expo.InOut
   })
+   
+  
+  
+    this.time.addEvent({
+      delay: 1000,
+      callback: () => {
+        flashLevel1.stop()
+        level1.setVisible(false)
+      },
+      loop: false
+    })
+  
+    const speechBubble = this.createSpeechBubble(50, 300, 250, 110, "Holy crap, I'm in 1987! How did I get this gun???", this)
 
-
-  this.time.addEvent({
-    delay: 1000,
-    callback: () => {
-      flash.stop()
-      level1.setVisible(false)
-    },
-    loop: false
-  })
+    this.time.addEvent({
+      delay: 4000,
+      callback: () => {
+        speechBubble.content.setVisible(false)
+        speechBubble.bubble.setVisible(false)
+      },
+      loop: false
+    })
 
     this.cursors = this.input.keyboard.createCursorKeys();
-    //this.physics.add.collider(this.player, this.platforms)
+    
 
-    // this.enemy = new enemy(this, 600, 400, 'brandon').setScale(.25) UNCOMMENT TO TEST BRANDON
-
-    // this.physics.add.collider(this.enemy, this.groundGroup)
-    // this.physics.add.collider(this.enemy, this.player, function(){
-    //   console.log('hit')
-    // })
-
-
+    this.createEnemies(this, 'mario', this.marioSpawns.m1.x, this.marioSpawns.m1.y, 2, 2.7)
+    this.createEnemies(this, 'mario', this.marioSpawns.m2.x, this.marioSpawns.m2.y, 5, 2.7)
+    this.createEnemies(this, 'mario', this.marioSpawns.m3.x, this.marioSpawns.m3.y, 6, 2.7)
+    this.createEnemies(this, 'mario', this.marioSpawns.m4.x, this.marioSpawns.m4.y, 2, 2.7)
+    this.createEnemies(this, 'mario', this.marioSpawns.m5.x, this.marioSpawns.m5.y, 2, 2.7)
+    this.createEnemies(this, 'mario', this.marioSpawns.m6.x, this.marioSpawns.m6.y, 2, 2.7)
 
 
-    this.createEnemies(this, 'mario', 800, 400, 3, 2.7)
-    this.createEnemies(this, 'mario', 1200, 400, 5, 2.7)
-    //this.terminator = new Terminator(this, 2800, 400, 'terminator').setScale(4.5)
-    this.createEnemies(this, 'terminator', 2800, 400, 1, 4.5)
-    this.createEnemies(this, 'terminator', this.playerZones.end.x - 400, 400, 1, 4.5)
+    this.createEnemies(this, 'terminator', this.terminatorSpawns.t1.x, this.terminatorSpawns.t1.y, 1, 4.5)
+    this.createEnemies(this, 'terminator', this.terminatorSpawns.t2.x, this.terminatorSpawns.t2.y, 1, 4.5)
 
-
-    // this.physics.add.collider(this.terminator, this.groundGroup);
-    // this.physics.add.collider(this.terminator, this.player);
-
-
-
-    // ...
-    //this.physics.add.collider(this.enemy, this.groundGroup);
-    //this.physics.add.collider(this.enemy, this.player);
   }
 
   createSounds() {
@@ -492,6 +588,72 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
     this.backgroundSound.setLoop(true);
     this.backgroundSound.volume = 0.1;
     this.backgroundSound.play();
+    
+     //VOLUME
+     this.volumeSpeaker = this.add
+     .image(727, 35, "speakerOn")
+     .setScrollFactor(0)
+     .setScale(0.3);
+   this.volumeUp = this.add
+     .image(757, 35, "volumeUp")
+     .setScrollFactor(0)
+     .setScale(0.3);
+   this.volumeDown = this.add
+     .image(697, 35, "volumeDown")
+     .setScrollFactor(0)
+     .setScale(0.3);
+
+   this.volumeUp.setInteractive();
+   this.volumeDown.setInteractive();
+   this.volumeSpeaker.setInteractive();
+
+   this.volumeUp.on("pointerdown", () => {
+     this.volumeUp.setTint(0xc2c2c2);
+     
+     let newVol = this.backgroundSound.volume + 0.1;
+     this.backgroundSound.setVolume(newVol);
+     if (this.backgroundSound.volume < 0.2) {
+       this.volumeSpeaker.setTexture("speakerOn");
+     }
+     if (this.backgroundSound.volume >= 0.9) {
+       this.volumeUp.setTint(0xff0000);
+       this.volumeUp.disableInteractive();
+     } else {
+       this.volumeDown.clearTint();
+       this.volumeDown.setInteractive();
+     }
+   });
+
+   this.volumeDown.on("pointerdown", () => {
+     this.volumeDown.setTint(0xc2c2c2);
+     let newVol = this.backgroundSound.volume - 0.1;
+     this.backgroundSound.setVolume(newVol);
+     if (this.backgroundSound.volume <= 0.2) {
+       this.volumeDown.setTint(0xff0000);
+       this.volumeDown.disableInteractive();
+       this.volumeSpeaker.setTexture("speakerOff");
+     } else {
+       this.volumeUp.clearTint();
+       this.volumeUp.setInteractive();
+     }
+   });
+
+   this.volumeDown.on("pointerup", () => {
+     this.volumeDown.clearTint();
+   });
+   this.volumeUp.on("pointerup", () => {
+     this.volumeUp.clearTint();
+   });
+
+   this.volumeSpeaker.on("pointerdown", () => {
+     if (this.volumeSpeaker.texture.key === "speakerOn") {
+       this.volumeSpeaker.setTexture("speakerOff");
+       this.backgroundSound.setMute(true);
+     } else {
+       this.volumeSpeaker.setTexture("speakerOn");
+       this.backgroundSound.setMute(false);
+     }
+   });
 
     this.sound.pauseOnBlur = false; //prevent sound from cutting when you leave tab
 
@@ -521,6 +683,7 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
 
     this.terminatorDeathSound = this.sound.add('terminator-dead');
     this.terminatorDeathSound.volume = 0.3
+    
 
   }
 
@@ -541,8 +704,26 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
       terminator.update(time, delta, scene.terminatorFire, scene.shootingSound, scene.player.x)
     })
     //this.terminator.update(time, delta, this.terminatorFire)
+    this.updateLevelEnded(this)
 
+  }
 
+  updateLevelEnded(scene) {
+    if (scene.flagpoleIsUp) {
+      scene.sky.setTint(0x004c99)
+      scene.time.delayedCall(200, () => {
+        scene.scene.pause()
+        scene.backgroundSound.pause()
+        scene.scene.launch('LevelCompletedScene', {
+          level: scene.level,
+          score: scene.player.score,
+          health: scene.player.health,
+          color: scene.color,
+          previousSceneName: scene.data.systems.config
+        })
+        scene.scene.moveAbove(scene, 'LevelCompletedScene')
+      }, null, this)
+    }
   }
 
   updateHealth(scene) {
@@ -622,29 +803,29 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
 
   createAnimations() {
     this.anims.create({
-      key: 'run',
+      key: `${this.color}Run`,
       frames: this.anims.generateFrameNumbers(`${this.color}SoldierRunning`),
       frameRate: 10,
       repeat: -1,
     });
     this.anims.create({
-      key: 'jump',
+      key: `${this.color}Jump`,
       frames: this.anims.generateFrameNumbers(`${this.color}SoldierJumping`),
       frameRate: 20,
     });
     this.anims.create({
-      key: 'idle',
+      key: `${this.color}Idle`,
       frames: this.anims.generateFrameNumbers(`${this.color}SoldierIdle`),
       frameRate: 10,
       repeat: -1,
     });
     this.anims.create({
-      key: 'die',
+      key: `${this.color}Die`,
       frames: this.anims.generateFrameNumbers(`${this.color}SoldierDying`),
       frameRate: 10,
     });
     this.anims.create({
-      key: 'crouch',
+      key: `${this.color}Crouch`,
       frames: this.anims.generateFrameNumbers(`${this.color}SoldierCrouching`, {start:3}),
       repeat: 0
     });
@@ -675,7 +856,7 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
     this.anims.create({
       key: 'raise-flagpole',
       frames: this.anims.generateFrameNumbers('flagpole'),
-      frameRate: 5,
+      frameRate: 10,
       repeat: 0,
     })
   }
@@ -698,13 +879,14 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
       } else {
         enemy.bulletHits+=1
         if (enemy!==this.player) {
-          enemy.playDamageTween() 
+          enemy.playDamageTween()
         } else {
           enemy.bounceOff()
         }
       }
       bullet.destroy()
     }
+
 
     pickupStar(player, star) {
       star.destroy()
@@ -723,8 +905,13 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
       this.player.decreaseHealth(1)
     }
 
-    raiseFlagpole() {
-      this.flagpole.play("raise-flagpole", false)
+    raiseFlagpole(scene) {
+      if (!this.flagpoleIsUp) {
+        scene.flagpole.play("raise-flagpole", false)
+      }
+      scene.flagpole.on('animationcomplete-raise-flagpole', () => {
+        this.flagpoleIsUp = true
+      })
     }
 
     showGameOverMenu(scene) {
