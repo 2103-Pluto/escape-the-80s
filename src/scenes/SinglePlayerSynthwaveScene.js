@@ -284,7 +284,12 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
   }
 
   createPlayer(scene) {
-    scene.player = new SoldierPlayer(scene, scene.playerZones.start.x, scene.playerZones.start.y, `${scene.color}SoldierIdle`, scene.socket, scene.color).setSize(14, 32).setOffset(15, 7).setScale(2.78);
+    if (scene.playerZones) {
+      scene.player = new SoldierPlayer(scene, scene.playerZones.start.x, scene.playerZones.start.y, `${scene.color}SoldierIdle`, scene.socket, scene.color).setSize(14, 32).setOffset(15, 7).setScale(2.78);
+    }
+    else {
+      scene.player = new SoldierPlayer(scene, 70, 500, `${scene.color}SoldierIdle`, scene.socket, scene.color).setSize(14, 32).setOffset(15, 7).setScale(2.78);
+    }
   }
 
   createPhysics(scene){
@@ -313,7 +318,8 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
   }
 
   createFlagpole(scene) {
-    scene.flagpole = new Flagpole(scene, scene.playerZones.end.x + 300, 310, 'flagpole').setScale(2.78)
+    // scene.flagpole = new Flagpole(scene, scene.playerZones.end.x + 300, 310, 'flagpole').setScale(2.78)
+    scene.flagpole = new Flagpole(scene, 300, 310, 'flagpole').setScale(2.78) //testing mode
     scene.flagpole.body.setSize(2, 160)
     scene.flagpole.body.setOffset(16, 0)
 
@@ -336,7 +342,7 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
       scene.physics.add.collider(newEnemy, scene.player, function(newEnemy, player){
         if (enemy==='mario' && newEnemy.body.touching.up){
             newEnemy.destroy()
-           scene.marioDeathSound.play()
+            scene.marioDeathSound.play()
         }
         else {
           player.bounceOff()
@@ -349,10 +355,10 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
   }
 
   setCamera(scene) {
-    const desiredHeightLimit = 3*this.height; //this is the height wanted to be the max
-    scene.cameras.main.startFollow(this.player);
+    const desiredHeightLimit = 3*scene.height; //this is the height wanted to be the max
+    scene.cameras.main.startFollow(scene.player);
 
-    scene.cameras.main.setBounds(0, -desiredHeightLimit+this.height, this.width * numberOfFrames, desiredHeightLimit)
+    scene.cameras.main.setBounds(0, -desiredHeightLimit+scene.height, scene.width * numberOfFrames, desiredHeightLimit)
   }
 
   createScoreLabel(scene) {
@@ -490,7 +496,7 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
     bubble.lineBetween(point2X, point2Y, point3X, point3Y);
     bubble.lineBetween(point1X, point1Y, point3X, point3Y);
 
-    const content = this.add.text(0, 0, quote, { fontFamily: '"Press Start 2P"', fontSize: 20, color: '#000000', align: 'center', wordWrap: { width: bubbleWidth - (bubblePadding * 2) } });
+    const content = scene.add.text(0, 0, quote, { fontFamily: '"Press Start 2P"', fontSize: 20, color: '#000000', align: 'center', wordWrap: { width: bubbleWidth - (bubblePadding * 2) } });
 
 
     const b = content.getBounds();
@@ -508,6 +514,7 @@ clearCharacterChoosing() {
 
   create() {
    // const scene = this
+   this.input.keyboard.enabled = false
    this.clearCharacterChoosing() //this clears player chosen from the CharacterSelectionScene so that we can choose again if we quit)
    // const scene = this
    console.log(this)
@@ -557,10 +564,11 @@ clearCharacterChoosing() {
     const speechBubble = this.createSpeechBubble(50, 300, 250, 110, "Holy crap, I'm in 1987! How did I get this gun???", this)
 
     this.time.addEvent({
-      delay: 4000,
+      delay: 3000,
       callback: () => {
         speechBubble.content.setVisible(false)
         speechBubble.bubble.setVisible(false)
+        this.input.keyboard.enabled = true
       },
       loop: false
     })
@@ -589,70 +597,70 @@ clearCharacterChoosing() {
     this.backgroundSound.play();
 
      //VOLUME
-     this.volumeSpeaker = this.add
-     .image(727, 35, "speakerOn")
-     .setScrollFactor(0)
-     .setScale(0.3);
-   this.volumeUp = this.add
-     .image(757, 35, "volumeUp")
-     .setScrollFactor(0)
-     .setScale(0.3);
-   this.volumeDown = this.add
-     .image(697, 35, "volumeDown")
-     .setScrollFactor(0)
-     .setScale(0.3);
+    this.volumeSpeaker = this.add
+      .image(727, 35, "speakerOn")
+      .setScrollFactor(0)
+      .setScale(0.3);
+    this.volumeUp = this.add
+      .image(757, 35, "volumeUp")
+      .setScrollFactor(0)
+      .setScale(0.3);
+    this.volumeDown = this.add
+      .image(697, 35, "volumeDown")
+      .setScrollFactor(0)
+      .setScale(0.3);
 
-   this.volumeUp.setInteractive();
-   this.volumeDown.setInteractive();
-   this.volumeSpeaker.setInteractive();
+    this.volumeUp.setInteractive();
+    this.volumeDown.setInteractive();
+    this.volumeSpeaker.setInteractive();
 
-   this.volumeUp.on("pointerdown", () => {
-     this.volumeUp.setTint(0xc2c2c2);
+    this.volumeUp.on("pointerdown", () => {
+      this.volumeUp.setTint(0xc2c2c2);
 
-     let newVol = this.backgroundSound.volume + 0.1;
-     this.backgroundSound.setVolume(newVol);
-     if (this.backgroundSound.volume < 0.2) {
-       this.volumeSpeaker.setTexture("speakerOn");
-     }
-     if (this.backgroundSound.volume >= 0.9) {
-       this.volumeUp.setTint(0xff0000);
-       this.volumeUp.disableInteractive();
-     } else {
-       this.volumeDown.clearTint();
-       this.volumeDown.setInteractive();
-     }
-   });
+      let newVol = this.backgroundSound.volume + 0.1;
+      this.backgroundSound.setVolume(newVol);
+      if (this.backgroundSound.volume < 0.2) {
+        this.volumeSpeaker.setTexture("speakerOn");
+      }
+      if (this.backgroundSound.volume >= 0.9) {
+        this.volumeUp.setTint(0xff0000);
+        this.volumeUp.disableInteractive();
+      } else {
+        this.volumeDown.clearTint();
+        this.volumeDown.setInteractive();
+      }
+    });
 
-   this.volumeDown.on("pointerdown", () => {
-     this.volumeDown.setTint(0xc2c2c2);
-     let newVol = this.backgroundSound.volume - 0.1;
-     this.backgroundSound.setVolume(newVol);
-     if (this.backgroundSound.volume <= 0.2) {
-       this.volumeDown.setTint(0xff0000);
-       this.volumeDown.disableInteractive();
-       this.volumeSpeaker.setTexture("speakerOff");
-     } else {
-       this.volumeUp.clearTint();
-       this.volumeUp.setInteractive();
-     }
-   });
+  this.volumeDown.on("pointerdown", () => {
+    this.volumeDown.setTint(0xc2c2c2);
+    let newVol = this.backgroundSound.volume - 0.1;
+    this.backgroundSound.setVolume(newVol);
+    if (this.backgroundSound.volume <= 0.2) {
+      this.volumeDown.setTint(0xff0000);
+      this.volumeDown.disableInteractive();
+      this.volumeSpeaker.setTexture("speakerOff");
+    } else {
+      this.volumeUp.clearTint();
+      this.volumeUp.setInteractive();
+    }
+  });
 
-   this.volumeDown.on("pointerup", () => {
-     this.volumeDown.clearTint();
-   });
-   this.volumeUp.on("pointerup", () => {
-     this.volumeUp.clearTint();
-   });
+  this.volumeDown.on("pointerup", () => {
+    this.volumeDown.clearTint();
+  });
+  this.volumeUp.on("pointerup", () => {
+    this.volumeUp.clearTint();
+  });
 
-   this.volumeSpeaker.on("pointerdown", () => {
-     if (this.volumeSpeaker.texture.key === "speakerOn") {
-       this.volumeSpeaker.setTexture("speakerOff");
-       this.backgroundSound.setMute(true);
-     } else {
-       this.volumeSpeaker.setTexture("speakerOn");
-       this.backgroundSound.setMute(false);
-     }
-   });
+  this.volumeSpeaker.on("pointerdown", () => {
+    if (this.volumeSpeaker.texture.key === "speakerOn") {
+      this.volumeSpeaker.setTexture("speakerOff");
+      this.backgroundSound.setMute(true);
+    } else {
+      this.volumeSpeaker.setTexture("speakerOn");
+      this.backgroundSound.setMute(false);
+    }
+  });
 
     this.sound.pauseOnBlur = false; //prevent sound from cutting when you leave tab
 
@@ -917,7 +925,7 @@ clearCharacterChoosing() {
       scene.scene.pause() //pause scene
       scene.backgroundSound.pause()  //pause music
       scene.scene.launch('GameOverMenuScene', { previousScene: scene })
-      scene.scene.moveAbove(this, 'GameOverMenuScene')
+      scene.scene.moveAbove(scene, 'GameOverMenuScene')
     }
 
     pause(scene) {

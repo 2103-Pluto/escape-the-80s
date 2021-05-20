@@ -1,20 +1,38 @@
 import Ground from '../entity/Ground';
 import Phaser from 'phaser'
 import Boss from '../entity/Boss'
+import Bullet from '../entity/Bullet';
+import MuzzleFlash from '../entity/MuzzleFlash';
+import Heart from '../entity/Heart';
+import Star from '../entity/Star';
 
 const numberOfFrames = 3;
 
 export default class NeonAlleyScene extends Phaser.Scene {
   constructor() {
     super('NeonAlleyScene');
+
+    this.scene = this;
+    this.level = 2;
+
+    //bind functions
     this.createBackgroundElement = this.createBackgroundElement.bind(this);
-    this.preloadBackround = this.preloadBackround.bind(this)
     this.preloadMusic = this.preloadMusic.bind(this)
     this.createSounds = this.createSounds.bind(this)
     this.preloadSpeaker = this.preloadSpeaker.bind(this)
     this.preloadBoss = this.preloadBoss.bind(this)
     this.preloadColaBomb = this.preload.bind(this)
     this.createBoss = this.createBoss.bind(this)
+    this.preloadMap = this.preloadMap.bind(this)
+    this.createMap = this.createMap.bind(this)
+    this.createPhysics = this.createPhysics.bind(this)
+    this.fire = this.fire.bind(this);
+    this.createBulletGroup = this.createBulletGroup.bind(this)
+    this.createHeartGroup = this.createHeartGroup.bind(this)
+    this.createStarGroup = this.createStarGroup.bind(this)
+    this.pickupStar = this.pickupStar.bind(this)
+    this.pickupHeart = this.pickupHeart.bind(this)
+    this.createGround = this.createGround.bind(this)
   }
 
   init(data) {
@@ -22,28 +40,10 @@ export default class NeonAlleyScene extends Phaser.Scene {
     this.initialHealth = data.health,
     this.color = data.color
   }
-  
-  preloadBackround() {
-    this.load.image("back", "assets/backgrounds/neon_alley_scene/back.png");
-    this.load.image("middle", "assets/backgrounds/neon_alley_scene/middle.png");
-    this.load.image("front", "assets/backgrounds/neon_alley_scene/front.png");
-    this.load.image("road", "assets/backgrounds/synthwave_scene/road.png");
-  }
-  
+
   preloadMusic() {
     this.load.audio('mfn-reagan', 'assets/audio/MoneyForNothingWReagan.wav');
-    this.load.audio('mfn-no-reagan', 'assets/audio/MoneyForNothing-small.wav')
-    this.load.audio('hurt', 'assets/audio/hurt.wav');
-    this.load.audio('jump', 'assets/audio/jump.wav');
-    this.load.audio('shooting', 'assets/audio/shooting.wav');
-    this.load.audio('pause', 'assets/audio/pause.wav');
-  }
-  
-  preloadSpeaker() {
-    this.load.image("speakerOn", "assets/sprites/speaker_on.png");
-    this.load.image("speakerOff", "assets/sprites/speaker_off.png");
-    this.load.image("volumeUp", "assets/sprites/volume_up.png");
-    this.load.image("volumeDown", "assets/sprites/volume_down.png");
+    this.load.audio('mfn-no-reagan', 'assets/audio/MoneyForNothing-small.wav');
   }
   
   preloadBoss() {
@@ -57,27 +57,24 @@ export default class NeonAlleyScene extends Phaser.Scene {
     this.load.image("coca-cola", "assets/sprites/coca-cola.png")
     this.load.image("explosion", "assets/spriteSheets/explosion.png")
   }
-  
+
+  preloadMap() {
+    this.load.image("back", "assets/backgrounds/neon_alley_scene/back.png");
+    this.load.image("middle", "assets/backgrounds/neon_alley_scene/middle.png");
+    this.load.image("front", "assets/backgrounds/neon_alley_scene/front.png");
+  }
+
   preload() {
-    // Preload Sprites
-    // << LOAD SPRITES HERE >>
-
-    this.load.image('ground', 'assets/sprites/ground-juan-test.png');
-
-    this.preloadBackround()
+    this.scene.get('TitleScene').displayLoadingBar(this, "I want my MTV!")
+    this.preloadMap()
     this.preloadBoss()
-    // Preload Sounds
-    // << LOAD SOUNDS HERE >>
     this.preloadMusic()
-    this.preloadSpeaker()
-  
   }
   
 
   createGround(tileWidth, count) {
-    const height = this.game.config.height;
     for (let i=0; i<count; i++) {
-      this.groundGroup.create(i*tileWidth, height, 'road').setOrigin(0, 1).setScale(3.5).refreshBody();
+      this.groundGroup.create(i*tileWidth, this.height, 'road').setOrigin(0, 1).setScale(3.5).refreshBody();
     }
   }
 
@@ -88,6 +85,7 @@ export default class NeonAlleyScene extends Phaser.Scene {
   }
   
   createSounds() {
+    this.game.sound.stopAll()
     this.backgroundMusic = this.sound.add('mfn-reagan')
     this.backgroundMusic.play()
     this.backgroundMusic.once('complete', function (backgroundMusic) {
@@ -190,36 +188,192 @@ export default class NeonAlleyScene extends Phaser.Scene {
   }
 
   create() {
-    //mute the previous scene
-    this.game.sound.stopAll();
+    this.input.keyboard.enabled = false
+    this.height = this.game.config.height;
+    this.width = this.game.config.width;
 
-    //Set up background
-    const width = this.game.config.width;
-    const height = this.game.config.height;
+     //---------->These shoulds be in order
+    this.createSounds()
+    this.createMap()
+    this.scene.get('SinglePlayerSynthwaveScene').createPlayer(this) //create player
+    this.player.score = this.initialScore
+    this.player.health = this.initialHealth
+    this.createStarGroup() //create star group
+    this.createHeartGroup()
+    this.scene.get('SinglePlayerSynthwaveScene').createScoreLabel(this)
+    this.scene.get('SinglePlayerSynthwaveScene').createHealthLabel(this)
+    this.createPhysics(this)
+    this.setCamera(this) //set camera
+    this.createBulletGroup(this)
+    this.scene.get('SinglePlayerSynthwaveScene').pause(this)
+    //<-----------
+
+    const level1 = this.add.text(400, 300, 'LEVEL 2',{ fontFamily: '"Press Start 2P"' }).setFontSize(46).setOrigin(0.5, 0.5)
+
+    const flashLevel1 = this.tweens.add({
+      targets: level1,
+      duration: 100,
+      repeat: -1,
+      alpha: 0,
+      ease: Phaser.Math.Easing.Expo.InOut
+    })
+
+    this.time.addEvent({
+      delay: 1000,
+      callback: () => {
+        flashLevel1.stop()
+        level1.setVisible(false)
+      },
+      loop: false
+    })
+
+    const speechBubble = this.scene.get('SinglePlayerSynthwaveScene').createSpeechBubble(50, 300, 250, 110, "1989?! Time flies when you're in the 80s", this)
+
+    this.time.addEvent({
+      delay: 3000,
+      callback: () => {
+        speechBubble.content.setVisible(false)
+        speechBubble.bubble.setVisible(false)
+        this.input.keyboard.enabled = true
+      },
+      loop: false
+    })
+
+    this.cursors = this.input.keyboard.createCursorKeys();
+  }
+
+  createBulletGroup(scene) {
+    scene.bullets = scene.physics.add.group({
+      classType: Bullet,
+      runChildUpdate: true,
+      allowGravity: false,
+      maxSize: 40
+    });
+
+    scene.physics.add.overlap(
+      scene.player,
+      scene.bullets,
+      scene.hit,
+      null,
+      scene
+    );
+  }
+
+  createMap() {
     this.createBackgroundElement(128*3.5, 'back', 2, 0, 0, 0, 0, 1)
-    this.createBackgroundElement(128*3.5, 'middle', 2*numberOfFrames, 0.25, 0, 1, height, 1)
-    this.createBackgroundElement(176*3.5, 'front', 3, 0.5, 0, 1, height, 5)
+    this.createBackgroundElement(128*3.5, 'middle', 2*numberOfFrames, 0.25, 0, 1, this.height, 1)
+    this.createBackgroundElement(176*3.5, 'front', 3, 0.5, 0, 1, this.height, 5)
     // this.createBackgroundElement(448, 'palms', 2*numberOfFrames, 0.75)
 
-    this.groundGroup = this.physics.add.staticGroup({ classType: Ground });
+    this.groundGroup = this.physics.add.staticGroup();
     this.createGround(168, 5*numberOfFrames);
-
-    // Create game entities
-    // << CREATE GAME ENTITIES HERE >>
-
-    // Create sounds
-    // << CREATE SOUNDS HERE >>
-   this.createSounds()
-    // Create collisions for all entities
-    // << CREATE COLLISIONS HERE >>
+    this.physics.world.setBounds(0, null, this.width * numberOfFrames, this.height, true, true, false, false)
   }
 
-  // time: total time elapsed (ms)
-  // delta: time elapsed (ms) since last update() call. 16.666 ms @ 60fps
+  
+  createPhysics(scene) {
+    scene.player.setCollideWorldBounds(true);
+    scene.physics.add.collider(scene.player, scene.groundGroup)
+  }
+
+  showGameOverMenu(scene) {
+    scene.scene.pause() //pause scene
+    scene.backgroundSound.pause()  //pause music
+    scene.scene.launch('GameOverMenuScene', { previousScene: scene })
+    scene.scene.moveAbove(scene, 'GameOverMenuScene')
+  }
+
+  fire() {
+    //--->testing mode
+    this.player.decreaseHealth(1)
+    console.log(this.player.health)
+    //<---testing mode
+    const offsetX = 60;
+    const offsetY = 5.5;
+    const bulletX =
+      this.player.x + (this.player.facingLeft ? -offsetX : offsetX);
+    const bulletY = this.player.isCrouching ? this.player.y + offsetY*3.1 : this.player.y - offsetY*1.2;
+    const muzzleX =
+      this.player.x + (this.player.facingLeft ? -offsetX*0.95 : offsetX*0.95);
+    const muzzleY = this.player.isCrouching ? this.player.y + offsetY*3.1 : this.player.y - offsetY*1.2;
+
+    //create muzzleFlash
+    {this.muzzleFlash ? this.muzzleFlash.reset(muzzleX, muzzleY, this.player.facingLeft)
+      : this.muzzleFlash = new MuzzleFlash(this, muzzleX, muzzleY, 'muzzleFlash', this.player.facingLeft)}
+      // Get the first available laser object that has been set to inactive
+      let bullet = this.bullets.getFirstDead();
+      // Check if we can reuse an inactive laser in our pool of lasers
+      if (!bullet) {
+        // Create a laser bullet and scale the sprite down
+        bullet = new Bullet(
+          this,
+          bulletX,
+          bulletY,
+          'bullet',
+          this.player.facingLeft
+        ).setScale(3);
+        this.bullets.add(bullet);
+      }
+      // Reset this laser to be used for the shot
+      bullet.reset(bulletX, bulletY, this.player.facingLeft);
+  }
+
+  setCamera(scene) {
+    const desiredHeightLimit = 3*scene.height; //this is the height wanted to be the max
+    scene.cameras.main.startFollow(scene.player);
+
+    scene.cameras.main.setBounds(0, -desiredHeightLimit+scene.height, scene.width * numberOfFrames, desiredHeightLimit)
+  }
+
+  createHeartGroup() {
+    this.hearts = this.physics.add.group({
+      classType: Heart,
+      runChildUpdate: true,
+      allowGravity: false,
+    })
+
+    this.physics.add.overlap(
+      this.hearts,
+      this.player,
+      this.pickupHeart,
+      null,
+      this
+    )
+  }
+
+  createStarGroup() {
+    this.stars = this.physics.add.group({
+      classType: Star,
+      runChildUpdate: true,
+      allowGravity: false,
+    })
+
+    this.physics.add.overlap(
+      this.stars,
+      this.player,
+      this.pickupStar,
+      null,
+      this
+    )
+  }
+
+  pickupStar(player, star) {
+    star.destroy()
+    this.coinSound.play()
+    this.player.increaseScore(1)
+  }
+
+  pickupHeart(player, heart) {
+    heart.destroy()
+    this.powerUpSound.play()
+    this.player.increaseHealth(1)
+  }
+
   update(time, delta) {
-    // << DO UPDATE LOGIC HERE >>
-
+    this.player.update(time, this.cursors, this.jumpSound, this.fire, this.shootingSound);
+    this.scene.get('SinglePlayerSynthwaveScene').updateHealth(this) //updates the pleyer's health displayed on scene
+    this.scene.get('SinglePlayerSynthwaveScene').updateScore(this) //updates the pleyer's score displayed on scene
+    if (this.muzzleFlash) this.muzzleFlash.update(delta) //updates muzzleFlash
   }
-
 
 }
