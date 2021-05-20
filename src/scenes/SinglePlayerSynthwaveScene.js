@@ -45,6 +45,7 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
     this.pause = this.pause.bind(this)
     this.createPhysics = this.createPhysics.bind(this)
     this.createSpeechBubble = this.createSpeechBubble.bind(this)
+    this.preloadSpeaker = this.preloadSpeaker.bind(this)
   }
 
   init(data) {
@@ -77,7 +78,7 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
     //Crouching Soldier
     this.load.spritesheet(`${this.color}SoldierCrouching`, `assets/spriteSheets/${this.color}/Gunner_${this.color}_Crouch.png`, {
       frameWidth: 48,
-      frameHeight: 39,
+      frameHeight: 48,
     })
 
     this.load.image('bullet', 'assets/sprites/SpongeBullet.png');
@@ -114,6 +115,13 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
       frameHeight: 37,
     });
   }
+  
+  preloadSpeaker() {
+    this.load.image("speakerOn", "assets/sprites/speaker_on.png");
+    this.load.image("speakerOff", "assets/sprites/speaker_off.png");
+    this.load.image("volumeUp", "assets/sprites/volume_up.png");
+    this.load.image("volumeDown", "assets/sprites/volume_down.png");
+  }
 
   preload() {
     //loading bar
@@ -123,6 +131,7 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
     this.preloadSounds() //load all sounds
     this.preloadMap() //preload background
     // this.preloadMario()
+    this.preloadSpeaker()
 
     this.load.spritesheet('heart', 'assets/spriteSheets/heart.png', {
       frameWidth: 16,
@@ -153,8 +162,6 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
   createGround(tileWidth, count) {
     for (let i=0; i<count; i++) {
       let newGround = this.groundGroup.create(i*tileWidth, this.height, 'road').setOrigin(0, 1).setScale(3.5).refreshBody();
-      newGround.body.allowGravity = false
-      newGround.body.immovable = true
     }
   }
 
@@ -248,7 +255,7 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
     this.createBackgroundElement(448, 'palms', 2*numberOfFrames, 0.45)
 
     // this.groundGroup = this.physics.add.staticGroup({classType: Ground});
-    this.groundGroup = this.physics.add.group()
+    this.groundGroup = this.physics.add.staticGroup()
     this.createGround(168, 5*numberOfFrames);
     this.physics.world.setBounds(0, null, this.width * numberOfFrames, this.height, true, true, false, false) //set world bounds only on sides
   }
@@ -474,7 +481,7 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
     bubble.lineBetween(point2X, point2Y, point3X, point3Y);
     bubble.lineBetween(point1X, point1Y, point3X, point3Y);
 
-    const content = this.add.text(0, 0, quote, { fontFamily: 'Arial', fontSize: 20, color: '#000000', align: 'center', wordWrap: { width: bubbleWidth - (bubblePadding * 2) } });
+    const content = this.add.text(0, 0, quote, { fontFamily: '"Press Start 2P"', fontSize: 20, color: '#000000', align: 'center', wordWrap: { width: bubbleWidth - (bubblePadding * 2) } });
 
     const b = content.getBounds();
 
@@ -488,7 +495,6 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
     // ALL THESE ('--->') NEED TO BE IN ORDER
     this.height = this.game.config.height; //retrive width and height (careful--Has to be at the top of create)
     this.width = this.game.config.width;
-    this.createSounds() //create all the sounds
     this.createAnimations(); //create all animations
     this.createMap() //Set up background
     this.createZoneLayers(this)
@@ -505,6 +511,7 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
     this.createBulletGroup(this) //create bullet group
     this.createFlagpole(this)
     this.createPhysics(this)
+    this.createSounds() //create all the sounds
     this.pause(this) //creates pause functionality
     // --->
     const level1 = this.add.text(400, 300, 'LEVEL 1',{ fontFamily: '"Press Start 2P"' }).setFontSize(46).setOrigin(0.5, 0.5)
@@ -538,17 +545,7 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
 
 
     this.cursors = this.input.keyboard.createCursorKeys();
-    //this.physics.add.collider(this.player, this.platforms)
-
-    // this.enemy = new enemy(this, 600, 400, 'brandon').setScale(.25) UNCOMMENT TO TEST BRANDON
-
-    // this.physics.add.collider(this.enemy, this.groundGroup)
-    // this.physics.add.collider(this.enemy, this.player, function(){
-    //   console.log('hit')
-    // })
-
-
-
+    
 
     this.createEnemies(this, 'mario', this.marioSpawns.m1.x, this.marioSpawns.m1.y, 2, 2.7)
     this.createEnemies(this, 'mario', this.marioSpawns.m2.x, this.marioSpawns.m2.y, 5, 2.7)
@@ -556,6 +553,7 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
     this.createEnemies(this, 'mario', this.marioSpawns.m4.x, this.marioSpawns.m4.y, 2, 2.7)
     this.createEnemies(this, 'mario', this.marioSpawns.m5.x, this.marioSpawns.m5.y, 2, 2.7)
     this.createEnemies(this, 'mario', this.marioSpawns.m6.x, this.marioSpawns.m6.y, 2, 2.7)
+
 
     this.createEnemies(this, 'terminator', this.terminatorSpawns.t1.x, this.terminatorSpawns.t1.y, 1, 4.5)
     this.createEnemies(this, 'terminator', this.terminatorSpawns.t2.x, this.terminatorSpawns.t2.y, 1, 4.5)
@@ -568,6 +566,72 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
     this.backgroundSound.setLoop(true);
     this.backgroundSound.volume = 0.1;
     this.backgroundSound.play();
+    
+     //VOLUME
+     this.volumeSpeaker = this.add
+     .image(727, 35, "speakerOn")
+     .setScrollFactor(0)
+     .setScale(0.3);
+   this.volumeUp = this.add
+     .image(757, 35, "volumeUp")
+     .setScrollFactor(0)
+     .setScale(0.3);
+   this.volumeDown = this.add
+     .image(697, 35, "volumeDown")
+     .setScrollFactor(0)
+     .setScale(0.3);
+
+   this.volumeUp.setInteractive();
+   this.volumeDown.setInteractive();
+   this.volumeSpeaker.setInteractive();
+
+   this.volumeUp.on("pointerdown", () => {
+     this.volumeUp.setTint(0xc2c2c2);
+     
+     let newVol = this.backgroundSound.volume + 0.1;
+     this.backgroundSound.setVolume(newVol);
+     if (this.backgroundSound.volume < 0.2) {
+       this.volumeSpeaker.setTexture("speakerOn");
+     }
+     if (this.backgroundSound.volume >= 0.9) {
+       this.volumeUp.setTint(0xff0000);
+       this.volumeUp.disableInteractive();
+     } else {
+       this.volumeDown.clearTint();
+       this.volumeDown.setInteractive();
+     }
+   });
+
+   this.volumeDown.on("pointerdown", () => {
+     this.volumeDown.setTint(0xc2c2c2);
+     let newVol = this.backgroundSound.volume - 0.1;
+     this.backgroundSound.setVolume(newVol);
+     if (this.backgroundSound.volume <= 0.2) {
+       this.volumeDown.setTint(0xff0000);
+       this.volumeDown.disableInteractive();
+       this.volumeSpeaker.setTexture("speakerOff");
+     } else {
+       this.volumeUp.clearTint();
+       this.volumeUp.setInteractive();
+     }
+   });
+
+   this.volumeDown.on("pointerup", () => {
+     this.volumeDown.clearTint();
+   });
+   this.volumeUp.on("pointerup", () => {
+     this.volumeUp.clearTint();
+   });
+
+   this.volumeSpeaker.on("pointerdown", () => {
+     if (this.volumeSpeaker.texture.key === "speakerOn") {
+       this.volumeSpeaker.setTexture("speakerOff");
+       this.backgroundSound.setMute(true);
+     } else {
+       this.volumeSpeaker.setTexture("speakerOn");
+       this.backgroundSound.setMute(false);
+     }
+   });
 
     this.sound.pauseOnBlur = false; //prevent sound from cutting when you leave tab
 
@@ -597,6 +661,7 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
 
     this.terminatorDeathSound = this.sound.add('terminator-dead');
     this.terminatorDeathSound.volume = 0.3
+    
 
   }
 
