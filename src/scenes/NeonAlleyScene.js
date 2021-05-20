@@ -2,6 +2,8 @@ import Ground from '../entity/Ground';
 import Phaser from 'phaser'
 import Bullet from '../entity/Bullet';
 import MuzzleFlash from '../entity/MuzzleFlash';
+import Heart from '../entity/Heart';
+import Star from '../entity/Star';
 
 const numberOfFrames = 3;
 
@@ -20,6 +22,10 @@ export default class NeonAlleyScene extends Phaser.Scene {
     this.createPhysics = this.createPhysics.bind(this)
     this.fire = this.fire.bind(this);
     this.createBulletGroup = this.createBulletGroup.bind(this)
+    this.createHeartGroup = this.createHeartGroup.bind(this)
+    this.createStarGroup = this.createStarGroup.bind(this)
+    this.pickupStar = this.pickupStar.bind(this)
+    this.pickupHeart = this.pickupHeart.bind(this)
   }
 
   init(data) {
@@ -57,6 +63,7 @@ export default class NeonAlleyScene extends Phaser.Scene {
   }
 
   create() {
+    this.input.keyboard.enabled = false
     this.height = this.game.config.height;
     this.width = this.game.config.width;
 
@@ -66,6 +73,8 @@ export default class NeonAlleyScene extends Phaser.Scene {
     this.scene.get('SinglePlayerSynthwaveScene').createPlayer(this) //create player
     this.player.score = this.initialScore
     this.player.health = this.initialHealth
+    this.createStarGroup() //create star group
+    this.createHeartGroup()
     this.scene.get('SinglePlayerSynthwaveScene').createScoreLabel(this)
     this.scene.get('SinglePlayerSynthwaveScene').createHealthLabel(this)
     this.createPhysics(this)
@@ -84,13 +93,23 @@ export default class NeonAlleyScene extends Phaser.Scene {
       ease: Phaser.Math.Easing.Expo.InOut
     })
 
-
-
     this.time.addEvent({
       delay: 1000,
       callback: () => {
         flashLevel1.stop()
         level1.setVisible(false)
+      },
+      loop: false
+    })
+
+    const speechBubble = this.scene.get('SinglePlayerSynthwaveScene').createSpeechBubble(50, 300, 250, 110, "1989?! Time flies when you're in the 80s", this)
+
+    this.time.addEvent({
+      delay: 3000,
+      callback: () => {
+        speechBubble.content.setVisible(false)
+        speechBubble.bubble.setVisible(false)
+        this.input.keyboard.enabled = true
       },
       loop: false
     })
@@ -135,7 +154,7 @@ export default class NeonAlleyScene extends Phaser.Scene {
     this.backgroundSound.volume = 0.1;
     this.backgroundSound.play();
 
-      //VOLUME
+    //VOLUME
     this.volumeSpeaker = this.add
       .image(727, 35, "speakerOn")
       .setScrollFactor(0)
@@ -237,6 +256,10 @@ export default class NeonAlleyScene extends Phaser.Scene {
   }
 
   fire() {
+    //--->testing mode
+    this.player.decreaseHealth(1)
+    console.log(this.player.health)
+    //<---testing mode
     const offsetX = 60;
     const offsetY = 5.5;
     const bulletX =
@@ -272,6 +295,50 @@ export default class NeonAlleyScene extends Phaser.Scene {
     scene.cameras.main.startFollow(scene.player);
 
     scene.cameras.main.setBounds(0, -desiredHeightLimit+scene.height, scene.width * numberOfFrames, desiredHeightLimit)
+  }
+
+  createHeartGroup() {
+    this.hearts = this.physics.add.group({
+      classType: Heart,
+      runChildUpdate: true,
+      allowGravity: false,
+    })
+
+    this.physics.add.overlap(
+      this.hearts,
+      this.player,
+      this.pickupHeart,
+      null,
+      this
+    )
+  }
+
+  createStarGroup() {
+    this.stars = this.physics.add.group({
+      classType: Star,
+      runChildUpdate: true,
+      allowGravity: false,
+    })
+
+    this.physics.add.overlap(
+      this.stars,
+      this.player,
+      this.pickupStar,
+      null,
+      this
+    )
+  }
+
+  pickupStar(player, star) {
+    star.destroy()
+    this.coinSound.play()
+    this.player.increaseScore(1)
+  }
+
+  pickupHeart(player, heart) {
+    heart.destroy()
+    this.powerUpSound.play()
+    this.player.increaseHealth(1)
   }
 
   update(time, delta) {
