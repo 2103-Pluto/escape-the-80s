@@ -27,8 +27,8 @@ export default class SynthwaveScene extends Phaser.Scene {
     this.countDown = this.countDown.bind(this)
     this.countingDown = this.countingDown.bind(this)
 
-    this.gameStart = false
-    // this.createMario = this.createMario.bind(this)
+    //this.gameStart = false
+
     this.preloadSpeaker = this.preloadSpeaker.bind(this)
   }
   
@@ -40,47 +40,50 @@ export default class SynthwaveScene extends Phaser.Scene {
 
   }
 
+  preloadSoldier() {
+    this.load.spritesheet(`${this.color}SoldierRunning`, `assets/spriteSheets/${this.color}/Gunner_${this.color}_Run.png`, {
+      frameWidth: 48,
+      frameHeight: 48,
+    })
+    //Idle Soldier
+    this.load.spritesheet(`${this.color}SoldierIdle`, `assets/spriteSheets/${this.color}/Gunner_${this.color}_Idle.png`, {
+      frameWidth: 48,
+      frameHeight: 48,
+    })
+
+    //Jumping Soldier
+    this.load.spritesheet(`${this.color}SoldierJumping`, `assets/spriteSheets/${this.color}/Gunner_${this.color}_Jump.png`, {
+      frameWidth: 48,
+      frameHeight: 48,
+    })
+
+    //Dying Soldier
+    this.load.spritesheet(`${this.color}SoldierDying`, `assets/spriteSheets/${this.color}/Gunner_${this.color}_Death.png`, {
+      frameWidth: 48,
+      frameHeight: 48,
+    })
+
+    //Crouching Soldier
+    this.load.spritesheet(`${this.color}SoldierCrouching`, `assets/spriteSheets/${this.color}/Gunner_${this.color}_Crouch.png`, {
+      frameWidth: 48,
+      frameHeight: 48,
+    })
+
+    this.load.image('bullet', 'assets/sprites/SpongeBullet.png');
+    this.load.image('muzzleFlash', 'assets/sprites/MuzzleFlash.png');
+  }
+
+
   preload() {
     //loading bar
     this.scene.get('TitleScene').displayLoadingBar(this, "ma, you've been bad")
-    //Running Blue Soldier
-    this.load.spritesheet(`${this.color}SoldierRunning`, `assets/spriteSheets/${this.color}/Gunner_${this.color}_Run.png`, {
-      frameWidth: 48,
-      frameHeight: 39,
-    })
-
-
-    //Idle Blue Soldier
-    this.load.spritesheet(`${this.color}SoldierIdle`, `assets/spriteSheets/${this.color}/Gunner_${this.color}_Idle.png`, {
-      frameWidth: 48,
-      frameHeight: 39,
-    })
-
-    //Jumping Blue Soldier
-    this.load.spritesheet(`${this.color}SoldierJumping`, `assets/spriteSheets/${this.color}/Gunner_${this.color}_Jump.png`, {
-      frameWidth: 48,
-      frameHeight: 39,
-    })
-
-     //Crouching Soldier
-     this.load.spritesheet(`${this.color}SoldierCrouching`, `assets/spriteSheets/${this.color}/Gunner_${this.color}_Crouch.png`, {
-      frameWidth: 48,
-      frameHeight: 39,
-    })
-
-    this.load.spritesheet('mario', 'assets/spriteSheets/mario_enemy.png', {
-      frameWidth: 30,
-      frameHeight: 37,
-    });
-
+    this.preloadSoldier()
+    
     this.load.spritesheet('flagpole', 'assets/spriteSheets/flagpoles_sheet.png', {
       frameWidth: 32,
       frameHeight: 168,
     })
-    this.load.spritesheet('heart', 'assets/spriteSheets/heart.png', {
-      frameWidth: 16,
-      frameHeight: 16,
-    });
+    
 
     this.load.image('ground', 'assets/sprites/ground-juan-test.png');
     this.load.image('brandon', 'assets/sprites/brandon.png');
@@ -112,8 +115,6 @@ export default class SynthwaveScene extends Phaser.Scene {
     const height = this.game.config.height;
     for (let i=0; i<count; i++) {
       let newGround = this.groundGroup.create(i*tileWidth, height, 'road').setOrigin(0, 1).setScale(3.5).refreshBody();
-      newGround.body.allowGravity = false
-      newGround.body.immovable = true
     }
   }
 
@@ -156,7 +157,7 @@ export default class SynthwaveScene extends Phaser.Scene {
           // const x = players[id].moveState.x
           // const y = players[id].moveState.y
           //const facingLeft = players[id].moveState.facingLeft
-          scene.otherPlayer = new SoldierPlayer(scene, 60, 400, `${scene.color}SoldierIdle`, scene.socket,).setSize(14, 32).setOffset(15, 7).setScale(2.78);
+          scene.otherPlayer = new SoldierPlayer(scene, 60, 500, `${scene.color}SoldierIdle`, scene.socket,).setSize(14, 32).setOffset(15, 7).setScale(2.78);
           // scene.otherPlayer.facingLeft = facingLeft
           // if(facingLeft) {
           //   scene.otherPlayer.flipX = !scene.otherPlayer.flipX
@@ -174,7 +175,7 @@ export default class SynthwaveScene extends Phaser.Scene {
     this.socket.on("newPlayer", function (arg) {
       const playerInfo  = arg;
      //need to add socket id to player?
-      scene.otherPlayer = new SoldierPlayer(scene, 60, 400, `${scene.color}SoldierIdle`, scene.socket,).setSize(14, 32).setOffset(15, 7).setScale(2.78);
+      scene.otherPlayer = new SoldierPlayer(scene, 60, 500, `${scene.color}SoldierIdle`, scene.socket,).setSize(14, 32).setOffset(15, 7).setScale(2.78);
       //note: to address variable characters
       scene.add.existing(scene.otherPlayer)
       scene.physics.add.collider(scene.otherPlayer, scene.groundGroup)
@@ -205,12 +206,12 @@ export default class SynthwaveScene extends Phaser.Scene {
     this.createBackgroundElement(168, 'palms-back', 5*numberOfFrames, 0.3)
     this.createBackgroundElement(448, 'palms', 2*numberOfFrames, 0.45)
 
-    this.groundGroup = this.physics.add.group();
+    this.groundGroup = this.physics.add.staticGroup();
     this.createGround(168, 5*numberOfFrames);
 
     // Create game entities
     // << CREATE GAME ENTITIES HERE >>
-    this.player = new SoldierPlayer(this, 60, 400, `${scene.color}SoldierIdle`, this.socket).setSize(14, 32).setOffset(15, 7).setScale(2.78);
+    this.player = new SoldierPlayer(this, 60, 500, `${scene.color}SoldierIdle`, this.socket).setSize(14, 32).setOffset(15, 7).setScale(2.78);
     this.player.setCollideWorldBounds(true); //stop player from running off the edges
     this.physics.world.setBounds(0, null, width * numberOfFrames, height, true, true, false, false) //set world bounds only on sides
   
@@ -349,9 +350,9 @@ export default class SynthwaveScene extends Phaser.Scene {
 
     this.socket.on("startGame", function () {
       
-      scene.countingDown()
-      scene.scene.resume()
-      this.gameStart = true
+      // scene.countingDown()
+      // scene.scene.resume()
+      scene.scene.launch("CountdownScene")
       
       
       
@@ -372,7 +373,8 @@ export default class SynthwaveScene extends Phaser.Scene {
     //this.player.update(time, this.cursors, this.jumpSound);
     if (this.muzzleFlash) this.muzzleFlash.update(delta)
 
-  
+    // if(this.gameStart===false && this.player.body.touching.down) this.player.body.moves = false
+    // else this.player.body.moves = true
 
     
   }
@@ -413,44 +415,38 @@ export default class SynthwaveScene extends Phaser.Scene {
 
   createAnimations() {
     this.anims.create({
-      key: 'run',
+      key: `${this.color}Run`,
       frames: this.anims.generateFrameNumbers(`${this.color}SoldierRunning`),
       frameRate: 10,
       repeat: -1,
     });
     this.anims.create({
-      key: 'jump',
+      key: `${this.color}Jump`,
       frames: this.anims.generateFrameNumbers(`${this.color}SoldierJumping`),
       frameRate: 20,
     });
     this.anims.create({
-      key: 'idle',
+      key: `${this.color}Idle`,
       frames: this.anims.generateFrameNumbers(`${this.color}SoldierIdle`),
       frameRate: 10,
       repeat: -1,
     });
     this.anims.create({
-      key: 'rotate-star',
-      frames: this.anims.generateFrameNumbers('star'),
+      key: `${this.color}Die`,
+      frames: this.anims.generateFrameNumbers(`${this.color}SoldierDying`),
       frameRate: 10,
-      repeat: -1,
-    })
-    this.anims.create({
-    key: 'rotate-heart',
-      frames: this.anims.generateFrameNumbers('heart'),
-      frameRate: 10,
-      repeat: -1
     });
     this.anims.create({
-      key: 'walk',
-      frames: this.anims.generateFrameNumbers('mario', { start: 5, end: 8 }),
-      frameRate: 5,
-      repeat: -1,
-    });
-    this.anims.create({
-      key: 'crouch',
+      key: `${this.color}Crouch`,
       frames: this.anims.generateFrameNumbers(`${this.color}SoldierCrouching`, {start:3}),
+      repeat: 0
     });
+    this.anims.create({
+      key: 'raise-flagpole',
+      frames: this.anims.generateFrameNumbers('flagpole'),
+      frameRate: 10,
+      repeat: 0,
+    })
   }
 
   countingDown(){
@@ -494,8 +490,8 @@ export default class SynthwaveScene extends Phaser.Scene {
     this.countDownText.setText('Start Race in:' + this.initialTime);
     if (this.initialTime <= 0) {
       this.countDownText.setText('');
-      //scene.resume();
-      this.gameStart=true
+      //this.scene.resume();
+      //this.gameStart=true
       this.timedEvent.remove();
       
     }
