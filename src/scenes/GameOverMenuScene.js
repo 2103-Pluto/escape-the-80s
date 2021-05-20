@@ -55,10 +55,12 @@ export default class GameOverMenuScene extends Phaser.Scene {
         game.scene.add('GameOverMenuScene', GameOverMenuScene)
       }
       else if (previousSceneName === 'NeonAlleyScene') {
+        scene.scene.remove('SinglePlayerSynthwaveScene')
         scene.scene.remove('NeonAlleyScene')
         scene.scene.remove('GameOverMenuScene')
         game.scene.add('NeonAlleyScene', NeonAlleyScene)
         game.scene.add('GameOverMenuScene', GameOverMenuScene)
+        game.scene.add('SinglePlayerSynthwaveScene', SinglePlayerSynthwaveScene)
       }
     })
   }
@@ -116,10 +118,13 @@ export default class GameOverMenuScene extends Phaser.Scene {
         game.scene.add('GameOverMenuScene', GameOverMenuScene)
       }
       else if (previousSceneName === 'NeonAlleyScene') {
+        scene.scene.remove('SinglePlayerSynthwaveScene')
+
         scene.scene.remove('NeonAlleyScene')
         scene.scene.remove('GameOverMenuScene')
         game.scene.add('NeonAlleyScene', NeonAlleyScene)
         game.scene.add('GameOverMenuScene', GameOverMenuScene)
+        game.scene.add('SinglePlayerSynthwaveScene', SinglePlayerSynthwaveScene)
       }
     })
   }

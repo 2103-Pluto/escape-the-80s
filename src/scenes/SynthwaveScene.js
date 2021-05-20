@@ -30,7 +30,7 @@ export default class SynthwaveScene extends Phaser.Scene {
 
     this.preloadSpeaker = this.preloadSpeaker.bind(this)
   }
-  
+
   preloadSpeaker() {
     this.load.image("speakerOn", "assets/sprites/speaker_on.png");
     this.load.image("speakerOff", "assets/sprites/speaker_off.png");
@@ -94,11 +94,13 @@ export default class SynthwaveScene extends Phaser.Scene {
     })
 
     //preload background
+    this.load.tilemapTiledJSON('multiplayerMap', 'assets/SynthWave.json')  // THIS IS THE MAP
     this.load.image("sky", "assets/backgrounds/synthwave_scene/back.png");
     this.load.image("mountains", "assets/backgrounds/synthwave_scene/mountains.png");
     this.load.image("palms-back", "assets/backgrounds/synthwave_scene/palms-back.png");
     this.load.image("palms", "assets/backgrounds/synthwave_scene/palms.png");
     this.load.image("road", "assets/backgrounds/synthwave_scene/road.png");
+    this.load.image("block", "assets/sprites/platform.png")    ///THIS IS THE TILESET OF THE PLATFORM
 
     // Preload Sounds
     // << LOAD SOUNDS HERE >>
@@ -106,8 +108,25 @@ export default class SynthwaveScene extends Phaser.Scene {
     this.load.audio('shooting', 'assets/audio/shooting.wav');
     this.load.audio('scream', 'assets/audio/scream.wav');
     this.load.audio('background-music', 'assets/audio/synthwave_scene/synthwave-palms.wav');
-    
+
     this.preloadSpeaker()
+  }
+
+  createPlatforms(scene){
+    scene.map = this.make.tilemap({key: 'multiplayerMap'})
+    console.log("MAP", scene.map)
+    scene.platformTileset = scene.map.addTilesetImage('Platform', 'block') // First name is form tiled, Second name is key above
+    console.log("TILESET", scene.platformTileset)
+    scene.platforms = scene.map.createStaticLayer("Tile Layer 1", scene.platformTileset, 0, -95)
+    console.log(scene.platforms)
+  }
+
+  addPlatformPhysics(scene){
+    scene.physics.add.collider(scene.player, scene.platforms, function() {
+      scene.player.body.touching.down = true
+    });
+    scene.platformGroup = this.physics.add.group()
+    scene.platforms.setCollisionBetween(1, 2)
   }
 
   createGround(tileWidth, count) {
@@ -142,8 +161,7 @@ export default class SynthwaveScene extends Phaser.Scene {
     //socket logic
     const scene = this
     this.socket = io();
-    
-    
+
     //scene.otherPlayer=null;
     this.socket.on("currentPlayers", function (arg) {
       const  players  = arg;
@@ -179,7 +197,7 @@ export default class SynthwaveScene extends Phaser.Scene {
     });
 
     this.socket.on("playerMoved", function (moveState){
-      
+
       //scene.otherPlayer.updateMovement({right: {isDown:true}})
       if(scene.otherPlayer){
       scene.otherPlayer.updateOtherPlayerMovement(moveState)
@@ -189,8 +207,8 @@ export default class SynthwaveScene extends Phaser.Scene {
       scene.otherPlayer.updateOtherPlayerInAir()
     }
     })
-      
-      
+
+
 
     //mute the previous scene
     this.game.sound.stopAll();
@@ -198,6 +216,7 @@ export default class SynthwaveScene extends Phaser.Scene {
     //Set up background
     const width = this.game.config.width;
     const height = this.game.config.height;
+
     this.add.image(width * 0.5, height * 0.46, 'sky').setOrigin(0.5).setScale(3.5).setScrollFactor(0)
     this.createBackgroundElement(504, 'mountains', 2*numberOfFrames, 0.15)
     this.createBackgroundElement(168, 'palms-back', 5*numberOfFrames, 0.3)
@@ -205,14 +224,17 @@ export default class SynthwaveScene extends Phaser.Scene {
 
     this.groundGroup = this.physics.add.staticGroup();
     this.createGround(168, 5*numberOfFrames);
+    this.createPlatforms(this)
+
 
     // Create game entities
     // << CREATE GAME ENTITIES HERE >>
     this.player = new SoldierPlayer(this, 60, 500, `${scene.color}SoldierIdle`, this.socket).setSize(14, 32).setOffset(15, 7).setScale(2.78);
     this.player.setCollideWorldBounds(true); //stop player from running off the edges
     this.physics.world.setBounds(0, null, width * numberOfFrames, height, true, true, false, false) //set world bounds only on sides
-  
-    
+
+
+
     //check other players moves and if collision between players:
 
 
@@ -228,6 +250,7 @@ export default class SynthwaveScene extends Phaser.Scene {
     this.physics.add.collider(this.player, this.groundGroup)
     this.cursors = this.input.keyboard.createCursorKeys();
     this.createAnimations();
+    this.addPlatformPhysics(this)
 
     // this.enemy = new enemy(this, 600, 400, 'brandon').setScale(.25)
 
@@ -264,7 +287,7 @@ export default class SynthwaveScene extends Phaser.Scene {
     this.backgroundSound.setLoop(true);
     this.backgroundSound.volume = 0.1;
     this.backgroundSound.play();
-    
+
     //VOLUME
     this.volumeSpeaker = this.add
       .image(727, 35, "speakerOn")
@@ -285,7 +308,7 @@ export default class SynthwaveScene extends Phaser.Scene {
 
     this.volumeUp.on("pointerdown", () => {
       this.volumeUp.setTint(0xc2c2c2);
-      
+
       let newVol = this.backgroundSound.volume + 0.1;
       this.backgroundSound.setVolume(newVol);
       if (this.backgroundSound.volume < 0.2) {
@@ -341,17 +364,18 @@ export default class SynthwaveScene extends Phaser.Scene {
     this.shootingSound.volume = 0.03;
 
     this.screamSound = this.sound.add('scream');
-   
-    scene.scene.pause()
-    scene.scene.launch("WaitingRoom", { socket: scene.socket })
+
+    //scene.scene.pause()
+    //scene.scene.launch("WaitingRoom", { socket: scene.socket })
 
     this.socket.on("startGame", function () {
+
       scene.scene.stop("WaitingforPlayer")
       scene.scene.launch("CountdownScene")
     })
     
     this.timer()
-    
+  
 
     // Create collisions for all entities
     // << CREATE COLLISIONS HERE >>
@@ -365,6 +389,7 @@ export default class SynthwaveScene extends Phaser.Scene {
     this.player.update(time, this.cursors, this.jumpSound, this.fire, this.shootingSound);
     if (this.muzzleFlash) this.muzzleFlash.update(delta)
   }
+
 
   timer(){
     const screenCenterX = this.cameras.main.worldView.x + this.cameras.main.width / 2;
@@ -393,6 +418,7 @@ export default class SynthwaveScene extends Phaser.Scene {
     this.initialTime--
     if(this.initialTime <= 0) this.clock.setText("TIME'S UP!!!")
     else this.clock.setText('Time:' + this.formatTime(this.initialTime))
+
   }
 
   fire(x, y, left) {
@@ -464,12 +490,4 @@ export default class SynthwaveScene extends Phaser.Scene {
       repeat: 0,
     })
   }
-
-  
-    // make the laser inactive and insivible when it hits the enemy
-    // hit(enemy, bullet) {
-    //   bullet.setActive(false);
-    //   bullet.setVisible(false);
-    // }
-
 }

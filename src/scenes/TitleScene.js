@@ -11,7 +11,7 @@ export default class TitleScene extends Phaser.Scene {
 
   preload() {
     //Loading bar
-    this.displayLoadingBar(this, 'I want my MTV!');
+    this.displayLoadingBar(this, 'Bueller? Bueller? Bueller?');
 
     //Load images, sprites, spritesheets
     for (let color of this.colors) {
