@@ -28,7 +28,7 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
     this.hitPlatform = this.hitPlatform.bind(this)
     this.createBackgroundElement = this.createBackgroundElement.bind(this);
     this.flagpoleIsUp = false;
-    this.touchingFlagpole = false; //testing mode
+    this.touchingFlagpole = false;
     //bind functions
     this.createPlayer = this.createPlayer.bind(this);
     this.createEnemies = this.createEnemies.bind(this)
@@ -219,7 +219,7 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
       }
   }
 
-  createMap() { //testing mode
+  createMap() {
     this.sky = this.add.image(this.width * 0.5, this.height * 0.46, 'sky').setOrigin(0.5).setScale(3.5).setScrollFactor(0)
     this.createBackgroundElement(504, 'mountains', 2*numberOfFrames, 0.15)
     this.createBackgroundElement(168, 'palms-back', 5*numberOfFrames, 0.3)
@@ -267,7 +267,7 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
     scene.physics.add.overlap(scene.player, scene.flagpole, function() {
       if (!scene.touchingFlagpole){
         scene.touchingFlagpole = true;
-        scene.raiseFlagpole(scene) //testing mode
+        scene.raiseFlagpole(scene)
       }
     })
     scene.physics.add.overlap(scene.platforms, scene.bullets, scene.hitPlatform, null, scene)
@@ -281,8 +281,7 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
   }
 
   createFlagpole(scene) {
-    // scene.flagpole = new Flagpole(scene, scene.playerZones.end.x, 310, 'flagpole').setScale(2.78)
-    scene.flagpole = new Flagpole(scene, 300, 310, 'flagpole').setScale(2.78) //testing mode
+    scene.flagpole = new Flagpole(scene, scene.playerZones.end.x, 310, 'flagpole').setScale(2.78)
     scene.flagpole.body.setSize(2, 160)
     scene.flagpole.body.setOffset(16, 0)
     scene.flagpole.body.immovable = true
@@ -555,11 +554,11 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
       terminator.update(time, delta, scene.terminatorFire)
     })
     //this.terminator.update(time, delta, this.terminatorFire)
-    this.updateLevelEnded(this) //testing mode
+    this.updateLevelEnded(this)
 
   }
 
-  updateLevelEnded(scene) { //testing mode
+  updateLevelEnded(scene) {
     if (scene.flagpoleIsUp) {
       scene.sky.setTint(0x004c99)
       scene.time.delayedCall(200, () => {
@@ -750,7 +749,7 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
       this.player.decreaseHealth(1)
     }
 
-    raiseFlagpole(scene) {//testing mode
+    raiseFlagpole(scene) {
       if (!this.flagpoleIsUp) {
         scene.flagpole.play("raise-flagpole", false)
       }
