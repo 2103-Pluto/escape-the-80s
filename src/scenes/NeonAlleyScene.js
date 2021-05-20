@@ -1,6 +1,5 @@
 import Ground from '../entity/Ground';
 import Phaser from 'phaser'
-import SoldierPlayer from '../entity/SoldierPlayer'
 
 const numberOfFrames = 3;
 
@@ -57,7 +56,7 @@ export default class NeonAlleyScene extends Phaser.Scene {
      //---------->These shoulds be in order
     this.createSounds()
     this.createMap()
-    this.createPlayer(this)
+    this.scene.get('SinglePlayerSynthwaveScene').createPlayer(this)
     this.createPhysics(this)
     //<-----------
   }
@@ -88,10 +87,6 @@ export default class NeonAlleyScene extends Phaser.Scene {
   createPhysics(scene) {
     scene.player.setCollideWorldBounds(true);
     scene.physics.add.collider(scene.player, scene.groundGroup)
-  }
-
-  createPlayer(scene) {
-    scene.player = new SoldierPlayer(scene, 200, 310, `${scene.color}SoldierIdle`, scene.socket, scene.color).setSize(14, 32).setOffset(15, 7).setScale(2.78);
   }
 
 }

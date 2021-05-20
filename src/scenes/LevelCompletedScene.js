@@ -119,16 +119,17 @@ export default class LevelCompletedScene extends Phaser.Scene {
         this.click.play();
 
         if (this.previousSceneName === 'SinglePlayerSynthwaveScene') {
+          this.scene.stop('SinglePlayerSynthwaveScene') //stop previous scene instance
           this.scene.start('NeonAlleyScene', { //start neon alley
             score: this.score,
             health: this.health,
             color: this.color
           })
-          this.scene.remove('SinglePlayerSynthwaveScene') //remove previous scene instance
-          game.scene.add('SinglePlayerSynthwaveScene', SinglePlayerSynthwaveScene) //add previous scene new instance
         } else if (this.previousSceneName === 'NeonAlleyScene') {
           this.scene.remove('NeonAlleyScene') //remove previous scene instance
+          this.scene.remove('SinglePlayerSynthwaveScene') //remove previous first level scene instance
           game.scene.add('NeonAlleyScene', NeonAlleyScene) //add previous scene new instance
+          game.scene.add('SinglePlayerSynthwaveScene', SinglePlayerSynthwaveScene) //add previous first level scene new instance
         }
         this.scene.remove('LevelCompletedScene') //remove this scene
         game.scene.add('LevelCompletedScene', LevelCompletedScene) //add new instance of level completed
