@@ -99,9 +99,9 @@ export default class NeonAlleyScene extends Phaser.Scene {
     this.volumeUp.on("pointerdown", () => {
       this.volumeUp.setTint(0xc2c2c2);
 
-      let newVol = this.backgroundSound.volume + 0.1;
-      this.backgroundSound.setVolume(newVol);
-      if (this.backgroundSound.volume < 0.2) {
+      let newVol = this.backgroundMusic.volume + 0.1;
+      this.backgroundMusic.setVolume(newVol);
+      if (this.backgroundMusic.volume < 0.2) {
         this.volumeSpeaker.setTexture("speakerOn");
       }
       if (this.backgroundMusic.volume >= 0.9) {
@@ -113,6 +113,7 @@ export default class NeonAlleyScene extends Phaser.Scene {
       }
     });
 
+    
     this.volumeDown.on("pointerdown", () => {
       this.volumeDown.setTint(0xc2c2c2);
       let newVol = this.backgroundMusic.volume - 0.1;
