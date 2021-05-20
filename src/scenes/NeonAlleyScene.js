@@ -44,14 +44,14 @@ export default class NeonAlleyScene extends Phaser.Scene {
     this.load.audio('mfn-reagan', 'assets/audio/MoneyForNothingWReagan.wav');
     this.load.audio('mfn-no-reagan', 'assets/audio/MoneyForNothing-small.wav');
   }
-  
+
   preloadBoss() {
     this.load.spritesheet("Boss", "assets/spriteSheets/Boss/Original-Dimensions/Sprite-Sheet-trimmy.png", {
       frameWidth: 19,
       frameHeight: 48,
     })
   }
-  
+
   preloadColaBomb() {
     this.load.image("coca-cola", "assets/sprites/coca-cola.png")
     this.load.image("explosion", "assets/spriteSheets/explosion.png")
@@ -69,7 +69,7 @@ export default class NeonAlleyScene extends Phaser.Scene {
     this.preloadBoss()
     this.preloadMusic()
   }
-  
+
 
   createGround(tileWidth, count) {
     for (let i=0; i<count; i++) {
@@ -82,7 +82,7 @@ export default class NeonAlleyScene extends Phaser.Scene {
       this.add.image(i*imageWidth*factor, height, texture).setOrigin(posX, posY).setScale(3.5).setScrollFactor(scrollFactor)
     }
   }
-  
+
   createSounds() {
     this.game.sound.stopAll()
     this.backgroundSound = this.sound.add('mfn-reagan')
@@ -92,7 +92,7 @@ export default class NeonAlleyScene extends Phaser.Scene {
       backgroundSound.volume = 0.1
       backgroundSound.play()
     })
-    
+
     //VOLUME
     this.volumeSpeaker = this.add
     .image(727, 35, "speakerOn")
@@ -128,7 +128,7 @@ export default class NeonAlleyScene extends Phaser.Scene {
       }
     });
 
-    
+
     this.volumeDown.on("pointerdown", () => {
       this.volumeDown.setTint(0xc2c2c2);
       let newVol = this.backgroundSound.volume - 0.1;
@@ -159,7 +159,7 @@ export default class NeonAlleyScene extends Phaser.Scene {
         this.backgroundSound.setMute(false);
       }
     });
-    
+
     this.sound.pauseOnBlur = false; //prevent sound from cutting when you leave tab
 
     this.jumpSound = this.sound.add('jump');
@@ -170,15 +170,15 @@ export default class NeonAlleyScene extends Phaser.Scene {
 
     this.hurtSound = this.sound.add('hurt');
     this.hurtSound.volume = 0.3;
-    
+
     this.pauseSound = this.sound.add('pause')
     this.pauseSound.volume = 0.03;
 
   }
-  
+
   createBoss(scene, x, y, scale) {
     let boss = new Boss(scene, x, y, scale)
-    
+
     scene.physics.add.collider(boss, scene.groundGroup)
     scene.physics.add.collider(boss, scene.player, function(b, p) {
       p.bounceOff()
@@ -207,18 +207,18 @@ export default class NeonAlleyScene extends Phaser.Scene {
     this.scene.get('SinglePlayerSynthwaveScene').pause(this)
     //<-----------
 
-    const level1 = this.add.text(400, 300, 'LEVEL 2',{ fontFamily: '"Press Start 2P"' }).setFontSize(46).setOrigin(0.5, 0.5)
+    const level1 = this.add.text(400, 200, 'LEVEL 2',{ fontFamily: '"Press Start 2P"' }).setFontSize(46).setOrigin(0.5, 0.5)
 
     const flashLevel1 = this.tweens.add({
       targets: level1,
-      duration: 100,
+      duration: 200,
       repeat: -1,
       alpha: 0,
       ease: Phaser.Math.Easing.Expo.InOut
     })
 
     this.time.addEvent({
-      delay: 1000,
+      delay: 2000,
       callback: () => {
         flashLevel1.stop()
         level1.setVisible(false)
@@ -269,7 +269,7 @@ export default class NeonAlleyScene extends Phaser.Scene {
     this.physics.world.setBounds(0, null, this.width * numberOfFrames, this.height, true, true, false, false)
   }
 
-  
+
   createPhysics(scene) {
     scene.player.setCollideWorldBounds(true);
     scene.physics.add.collider(scene.player, scene.groundGroup)
@@ -283,10 +283,6 @@ export default class NeonAlleyScene extends Phaser.Scene {
   }
 
   fire() {
-    //--->testing mode
-    this.player.decreaseHealth(1)
-    console.log(this.player.health)
-    //<---testing mode
     const offsetX = 60;
     const offsetY = 5.5;
     const bulletX =

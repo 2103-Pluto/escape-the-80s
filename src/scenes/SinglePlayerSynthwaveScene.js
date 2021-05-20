@@ -540,11 +540,11 @@ clearCharacterChoosing() {
     this.createSounds() //create all the sounds
     this.pause(this) //creates pause functionality
     // --->
-    const level1 = this.add.text(400, 300, 'LEVEL 1',{ fontFamily: '"Press Start 2P"' }).setFontSize(46).setOrigin(0.5, 0.5)
+    const level1 = this.add.text(400, 200, 'LEVEL 1',{ fontFamily: '"Press Start 2P"' }).setFontSize(46).setOrigin(0.5, 0.5)
 
     const flashLevel1 = this.tweens.add({
       targets: level1,
-      duration: 100,
+      duration: 200,
       repeat: -1,
       alpha: 0,
       ease: Phaser.Math.Easing.Expo.InOut
@@ -553,7 +553,7 @@ clearCharacterChoosing() {
 
 
     this.time.addEvent({
-      delay: 1000,
+      delay: 2000,
       callback: () => {
         flashLevel1.stop()
         level1.setVisible(false)
