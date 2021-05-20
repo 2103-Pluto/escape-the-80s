@@ -323,7 +323,12 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
           player.decreaseHealth(1)
         }
         else if (enemy==='mario'){
-          newEnemy.body.immovable = true
+          newEnemy.playDamageTween()
+          const timer = scene.time.delayedCall(300,() => newEnemy.destroy())
+          //newEnemy.destroy()
+          //newEnemy.body.immovable = true
+          //newEnemy.bulletHits = 5
+          //scene.hit(newEnemy)
         }
       });
       enemyX+=50 //if you create a troop of enemies, they'll be 50 pixels apart
@@ -718,6 +723,7 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
       }
       bullet.destroy()
     }
+
 
     pickupStar(player, star) {
       star.destroy()
