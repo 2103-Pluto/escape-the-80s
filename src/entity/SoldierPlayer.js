@@ -162,18 +162,28 @@ export default class SoldierPlayer extends Phaser.Physics.Arcade.Sprite {
 
     //crouching
     if (moveState.down){
-      this.setVelocityX(0)
+      this.isCrouching = true
+      this.body.setSize(16, 27)
+      if (!this.facingLeft) {
+        this.body.setOffset(17, 12) 
+      } else {
+        this.body.setOffset(15, 12) 
+      }
       this.play(`${this.color}Crouch`, true)
-
 
     }
     // Move left
     else if (moveState.left) {  // will be else if
 
+      this.isCrouching = false
+      this.body.setSize(14, 32)
       if (!this.facingLeft) {
+
         this.flipX = !this.flipX;
         this.facingLeft = true;
+        // this.moveState.facingLeft = true
         this.body.setOffset(19, 7)
+
       }
       this.setVelocityX(-300);
       cam.scrollX -= speed;
@@ -185,13 +195,14 @@ export default class SoldierPlayer extends Phaser.Physics.Arcade.Sprite {
     // Move right
     else if (moveState.right) {
 
+      this.isCrouching = false
+      this.body.setSize(14, 32)
       if (this.facingLeft) {
         this.flipX = !this.flipX;
         this.facingLeft = false;
         this.body.setOffset(15, 7)
       }
       this.setVelocityX(300);
-
       cam.scrollX += speed;
       if (this.body.onFloor()) {
         this.play(`${this.color}Run`, true);
@@ -201,9 +212,16 @@ export default class SoldierPlayer extends Phaser.Physics.Arcade.Sprite {
     }
      // Neutral (no movement)
      else {
+      this.isCrouching = false
       this.setVelocityX(0);
-      // Whenever Josh is not moving, use the idleUnarmed animation
-        this.anims.play(`${this.color}Idle`, true);
+      this.anims.play(`${this.color}Idle`, true);
+
+      this.body.setSize(14, 32)
+      if (!this.facingLeft) {
+        this.body.setOffset(15, 7)
+      } else {
+        this.body.setOffset(19, 7)
+      }
     }
 
 
