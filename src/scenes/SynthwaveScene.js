@@ -25,6 +25,14 @@ export default class SynthwaveScene extends Phaser.Scene {
     this.createStar = this.createStar.bind(this)
     this.createHeart = this.createHeart.bind(this);
     // this.createMario = this.createMario.bind(this)
+    this.preloadSpeaker = this.preloadSpeaker.bind(this)
+  }
+  
+  preloadSpeaker() {
+    this.load.image("speakerOn", "assets/sprites/speaker_on.png");
+    this.load.image("speakerOff", "assets/sprites/speaker_off.png");
+    this.load.image("volumeUp", "assets/sprites/volume_up.png");
+    this.load.image("volumeDown", "assets/sprites/volume_down.png");
   }
 
   preload() {
@@ -91,6 +99,8 @@ export default class SynthwaveScene extends Phaser.Scene {
     this.load.audio('shooting', 'assets/audio/shooting.wav');
     this.load.audio('scream', 'assets/audio/scream.wav');
     this.load.audio('background-music', 'assets/audio/synthwave_scene/synthwave-palms.wav');
+    
+    this.preloadSpeaker()
   }
 
   createGround(tileWidth, count) {
@@ -251,6 +261,72 @@ export default class SynthwaveScene extends Phaser.Scene {
     this.backgroundSound.setLoop(true);
     this.backgroundSound.volume = 0.1;
     this.backgroundSound.play();
+    
+    //VOLUME
+    this.volumeSpeaker = this.add
+      .image(727, 35, "speakerOn")
+      .setScrollFactor(0)
+      .setScale(0.3);
+    this.volumeUp = this.add
+      .image(757, 35, "volumeUp")
+      .setScrollFactor(0)
+      .setScale(0.3);
+    this.volumeDown = this.add
+      .image(697, 35, "volumeDown")
+      .setScrollFactor(0)
+      .setScale(0.3);
+
+    this.volumeUp.setInteractive();
+    this.volumeDown.setInteractive();
+    this.volumeSpeaker.setInteractive();
+
+    this.volumeUp.on("pointerdown", () => {
+      this.volumeUp.setTint(0xc2c2c2);
+      
+      let newVol = this.backgroundSound.volume + 0.1;
+      this.backgroundSound.setVolume(newVol);
+      if (this.backgroundSound.volume < 0.2) {
+        this.volumeSpeaker.setTexture("speakerOn");
+      }
+      if (this.backgroundSound.volume >= 0.9) {
+        this.volumeUp.setTint(0xff0000);
+        this.volumeUp.disableInteractive();
+      } else {
+        this.volumeDown.clearTint();
+        this.volumeDown.setInteractive();
+      }
+    });
+
+    this.volumeDown.on("pointerdown", () => {
+      this.volumeDown.setTint(0xc2c2c2);
+      let newVol = this.backgroundSound.volume - 0.1;
+      this.backgroundSound.setVolume(newVol);
+      if (this.backgroundSound.volume <= 0.2) {
+        this.volumeDown.setTint(0xff0000);
+        this.volumeDown.disableInteractive();
+        this.volumeSpeaker.setTexture("speakerOff");
+      } else {
+        this.volumeUp.clearTint();
+        this.volumeUp.setInteractive();
+      }
+    });
+
+    this.volumeDown.on("pointerup", () => {
+      this.volumeDown.clearTint();
+    });
+    this.volumeUp.on("pointerup", () => {
+      this.volumeUp.clearTint();
+    });
+
+    this.volumeSpeaker.on("pointerdown", () => {
+      if (this.volumeSpeaker.texture.key === "speakerOn") {
+        this.volumeSpeaker.setTexture("speakerOff");
+        this.backgroundSound.setMute(true);
+      } else {
+        this.volumeSpeaker.setTexture("speakerOn");
+        this.backgroundSound.setMute(false);
+      }
+    });
 
     this.sound.pauseOnBlur = false; //prevent sound from cutting when you leave tab
 
