@@ -24,8 +24,7 @@ export default class SynthwaveScene extends Phaser.Scene {
 
     this.createStar = this.createStar.bind(this)
     this.createHeart = this.createHeart.bind(this);
-    this.countDown = this.countDown.bind(this)
-    this.countingDown = this.countingDown.bind(this)
+    
 
     //this.gameStart = false
 
@@ -144,9 +143,7 @@ export default class SynthwaveScene extends Phaser.Scene {
     const scene = this
     this.socket = io();
     
-    //timer
     
-
     //scene.otherPlayer=null;
     this.socket.on("currentPlayers", function (arg) {
       const  players  = arg;
@@ -349,17 +346,12 @@ export default class SynthwaveScene extends Phaser.Scene {
     scene.scene.launch("WaitingRoom", { socket: scene.socket })
 
     this.socket.on("startGame", function () {
-      
-      // scene.countingDown()
-      // scene.scene.resume()
       scene.scene.launch("CountdownScene")
-      
-      
-      
-      //console.log('testing')
     })
     
+    this.timer()
     
+
     // Create collisions for all entities
     // << CREATE COLLISIONS HERE >>
   }
@@ -370,13 +362,36 @@ export default class SynthwaveScene extends Phaser.Scene {
     // << DO UPDATE LOGIC HERE >>
     const scene = this
     this.player.update(time, this.cursors, this.jumpSound, this.fire, this.shootingSound);
-    //this.player.update(time, this.cursors, this.jumpSound);
     if (this.muzzleFlash) this.muzzleFlash.update(delta)
+  }
 
-    // if(this.gameStart===false && this.player.body.touching.down) this.player.body.moves = false
-    // else this.player.body.moves = true
-
+  timer(){
+    const screenCenterX = this.cameras.main.worldView.x + this.cameras.main.width / 2;
+    const screenCenterY = this.cameras.main.worldView.y + this.cameras.main.height / 2;
+    this.initialTime = 90
+    //timer
     
+    this.clock = this.add.text(screenCenterX, screenCenterY-250, 
+    'Time:' + this.formatTime(this.initialTime), { fontFamily: '"Press Start 2P"' }).setFontSize(20).setOrigin(0.5)
+    this.timedEvent = this.time.addEvent({
+      delay: 1000,
+      callback: this.timerCount,
+      callbackScope: this,
+      loop: true
+    })
+    this.clock.setScrollFactor(0)
+  }
+
+  formatTime(seconds) {
+    var minutes = Math.floor(seconds / 60);
+    var partInSeconds = seconds % 60;
+    partInSeconds = partInSeconds.toString().padStart(2, "0");
+    return `${minutes}:${partInSeconds}`;
+  }
+  timerCount(){
+    this.initialTime--
+    if(this.initialTime <= 0) this.clock.setText("TIME'S UP!!!")
+    else this.clock.setText('Time:' + this.formatTime(this.initialTime))
   }
 
   fire(x, y, left) {
@@ -449,54 +464,7 @@ export default class SynthwaveScene extends Phaser.Scene {
     })
   }
 
-  countingDown(){
-    this.events.on('resume', () => {
-      this.initialTime = 3
-      const screenCenterX = this.cameras.main.worldView.x + this.cameras.main.width / 2;
-      const screenCenterY = this.cameras.main.worldView.y + this.cameras.main.height / 2;
-      //scene.scene.resume()
-      this.countDownText = this.add.text(screenCenterX, screenCenterY, 
-        'Start Race in:' + this.initialTime).setOrigin(0.5)
-        this.timedEvent = this.time.addEvent({
-          delay: 1000,
-          callback: this.countDown,
-          callbackScope: this,
-          loop: true
-        })
-      })
-        
-  }
-
-
-  listenToEvents(){
-    const screenCenterX = this.cameras.main.worldView.x + this.cameras.main.width / 2;
-    const screenCenterY = this.cameras.main.worldView.y + this.cameras.main.height / 2;
-    
-    this.events.on('resume', () => {
-      this.initialTime = 3;
-      this.countDownText = this.add.text(screenCenterX, screenCenterY, 
-          'Start Race in:' + this.initialTime, { fontFamily: '"Press Start 2P"' }).setFontSize(28).setOrigin(0.5)
-      this.timedEvent = this.time.addEvent({
-        delay: 1000,
-        callback: this.countDown,
-        callbackScope: this,
-        loop: true
-      })
-    })
-  }
-
-  countDown() {
-    this.initialTime--;
-    this.countDownText.setText('Start Race in:' + this.initialTime);
-    if (this.initialTime <= 0) {
-      this.countDownText.setText('');
-      //this.scene.resume();
-      //this.gameStart=true
-      this.timedEvent.remove();
-      
-    }
-  }
-
+  
     // make the laser inactive and insivible when it hits the enemy
     // hit(enemy, bullet) {
     //   bullet.setActive(false);

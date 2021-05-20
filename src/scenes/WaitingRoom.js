@@ -69,9 +69,9 @@ export default class WaitingRoom extends Phaser.Scene {
       scene.socket.emit("getRoomCode");
     });
 
-    scene.notValidText = scene.add.text(670, 295, "", {
+    scene.notValidText = scene.add.text(450, 260, "", {
       fill: "#ff0000",
-      fontSize: "15px",
+      fontSize: "20px",
     });
     scene.roomKeyText = scene.add.text(210, 250, "", {
       fill: "#000000",
