@@ -351,6 +351,7 @@ export default class SynthwaveScene extends Phaser.Scene {
       
       scene.countingDown()
       scene.scene.resume()
+      this.gameStart = true
       
       
       
@@ -371,9 +372,7 @@ export default class SynthwaveScene extends Phaser.Scene {
     //this.player.update(time, this.cursors, this.jumpSound);
     if (this.muzzleFlash) this.muzzleFlash.update(delta)
 
-    // this.enemy.update(this.screamSound);
-    
-    // this.mario.update()
+  
 
     
   }
@@ -460,7 +459,6 @@ export default class SynthwaveScene extends Phaser.Scene {
       const screenCenterX = this.cameras.main.worldView.x + this.cameras.main.width / 2;
       const screenCenterY = this.cameras.main.worldView.y + this.cameras.main.height / 2;
       //scene.scene.resume()
-      this.player.moves = false
       this.countDownText = this.add.text(screenCenterX, screenCenterY, 
         'Start Race in:' + this.initialTime).setOrigin(0.5)
         this.timedEvent = this.time.addEvent({
@@ -497,6 +495,7 @@ export default class SynthwaveScene extends Phaser.Scene {
     if (this.initialTime <= 0) {
       this.countDownText.setText('');
       //scene.resume();
+      this.gameStart=true
       this.timedEvent.remove();
       
     }

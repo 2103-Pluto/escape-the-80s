@@ -3,7 +3,6 @@ import Phaser from "phaser";
 export default class WaitingRoom extends Phaser.Scene {
   constructor() {
     super("WaitingRoom");
-    this.code = ''
   }
 
   init(data) {
@@ -91,6 +90,7 @@ export default class WaitingRoom extends Phaser.Scene {
     scene.socket.on("keyIsValid", function (input) {
       scene.socket.emit("joinRoom", input);
       scene.scene.stop("WaitingRoom");
+      scene.scene.launch("Countdown")
       //scene.scene.resume('SynthwaveScene')
     });
   }
