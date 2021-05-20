@@ -1,5 +1,6 @@
 import Ground from '../entity/Ground';
 import Phaser from 'phaser'
+import Boss from '../entity/Boss'
 
 const numberOfFrames = 3;
 
@@ -11,6 +12,9 @@ export default class NeonAlleyScene extends Phaser.Scene {
     this.preloadMusic = this.preloadMusic.bind(this)
     this.createSounds = this.createSounds.bind(this)
     this.preloadSpeaker = this.preloadSpeaker.bind(this)
+    this.preloadBoss = this.preloadBoss.bind(this)
+    this.preloadColaBomb = this.preload.bind(this)
+    this.createBoss = this.createBoss.bind(this)
   }
 
   init(data) {
@@ -42,6 +46,18 @@ export default class NeonAlleyScene extends Phaser.Scene {
     this.load.image("volumeDown", "assets/sprites/volume_down.png");
   }
   
+  preloadBoss() {
+    this.load.spritesheet("Boss", "assets/spriteSheets/Boss/Original-Dimensions/Sprite-Sheet-trimmy.png", {
+      frameWidth: 19,
+      frameHeight: 48,
+    })
+  }
+  
+  preloadColaBomb() {
+    this.load.image("coca-cola", "assets/sprites/coca-cola.png")
+    this.load.image("explosion", "assets/spriteSheets/explosion.png")
+  }
+  
   preload() {
     // Preload Sprites
     // << LOAD SPRITES HERE >>
@@ -49,10 +65,12 @@ export default class NeonAlleyScene extends Phaser.Scene {
     this.load.image('ground', 'assets/sprites/ground-juan-test.png');
 
     this.preloadBackround()
+    this.preloadBoss()
     // Preload Sounds
     // << LOAD SOUNDS HERE >>
     this.preloadMusic()
     this.preloadSpeaker()
+  
   }
   
 
@@ -159,6 +177,16 @@ export default class NeonAlleyScene extends Phaser.Scene {
     this.pauseSound = this.sound.add('pause')
     this.pauseSound.volume = 0.03;
 
+  }
+  
+  createBoss(scene, x, y, scale) {
+    let boss = new Boss(scene, x, y, scale)
+    
+    scene.physics.add.collider(boss, scene.groundGroup)
+    scene.physics.add.collider(boss, scene.player, function(b, p) {
+      p.bounceOff()
+      p.decreaseHealth(1)
+    })
   }
 
   create() {

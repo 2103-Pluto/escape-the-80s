@@ -145,7 +145,6 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
       frameHeight: 16,
     });
 
-    this.load.image('brandon', 'assets/sprites/brandon.png');
     this.load.spritesheet('star', 'assets/spriteSheets/star.png', {
       frameWidth: 16,
       frameHeight: 16,
