@@ -260,9 +260,6 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
     this.createBackgroundElement(504, 'mountains', 2*numberOfFrames, 0.15)
     this.createBackgroundElement(168, 'palms-back', 5*numberOfFrames, 0.3)
     this.createBackgroundElement(448, 'palms', 2*numberOfFrames, 0.45)
-
-    // this.groundGroup = this.physics.add.staticGroup({classType: Ground});
-
     this.groundGroup = this.physics.add.staticGroup()
     this.createGround(168, 5*numberOfFrames);
     this.physics.world.setBounds(0, null, this.width * numberOfFrames, this.height, true, true, false, false) //set world bounds only on sides
@@ -338,16 +335,16 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
       scene.physics.add.collider(newEnemy, scene.groundGroup);
       scene.physics.add.collider(newEnemy, scene.platforms)
       scene.physics.add.collider(newEnemy, scene.player, function(newEnemy, player){
-        if (player.body.touching.right || player.body.touching.left){   /// CHECK THIS WITH MARIOS ON PLATFORMS
+        if (enemy==='mario' && newEnemy.body.touching.up){
+            newEnemy.destroy()
+           scene.marioDeathSound.play()
+        }
+        else {
           player.bounceOff()
           player.decreaseHealth(1)
         }
-        else if (enemy==='mario'){
-           newEnemy.destroy()
-           scene.marioDeathSound.play()
-        }
       });
-      enemyX+=50 //if you create a troop of enemies, they'll be 50 pixels apart
+      enemyX+=70 //if you create a troop of enemies, they'll be 50 pixels apart
     }
     return scene.mario
   }
@@ -702,9 +699,9 @@ clearCharacterChoosing() {
 
     this.marios.getChildren().forEach(function (mario) {
       mario.update(scene.marioDeathSound)
-    })
+    }) 
     this.terminators.getChildren().forEach(function (terminator) {
-      terminator.update(time, delta, scene.terminatorFire)
+      terminator.update(time, delta, scene.terminatorFire, scene.shootingSound, scene.player.x)
     })
     //this.terminator.update(time, delta, this.terminatorFire)
     this.updateLevelEnded(this)
@@ -830,6 +827,7 @@ clearCharacterChoosing() {
     this.anims.create({
       key: `${this.color}Crouch`,
       frames: this.anims.generateFrameNumbers(`${this.color}SoldierCrouching`, {start:3}),
+      repeat: 0
     });
     this.anims.create({
       key: 'rotate-star',

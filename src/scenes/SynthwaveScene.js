@@ -24,6 +24,10 @@ export default class SynthwaveScene extends Phaser.Scene {
 
     this.createStar = this.createStar.bind(this)
     this.createHeart = this.createHeart.bind(this);
+    this.countDown = this.countDown.bind(this)
+    this.countingDown = this.countingDown.bind(this)
+
+    this.gameStart = false
     // this.createMario = this.createMario.bind(this)
     this.preloadSpeaker = this.preloadSpeaker.bind(this)
   }
@@ -33,6 +37,7 @@ export default class SynthwaveScene extends Phaser.Scene {
     this.load.image("speakerOff", "assets/sprites/speaker_off.png");
     this.load.image("volumeUp", "assets/sprites/volume_up.png");
     this.load.image("volumeDown", "assets/sprites/volume_down.png");
+
   }
 
   preload() {
@@ -137,7 +142,8 @@ export default class SynthwaveScene extends Phaser.Scene {
     //socket logic
     const scene = this
     this.socket = io();
-    //
+    
+    //timer
     
 
     //scene.otherPlayer=null;
@@ -146,19 +152,21 @@ export default class SynthwaveScene extends Phaser.Scene {
       console.log('players--->', players)
       Object.keys(players).forEach(function (id) {
         if (players[id].playerId !== scene.socket.id) {
-          console.log('movestate--->', players[id].moveState)
-          const x = players[id].moveState.x
-          const y = players[id].moveState.y
-          const facingLeft = players[id].moveState.facingLeft
-          scene.otherPlayer = new SoldierPlayer(scene, x, y, `${scene.color}SoldierIdle`, scene.socket,).setSize(14, 32).setOffset(15, 7).setScale(2.78);
-          scene.otherPlayer.facingLeft = facingLeft
-          if(facingLeft) {
-            scene.otherPlayer.flipX = !scene.otherPlayer.flipX
-          }
+          //console.log('movestate--->', players[id].moveState)
+          // const x = players[id].moveState.x
+          // const y = players[id].moveState.y
+          //const facingLeft = players[id].moveState.facingLeft
+          scene.otherPlayer = new SoldierPlayer(scene, 60, 400, `${scene.color}SoldierIdle`, scene.socket,).setSize(14, 32).setOffset(15, 7).setScale(2.78);
+          // scene.otherPlayer.facingLeft = facingLeft
+          // if(facingLeft) {
+          //   scene.otherPlayer.flipX = !scene.otherPlayer.flipX
+          // }
           //note: to address variable characters
           scene.add.existing(scene.otherPlayer)
           scene.physics.add.collider(scene.otherPlayer, scene.groundGroup)
           //'this' context here is the function; need to grab the 'this' that is the scene (i.e. 'scene')
+          //turn game on
+          //if(Object.keys(players).length===2) scene.scene.resume()
         }
       });
     });
@@ -205,7 +213,8 @@ export default class SynthwaveScene extends Phaser.Scene {
     this.player = new SoldierPlayer(this, 60, 400, `${scene.color}SoldierIdle`, this.socket).setSize(14, 32).setOffset(15, 7).setScale(2.78);
     this.player.setCollideWorldBounds(true); //stop player from running off the edges
     this.physics.world.setBounds(0, null, width * numberOfFrames, height, true, true, false, false) //set world bounds only on sides
-
+  
+    
     //check other players moves and if collision between players:
 
 
@@ -334,8 +343,21 @@ export default class SynthwaveScene extends Phaser.Scene {
     this.shootingSound.volume = 0.03;
 
     this.screamSound = this.sound.add('scream');
-
+   
+    scene.scene.pause()
     scene.scene.launch("WaitingRoom", { socket: scene.socket })
+
+    this.socket.on("startGame", function () {
+      
+      scene.countingDown()
+      scene.scene.resume()
+      
+      
+      
+      //console.log('testing')
+    })
+    
+    
     // Create collisions for all entities
     // << CREATE COLLISIONS HERE >>
   }
@@ -432,6 +454,53 @@ export default class SynthwaveScene extends Phaser.Scene {
     });
   }
 
+  countingDown(){
+    this.events.on('resume', () => {
+      this.initialTime = 3
+      const screenCenterX = this.cameras.main.worldView.x + this.cameras.main.width / 2;
+      const screenCenterY = this.cameras.main.worldView.y + this.cameras.main.height / 2;
+      //scene.scene.resume()
+      this.player.moves = false
+      this.countDownText = this.add.text(screenCenterX, screenCenterY, 
+        'Start Race in:' + this.initialTime).setOrigin(0.5)
+        this.timedEvent = this.time.addEvent({
+          delay: 1000,
+          callback: this.countDown,
+          callbackScope: this,
+          loop: true
+        })
+      })
+        
+  }
+
+
+  listenToEvents(){
+    const screenCenterX = this.cameras.main.worldView.x + this.cameras.main.width / 2;
+    const screenCenterY = this.cameras.main.worldView.y + this.cameras.main.height / 2;
+    
+    this.events.on('resume', () => {
+      this.initialTime = 3;
+      this.countDownText = this.add.text(screenCenterX, screenCenterY, 
+          'Start Race in:' + this.initialTime, { fontFamily: '"Press Start 2P"' }).setFontSize(28).setOrigin(0.5)
+      this.timedEvent = this.time.addEvent({
+        delay: 1000,
+        callback: this.countDown,
+        callbackScope: this,
+        loop: true
+      })
+    })
+  }
+
+  countDown() {
+    this.initialTime--;
+    this.countDownText.setText('Start Race in:' + this.initialTime);
+    if (this.initialTime <= 0) {
+      this.countDownText.setText('');
+      //scene.resume();
+      this.timedEvent.remove();
+      
+    }
+  }
 
     // make the laser inactive and insivible when it hits the enemy
     // hit(enemy, bullet) {

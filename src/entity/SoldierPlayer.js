@@ -20,7 +20,7 @@ export default class SoldierPlayer extends Phaser.Physics.Arcade.Sprite {
     this.moveState = {
       x: x,
       y: y,
-      facingLeft: this.facingLeft,
+      // facingLeft: this.facingLeft,
       left: false,
       right: false,
       up: false,
@@ -63,9 +63,7 @@ export default class SoldierPlayer extends Phaser.Physics.Arcade.Sprite {
       } else {
         this.body.setOffset(15, 12) 
       }
-
       this.play(`${this.color}Crouch`, true)
-
 
       if(this.socket){
         this.moveState.x = this.x
@@ -86,7 +84,7 @@ export default class SoldierPlayer extends Phaser.Physics.Arcade.Sprite {
 
         this.flipX = !this.flipX;
         this.facingLeft = true;
-        this.moveState.facingLeft = true
+        // this.moveState.facingLeft = true
         this.body.setOffset(19, 7)
 
       }
@@ -162,13 +160,13 @@ export default class SoldierPlayer extends Phaser.Physics.Arcade.Sprite {
     //crouching
     if (moveState.down){
       this.setVelocityX(0)
-
       this.play(`${this.color}Crouch`, true)
 
 
     }
     // Move left
     else if (moveState.left) {  // will be else if
+
       if (!this.facingLeft) {
         this.flipX = !this.flipX;
         this.facingLeft = true;
