@@ -77,7 +77,7 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
     //Crouching Soldier
     this.load.spritesheet(`${this.color}SoldierCrouching`, `assets/spriteSheets/${this.color}/Gunner_${this.color}_Crouch.png`, {
       frameWidth: 48,
-      frameHeight: 39,
+      frameHeight: 48,
     })
 
     this.load.image('bullet', 'assets/sprites/SpongeBullet.png');
@@ -153,8 +153,6 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
   createGround(tileWidth, count) {
     for (let i=0; i<count; i++) {
       let newGround = this.groundGroup.create(i*tileWidth, this.height, 'road').setOrigin(0, 1).setScale(3.5).refreshBody();
-      newGround.body.allowGravity = false
-      newGround.body.immovable = true
     }
   }
 
@@ -221,7 +219,7 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
     this.createBackgroundElement(448, 'palms', 2*numberOfFrames, 0.45)
 
     // this.groundGroup = this.physics.add.staticGroup({classType: Ground});
-    this.groundGroup = this.physics.add.group()
+    this.groundGroup = this.physics.add.staticGroup()
     this.createGround(168, 5*numberOfFrames);
     this.physics.world.setBounds(0, null, this.width * numberOfFrames, this.height, true, true, false, false) //set world bounds only on sides
   }
