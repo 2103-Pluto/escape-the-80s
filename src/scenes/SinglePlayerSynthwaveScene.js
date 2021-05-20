@@ -250,8 +250,7 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
   }
 
   createPlayer(scene) {
-    scene.player = new SoldierPlayer(scene, scene.playerZones.start.x, scene.playerZones.start.y, `${scene.color}SoldierIdle`, scene.socket).setSize(14, 32).setOffset(15, 7).setScale(2.78);
-    scene.player.color = scene.color;
+    scene.player = new SoldierPlayer(scene, scene.playerZones.start.x, scene.playerZones.start.y, `${scene.color}SoldierIdle`, scene.socket, scene.color).setSize(14, 32).setOffset(15, 7).setScale(2.78);
   }
 
   createPhysics(scene){
@@ -412,10 +411,10 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
   }
 
   clearCharacterChoosing() {
-    // this.scene.remove('CharacterChoosingScene')
-    // this.scene.remove('StoryScene')
-    // this.game.scene.add('CharacterChoosingScene', CharacterChoosingScene)
-    // this.game.scene.add('StoryScene', StoryScene)
+    this.scene.remove('CharacterChoosingScene')
+    this.scene.remove('StoryScene')
+    this.game.scene.add('CharacterChoosingScene', CharacterChoosingScene)
+    this.game.scene.add('StoryScene', StoryScene)
   }
 
   create() {
@@ -583,7 +582,6 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
   }
 
   fire() {
-    console.log(this.color)
     const offsetX = 60;
     const offsetY = 5.5;
     const bulletX =
@@ -648,29 +646,29 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
 
   createAnimations() {
     this.anims.create({
-      key: 'run',
+      key: `${this.color}Run`,
       frames: this.anims.generateFrameNumbers(`${this.color}SoldierRunning`),
       frameRate: 10,
       repeat: -1,
     });
     this.anims.create({
-      key: 'jump',
+      key: `${this.color}Jump`,
       frames: this.anims.generateFrameNumbers(`${this.color}SoldierJumping`),
       frameRate: 20,
     });
     this.anims.create({
-      key: 'idle',
+      key: `${this.color}Idle`,
       frames: this.anims.generateFrameNumbers(`${this.color}SoldierIdle`),
       frameRate: 10,
       repeat: -1,
     });
     this.anims.create({
-      key: 'die',
+      key: `${this.color}Die`,
       frames: this.anims.generateFrameNumbers(`${this.color}SoldierDying`),
       frameRate: 10,
     });
     this.anims.create({
-      key: 'crouch',
+      key: `${this.color}Crouch`,
       frames: this.anims.generateFrameNumbers(`${this.color}SoldierCrouching`, {start:3}),
     });
     this.anims.create({
