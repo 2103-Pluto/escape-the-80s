@@ -29,7 +29,7 @@ export default class NeonAlleyScene extends Phaser.Scene {
 
     // Preload Sounds
     // << LOAD SOUNDS HERE >>
-    this.load.audio('background-music', 'assets/audio/neon_alley_scene/neon-alley.wav');
+    this.load.audio('background-music-neon-alley', 'assets/audio/neon_alley_scene/neon-alley.wav');
   }
 
   createGround(tileWidth, count) {
@@ -65,7 +65,7 @@ export default class NeonAlleyScene extends Phaser.Scene {
 
     // Create sounds
     // << CREATE SOUNDS HERE >>
-    this.backgroundSound = this.sound.add('background-music'); //add background music for this level
+    this.backgroundSound = this.sound.add('background-music-neon-alley'); //add background music for this level
     this.backgroundSound.setLoop(true);
     this.backgroundSound.volume = 0.1;
     this.backgroundSound.play();
