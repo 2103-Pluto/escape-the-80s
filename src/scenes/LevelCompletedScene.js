@@ -24,7 +24,7 @@ export default class LevelCompletedScene extends Phaser.Scene {
     this.height = this.game.config.height;
     this.width = this.game.config.width;
 
-    this.hoverIcon = this.add.sprite(100, 100, 'cassette-tape').setScale(0.08);
+    this.hoverIcon = this.add.sprite(100, 100, 'cassette-tape').setScale(0.06);
     this.hoverIcon.setVisible(false)
     this.scene.get('MainMenuScene').createClick(this)
     this.powerUpSound = this.sound.add('power-up');
@@ -40,11 +40,10 @@ export default class LevelCompletedScene extends Phaser.Scene {
     this.sound.pauseOnBlur = false;
 
     //add text
-    this.add.text(this.width*0.5, this.height*0.2, `Level ${this.level} completed!`, { fontFamily: '"Press Start 2P"' }).setFontSize(32).setOrigin(0.5).setColor('#ED6BF3')
+    this.add.text(this.width*0.5, this.height*0.4, `LEVEL ${this.level} COMPLETED!!!`, { fontFamily: '"Press Start 2P"' }).setFontSize(32).setOrigin(0.5).setColor('#feff38')
 
-    this.add.text(this.width*0.5, this.height*0.4, "You're one step closer", { fontFamily: '"Press Start 2P"' }).setFontSize(26).setOrigin(0.5).setColor('#4DF3F5')
-
-    this.add.text(this.width*0.5, this.height*0.5, "to escaping the 80s", { fontFamily: '"Press Start 2P"' }).setFontSize(26).setOrigin(0.5).setColor('#4DF3F5')
+    this.line1 = this.add.text(this.width*0.5, this.height*0.5, "One step closer to escaping the 80s", { fontFamily: '"Press Start 2P"' }).setFontSize(20).setOrigin(0.5)
+    this.line1.setVisible(false)
 
     this.createGoToNextLevelButton()
     this.createScoreLabel()
@@ -78,29 +77,37 @@ export default class LevelCompletedScene extends Phaser.Scene {
       to: this.health,
       duration: 600,
       delay: this.scoreTweenDuration,
+      completeDelay: 200,
       onComplete: () => {
         this.powerUpSound.play()
-        this.goToNextLevelButton.setVisible(true);
-        this.activeGoToNextLevelButton = true;
+        this.line1.setVisible(true)
+        this.time.delayedCall(500, () => {
+          this.goToNextLevelButton.setVisible(true);
+          this.activeGoToNextLevelButton = true;
+          this.playGoToNextLevelTween();
+        }, null, this)
       }
     });
   }
 
   createGoToNextLevelButton() {
-    this.goToNextLevelButton = this.add.text(550, 40, 'Go to Next Level', { fontFamily: '"Press Start 2P"' }).setFontSize(28).setOrigin(0.5).setColor('#4DF3F5')
+    this.goToNextLevelButton = this.add.text(620, 570, 'Go to Next Level', { fontFamily: '"Press Start 2P"' }).setFontSize(20).setOrigin(0.5).setColor('#4DF3F5')
     this.goToNextLevelButton.setVisible(false);
 
     this.goToNextLevelButton.setInteractive();
     this.goToNextLevelButton.on("pointerover", () => {
       if (this.activeGoToNextLevelButton) {
+        this.goToNextLevelButton.alpha = 1;
+        this.goToNextLevelTween.pause()
         this.hoverIcon.setVisible(true);
         this.goToNextLevelButton.setColor('#feff38')
-        this.hoverIcon.x = this.goToNextLevelButton.x - this.goToNextLevelButton.width/2 - 45;
+        this.hoverIcon.x = this.goToNextLevelButton.x - this.goToNextLevelButton.width/2 - 30;
         this.hoverIcon.y = this.goToNextLevelButton.y;
       }
     })
     this.goToNextLevelButton.on("pointerout", () => {
       if (this.activeGoToNextLevelButton) {
+        this.goToNextLevelTween.resume()
         this.hoverIcon.setVisible(false);
         this.goToNextLevelButton.setColor('#4DF3F5')
       }
@@ -126,6 +133,18 @@ export default class LevelCompletedScene extends Phaser.Scene {
         this.scene.remove('LevelCompletedScene') //remove this scene
         game.scene.add('LevelCompletedScene', LevelCompletedScene) //add new instance of level completed
       }
+    })
+  }
+
+  playGoToNextLevelTween() {
+    this.goToNextLevelTween = this.tweens.add({
+      targets: this.goToNextLevelButton,
+      duration: 600,
+      repeat: -1,
+      ease: Phaser.Math.Easing.Expo.InOut,
+      // ease: Phaser.Math.Easing.Cubic.Out,
+      alpha: 0,
+      yoyo: true
     })
   }
 

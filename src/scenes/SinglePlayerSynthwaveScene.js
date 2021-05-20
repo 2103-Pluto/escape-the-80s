@@ -219,8 +219,8 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
       }
   }
 
-  createMap() {
-    this.add.image(this.width * 0.5, this.height * 0.46, 'sky').setOrigin(0.5).setScale(3.5).setScrollFactor(0)
+  createMap() { //testing mode
+    this.sky = this.add.image(this.width * 0.5, this.height * 0.46, 'sky').setOrigin(0.5).setScale(3.5).setScrollFactor(0)
     this.createBackgroundElement(504, 'mountains', 2*numberOfFrames, 0.15)
     this.createBackgroundElement(168, 'palms-back', 5*numberOfFrames, 0.3)
     this.createBackgroundElement(448, 'palms', 2*numberOfFrames, 0.45)
@@ -561,17 +561,19 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
 
   updateLevelEnded(scene) { //testing mode
     if (scene.flagpoleIsUp) {
-      scene.scene.pause()
-      scene.backgroundSound.pause()
-      scene.scene.launch('LevelCompletedScene', {
-        level: scene.level,
-        score: scene.player.score,
-        health: scene.player.health,
-        color: scene.color,
-        previousSceneName: scene.data.systems.config
-      })
-      scene.cameras.main.fadeOut(6000)
-      scene.scene.moveAbove(scene, 'LevelCompletedScene')
+      scene.sky.setTint(0x004c99)
+      scene.time.delayedCall(200, () => {
+        scene.scene.pause()
+        scene.backgroundSound.pause()
+        scene.scene.launch('LevelCompletedScene', {
+          level: scene.level,
+          score: scene.player.score,
+          health: scene.player.health,
+          color: scene.color,
+          previousSceneName: scene.data.systems.config
+        })
+        scene.scene.moveAbove(scene, 'LevelCompletedScene')
+      }, null, this)
     }
   }
 
