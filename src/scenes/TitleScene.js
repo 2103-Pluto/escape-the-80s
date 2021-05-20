@@ -40,6 +40,7 @@ export default class TitleScene extends Phaser.Scene {
   }
 
   create() {
+    document.querySelector('div').style.display = 'none'
     //add background music
     const backgroundMusic = this.sound.add('title-music');
     backgroundMusic.setLoop(true);

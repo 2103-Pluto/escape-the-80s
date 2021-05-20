@@ -24,7 +24,10 @@ export default class SynthwaveScene extends Phaser.Scene {
 
     this.createStar = this.createStar.bind(this)
     this.createHeart = this.createHeart.bind(this);
-    // this.createMario = this.createMario.bind(this)
+    this.countDown = this.countDown.bind(this)
+    this.countingDown = this.countingDown.bind(this)
+
+    this.gameStart = false
   }
 
   preload() {
@@ -129,7 +132,7 @@ export default class SynthwaveScene extends Phaser.Scene {
     this.socket = io();
     
     //timer
-   
+    
 
     //scene.otherPlayer=null;
     this.socket.on("currentPlayers", function (arg) {
@@ -198,7 +201,8 @@ export default class SynthwaveScene extends Phaser.Scene {
     this.player = new SoldierPlayer(this, 60, 400, `${scene.color}SoldierIdle`, this.socket).setSize(14, 32).setOffset(15, 7).setScale(2.78);
     this.player.setCollideWorldBounds(true); //stop player from running off the edges
     this.physics.world.setBounds(0, null, width * numberOfFrames, height, true, true, false, false) //set world bounds only on sides
-
+  
+    
     //check other players moves and if collision between players:
 
 
@@ -266,7 +270,12 @@ export default class SynthwaveScene extends Phaser.Scene {
     scene.scene.launch("WaitingRoom", { socket: scene.socket })
 
     this.socket.on("startGame", function () {
+      
+      scene.countingDown()
       scene.scene.resume()
+      
+      
+      
       //console.log('testing')
     })
     
@@ -367,6 +376,53 @@ export default class SynthwaveScene extends Phaser.Scene {
     });
   }
 
+  countingDown(){
+    this.events.on('resume', () => {
+      this.initialTime = 3
+      const screenCenterX = this.cameras.main.worldView.x + this.cameras.main.width / 2;
+      const screenCenterY = this.cameras.main.worldView.y + this.cameras.main.height / 2;
+      //scene.scene.resume()
+      this.player.moves = false
+      this.countDownText = this.add.text(screenCenterX, screenCenterY, 
+        'Start Race in:' + this.initialTime).setOrigin(0.5)
+        this.timedEvent = this.time.addEvent({
+          delay: 1000,
+          callback: this.countDown,
+          callbackScope: this,
+          loop: true
+        })
+      })
+        
+  }
+
+
+  listenToEvents(){
+    const screenCenterX = this.cameras.main.worldView.x + this.cameras.main.width / 2;
+    const screenCenterY = this.cameras.main.worldView.y + this.cameras.main.height / 2;
+    
+    this.events.on('resume', () => {
+      this.initialTime = 3;
+      this.countDownText = this.add.text(screenCenterX, screenCenterY, 
+          'Start Race in:' + this.initialTime, { fontFamily: '"Press Start 2P"' }).setFontSize(28).setOrigin(0.5)
+      this.timedEvent = this.time.addEvent({
+        delay: 1000,
+        callback: this.countDown,
+        callbackScope: this,
+        loop: true
+      })
+    })
+  }
+
+  countDown() {
+    this.initialTime--;
+    this.countDownText.setText('Start Race in:' + this.initialTime);
+    if (this.initialTime <= 0) {
+      this.countDownText.setText('');
+      //scene.resume();
+      this.timedEvent.remove();
+      
+    }
+  }
 
     // make the laser inactive and insivible when it hits the enemy
     // hit(enemy, bullet) {

@@ -55,9 +55,9 @@ export default class SoldierPlayer extends Phaser.Physics.Arcade.Sprite {
     const speed = 3;
 
     //crouching
-    /*if (cursors.down.isDown){
+    if (cursors.down.isDown){
       this.isCrouching = true
-    
+      
       if (!this.facingLeft) {
         this.body.setSize(16, 27).setOffset(17, 8) //.setSize(16, 27).setOffset(17, 12)
       } else {
@@ -65,7 +65,7 @@ export default class SoldierPlayer extends Phaser.Physics.Arcade.Sprite {
       }
       
       this.setVelocityX(0)
-      //this.play('crouch', true)
+      this.play('crouch', false)
 
       if(this.socket){
         this.moveState.x = this.x
@@ -77,9 +77,9 @@ export default class SoldierPlayer extends Phaser.Physics.Arcade.Sprite {
 
         this.emitMovement(this.moveState)
         }
-    } */ 
+    } 
     // Move left
-     if (cursors.left.isDown) { // should else if after crouch is reintroduced
+     else if (cursors.left.isDown) { // should else if after crouch is reintroduced
       this.isCrouching = false
       if (!this.facingLeft) {
 
@@ -158,13 +158,13 @@ export default class SoldierPlayer extends Phaser.Physics.Arcade.Sprite {
 
 
     //crouching
-    /*if (moveState.down){
+    if (moveState.down){
       this.setVelocityX(0)
-      this.play('crouch', true)
+      //this.play('crouch', true)
 
-    }*/
+    }
     // Move left
-     if (moveState.left) {  // will be else if
+     else if (moveState.left) {  // will be else if
       if (!this.facingLeft) {
         this.flipX = !this.flipX;
         this.facingLeft = true;

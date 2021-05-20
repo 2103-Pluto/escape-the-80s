@@ -3,8 +3,7 @@ import Phaser from "phaser";
 export default class WaitingRoom extends Phaser.Scene {
   constructor() {
     super("WaitingRoom");
-    this.state = {};
-    this.hasBeenSet = false;
+    this.code = ''
   }
 
   init(data) {
@@ -17,7 +16,8 @@ export default class WaitingRoom extends Phaser.Scene {
 
   create() {
     const scene = this;
-
+    document.querySelector('div').style.display = 'block'
+    
     scene.popUp = scene.add.graphics();
     scene.boxes = scene.add.graphics();
 
@@ -54,13 +54,13 @@ export default class WaitingRoom extends Phaser.Scene {
     scene.boxes.fillRect(425, 200, 275, 100);
     // const codeForm = this.cache.html.get('codeform')
     // //console.log(codeForm)
+    scene.inputElement = scene.add.
     scene.inputElement = scene.add.dom(562.5, 250).createFromCache("codeform");
     console.log(scene.inputElement)
     scene.inputElement.addListener("click");
     scene.inputElement.on("click", function (event) {
       if (event.target.name === "enterRoom") {
         const input = scene.inputElement.getChildByName("code-form");
-
         scene.socket.emit("isKeyValid", input.value);
       }
     });

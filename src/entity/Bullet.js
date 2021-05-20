@@ -43,6 +43,7 @@ this.reset(x, y, facingLeft)
     // We can then reuse this laser object
     if (this.lifespan <= 0) {
       this.setActive(false);
+      this.destroy()
       this.setVisible(false);
     }
   }
