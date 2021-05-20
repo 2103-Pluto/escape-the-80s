@@ -173,6 +173,8 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
 
   createLayers(scene) {
     const map = this.make.tilemap({key: 'map'})
+    //const groundTileset = map.addTilesetImage('Ground', 'road')
+    //scene.ground = map.createStaticLayer('Ground', ground, 0, 0)
     const platformTileset = map.addTilesetImage('Platform', 'platform') // First name is form tiled, Second name is key above
     scene.platforms = map.createStaticLayer("Tile Layer 1", platformTileset, 0, -100)
     scene.heartsLayer = map.getObjectLayer('Heart_Layer')
@@ -187,7 +189,32 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
     const map = this.make.tilemap({key: 'map'})
     scene.zonesOne = map.getObjectLayer('player_zones');
     scene.playerZones = this.getPlayerZones(scene.zonesOne)
+    scene.zonesT = map.getObjectLayer('Terminator_Spawn')
+    scene.zonesM = map.getObjectLayer('Mario_Spawn')
+    scene.terminatorSpawns = this.getTerminatorSpawns(scene)
+    scene.marioSpawns = this.getMarioSpawns(scene)
   }
+
+  getTerminatorSpawns(scene){
+    const markers = scene.zonesT.objects
+    return {
+      t1: markers.find(m => m.name === 'Terminator1'),
+      t2: markers.find(m => m.name === 'Terminator2')
+    }
+  }
+
+  getMarioSpawns(scene){
+    const markers = scene.zonesM.objects
+   return {
+      m1: markers.find(m => m.name === 'Mario1'),
+      m2: markers.find(m => m.name === 'Mario2'),
+      m3: markers.find(m => m.name === 'M3'),
+      m4: markers.find(m => m.name === 'M4'),
+      m5: markers.find(m => m.name === 'M5'),
+      m6: markers.find(m => m.name === 'M6'),
+    }
+  }
+
 
   createGooFromLayer(scene){
     const gooArr = scene.gooLayer.objects
@@ -247,7 +274,7 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
   }
 
   createGoo(x, y, scene) {
-    const goo = new Goo(scene, x, y, 'goo').setScale(2.8) //we can custom this
+    const goo = new Goo(scene, x, y, 'goo').setScale(2) //we can custom this
     // goo.alpha = 0.8 //we can custom this
     scene.goos.add(goo)
   }
@@ -276,14 +303,14 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
       bullet.setActive(false)
       bullet.destroy()
     }
-    
+
   }
 
   createFlagpole(scene) {
-    scene.flagpole = new Flagpole(scene, scene.playerZones.end.x, 310, 'flagpole').setScale(2.78)
+    scene.flagpole = new Flagpole(scene, scene.playerZones.end.x + 200, 310, 'flagpole').setScale(2.78)
     scene.flagpole.body.immovable = true
     scene.flagpole.body.allowGravity = false
-    
+
   }
 
 
@@ -297,16 +324,18 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
       let newEnemy = new type(scene, enemyX, enemyY, enemy).setScale(scale)
       groupType.add(newEnemy)
       scene.physics.add.collider(newEnemy, scene.groundGroup);
+      scene.physics.add.collider(newEnemy, scene.platforms)
       scene.physics.add.collider(newEnemy, scene.player, function(newEnemy, player){
-        if (player.body.touching.right || player.body.touching.left){
+        if (player.body.touching.right || player.body.touching.left){   /// CHECK THIS WITH MARIOS ON PLATFORMS
           player.bounceOff()
           player.decreaseHealth(1)
         }
         else if (enemy==='mario'){
-          newEnemy.body.immovable = true
+           newEnemy.destroy()
+           scene.marioDeathSound.play()
         }
       });
-      enemyX+=50 //if you create a troop of enemies, they'll be 50 pixels apart 
+      enemyX+=50 //if you create a troop of enemies, they'll be 50 pixels apart
     }
     return scene.mario
   }
@@ -462,8 +491,7 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
 
   create() {
    // const scene = this
-    
-    
+   console.log(this)
     // ALL THESE ('--->') NEED TO BE IN ORDER
     this.height = this.game.config.height; //retrive width and height (careful--Has to be at the top of create)
     this.width = this.game.config.width;
@@ -515,34 +543,21 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
       loop: false
     })
 
+
     this.cursors = this.input.keyboard.createCursorKeys();
-    //this.physics.add.collider(this.player, this.platforms)
-
-    // this.enemy = new enemy(this, 600, 400, 'brandon').setScale(.25) UNCOMMENT TO TEST BRANDON
-
-    // this.physics.add.collider(this.enemy, this.groundGroup)
-    // this.physics.add.collider(this.enemy, this.player, function(){
-    //   console.log('hit')
-    // })
-
-
-
-
-    this.createEnemies(this, 'mario', 800, 400, 3, 2.7)
-    this.createEnemies(this, 'mario', 1200, 400, 5, 2.7)
-    //this.terminator = new Terminator(this, 2800, 400, 'terminator').setScale(4.5)
-    this.createEnemies(this, 'terminator', 2800, 400, 1, 4.5)
-    this.createEnemies(this, 'terminator', this.playerZones.end.x - 400, 400, 1, 4.5)
     
 
-    // this.physics.add.collider(this.terminator, this.groundGroup);
-    // this.physics.add.collider(this.terminator, this.player);
+    this.createEnemies(this, 'mario', this.marioSpawns.m1.x, this.marioSpawns.m1.y, 2, 2.7)
+    this.createEnemies(this, 'mario', this.marioSpawns.m2.x, this.marioSpawns.m2.y, 5, 2.7)
+    this.createEnemies(this, 'mario', this.marioSpawns.m3.x, this.marioSpawns.m3.y, 6, 2.7)
+    this.createEnemies(this, 'mario', this.marioSpawns.m4.x, this.marioSpawns.m4.y, 2, 2.7)
+    this.createEnemies(this, 'mario', this.marioSpawns.m5.x, this.marioSpawns.m5.y, 2, 2.7)
+    this.createEnemies(this, 'mario', this.marioSpawns.m6.x, this.marioSpawns.m6.y, 2, 2.7)
 
-    
 
-    // ...
-    //this.physics.add.collider(this.enemy, this.groundGroup);
-    //this.physics.add.collider(this.enemy, this.player);
+    this.createEnemies(this, 'terminator', this.terminatorSpawns.t1.x, this.terminatorSpawns.t1.y, 1, 4.5)
+    this.createEnemies(this, 'terminator', this.terminatorSpawns.t2.x, this.terminatorSpawns.t2.y, 1, 4.5)
+
   }
 
   createSounds() {
@@ -692,7 +707,7 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
     const muzzleX =
       this.player.x + (this.player.facingLeft ? -offsetX*0.95 : offsetX*0.95);
     const muzzleY = this.player.isCrouching ? this.player.y + offsetY*3.1 : this.player.y - offsetY*1.2;
-  
+
     //create muzzleFlash
     {this.muzzleFlash ? this.muzzleFlash.reset(muzzleX, muzzleY, this.player.facingLeft)
       : this.muzzleFlash = new MuzzleFlash(this, muzzleX, muzzleY, 'muzzleFlash', this.player.facingLeft)}
@@ -823,14 +838,14 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
       } else {
         enemy.bulletHits+=1
         if (enemy!==this.player) {
-          enemy.playDamageTween() 
+          enemy.playDamageTween()
         } else {
           enemy.bounceOff()
         }
-        
       }
       bullet.destroy()
     }
+
 
     pickupStar(player, star) {
       star.destroy()
