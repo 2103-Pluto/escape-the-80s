@@ -33,6 +33,7 @@ import GameOverMenuScene from './scenes/GameOverMenuScene'
 import SinglePlayerSynthwaveScene from './scenes/SinglePlayerSynthwaveScene'
 import WaitingRoom from './scenes/WaitingRoom'
 import CountdownScene from './scenes/CountdownScene'
+import WaitingforPlayer from './scenes/MultiplayerWaiting'
 
 class Game extends Phaser.Game {
   constructor() {
@@ -59,6 +60,7 @@ class Game extends Phaser.Game {
     this.scene.add('SinglePlayerSynthwaveScene', SinglePlayerSynthwaveScene)
     this.scene.add('WaitingRoom', WaitingRoom)
     this.scene.add('CountdownScene', CountdownScene)
+    this.scene.add("WaitingforPlayer", WaitingforPlayer)
     // Start the game with the titlescene
     this.scene.start('TitleScene')
 

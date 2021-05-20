@@ -52,7 +52,8 @@ module.exports = (io) => {
       if (Object.keys(gameRooms).includes(input)) {
         const playerNumber = gameRooms[input]["numPlayers"];
         if (playerNumber === undefined || playerNumber < 2) {
-          socket.emit("keyIsValid", input);
+          const response = [input, playerNumber+1]
+          socket.emit("keyIsValid", response);
         }
       } else socket.emit("keyNotValid");
     });

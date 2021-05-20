@@ -346,6 +346,7 @@ export default class SynthwaveScene extends Phaser.Scene {
     scene.scene.launch("WaitingRoom", { socket: scene.socket })
 
     this.socket.on("startGame", function () {
+      scene.scene.stop("WaitingforPlayer")
       scene.scene.launch("CountdownScene")
     })
     
