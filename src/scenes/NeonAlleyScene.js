@@ -1,7 +1,7 @@
 import Ground from '../entity/Ground';
 import Phaser from 'phaser'
 
-const numberOfFrames = 15;
+const numberOfFrames = 3;
 
 export default class NeonAlleyScene extends Phaser.Scene {
   constructor() {
