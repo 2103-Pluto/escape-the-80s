@@ -32,6 +32,13 @@ export default class LevelCompletedScene extends Phaser.Scene {
     this.coinSound = this.sound.add('coin');
     this.coinSound.volume = 0.1;
 
+    //play celebration music
+    this.backgroundSound = this.sound.add('celebration');
+    this.backgroundSound.setLoop(true);
+    this.backgroundSound.volume = 0.12;
+    this.backgroundSound.play();
+    this.sound.pauseOnBlur = false;
+
     //add text
     this.add.text(this.width*0.5, this.height*0.2, `Level ${this.level} completed!`, { fontFamily: '"Press Start 2P"' }).setFontSize(32).setOrigin(0.5).setColor('#ED6BF3')
 

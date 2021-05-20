@@ -28,6 +28,7 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
     this.hitPlatform = this.hitPlatform.bind(this)
     this.createBackgroundElement = this.createBackgroundElement.bind(this);
     this.flagpoleIsUp = false;
+    this.touchingFlagpole = false; //testing mode
     //bind functions
     this.createPlayer = this.createPlayer.bind(this);
     this.createEnemies = this.createEnemies.bind(this)
@@ -98,6 +99,7 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
     this.load.audio('pause', 'assets/audio/pause.wav');
     this.load.audio('mario-dead', 'assets/audio/mario_hurt.wav')
     this.load.audio('terminator-dead', 'assets/audio/be_back.wav')
+    this.load.audio('celebration', 'assets/audio/celebration.wav')
   }
 
   preloadMap() {
@@ -263,7 +265,10 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
     scene.platforms.setCollisionBetween(1, 2)
     scene.physics.add.collider(scene.flagpole, scene.groundGroup)
     scene.physics.add.overlap(scene.player, scene.flagpole, function() {
-      scene.raiseFlagpole(scene)
+      if (!scene.touchingFlagpole){
+        scene.touchingFlagpole = true;
+        scene.raiseFlagpole(scene) //testing mode
+      }
     })
     scene.physics.add.overlap(scene.platforms, scene.bullets, scene.hitPlatform, null, scene)
   }
@@ -276,8 +281,8 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
   }
 
   createFlagpole(scene) {
-    scene.flagpole = new Flagpole(scene, scene.playerZones.end.x, 310, 'flagpole').setScale(2.78)
-    // scene.flagpole = new Flagpole(scene, 300, 310, 'flagpole').setScale(2.78) //testing mode
+    // scene.flagpole = new Flagpole(scene, scene.playerZones.end.x, 310, 'flagpole').setScale(2.78)
+    scene.flagpole = new Flagpole(scene, 300, 310, 'flagpole').setScale(2.78) //testing mode
     scene.flagpole.body.setSize(2, 160)
     scene.flagpole.body.setOffset(16, 0)
     scene.flagpole.body.immovable = true
@@ -565,6 +570,7 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
         color: scene.color,
         previousSceneName: scene.data.systems.config
       })
+      scene.cameras.main.fadeOut(6000)
       scene.scene.moveAbove(scene, 'LevelCompletedScene')
     }
   }
