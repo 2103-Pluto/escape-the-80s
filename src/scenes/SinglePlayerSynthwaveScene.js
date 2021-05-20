@@ -10,6 +10,8 @@ import Mario from '../entity/Mario'
 import Goo from '../entity/Goo'
 import Terminator from '../entity/Terminator'
 import Flagpole from '../entity/Flagpole'
+import CharacterChoosingScene from './CharacterChoosingScene'
+import StoryScene from './StoryScene'
 
 
 const numberOfFrames = 15;
@@ -45,6 +47,7 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
     this.createFlagpole = this.createFlagpole.bind(this)
     this.pause = this.pause.bind(this)
     this.createPhysics = this.createPhysics.bind(this)
+    this.clearCharacterChoosing = this.clearCharacterChoosing.bind(this)
   }
 
   init(data) {
@@ -274,8 +277,8 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
   }
 
   createFlagpole(scene) {
-    // scene.flagpole = new Flagpole(scene, scene.playerZones.end.x, 310, 'flagpole').setScale(2.78)
-    scene.flagpole = new Flagpole(scene, 300, 310, 'flagpole').setScale(2.78) //testing mode
+    scene.flagpole = new Flagpole(scene, scene.playerZones.end.x, 310, 'flagpole').setScale(2.78)
+    // scene.flagpole = new Flagpole(scene, 300, 310, 'flagpole').setScale(2.78) //testing mode
     scene.flagpole.body.setSize(2, 160)
     scene.flagpole.body.setOffset(16, 0)
     scene.flagpole.body.immovable = true
@@ -408,8 +411,16 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
     );
   }
 
+  clearCharacterChoosing() {
+    // this.scene.remove('CharacterChoosingScene')
+    // this.scene.remove('StoryScene')
+    // this.game.scene.add('CharacterChoosingScene', CharacterChoosingScene)
+    // this.game.scene.add('StoryScene', StoryScene)
+  }
+
   create() {
    // const scene = this
+   this.clearCharacterChoosing() //this clears player chosen from the CharacterSelectionScene so that we can choose again if we quit)
 
 
     // ALL THESE ('--->') NEED TO BE IN ORDER
@@ -572,6 +583,7 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
   }
 
   fire() {
+    console.log(this.color)
     const offsetX = 60;
     const offsetY = 5.5;
     const bulletX =

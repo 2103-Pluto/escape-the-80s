@@ -1,4 +1,6 @@
 import Phaser from 'phaser'
+import SinglePlayerSynthwaveScene from './SinglePlayerSynthwaveScene'
+import NeonAlleyScene from './NeonAlleyScene'
 
 export default class GameOverMenuScene extends Phaser.Scene {
   constructor() {
@@ -40,18 +42,26 @@ export default class GameOverMenuScene extends Phaser.Scene {
       quit.setColor('white')
     })
     quit.on("pointerup", () => {
+      const game = this.game;
+      const previousSceneName = scene.previousScene.data.systems.config;
       scene.click.play();
       scene.previousScene.scene.stop(); //stop the previous scene, which is running in parallel
       scene.scene.stop(); //stop this menu scene
       scene.scene.start('TitleScene') //go back to TitleScene
+      if (previousSceneName === 'SinglePlayerSynthwaveScene') {
+        scene.scene.remove('SinglePlayerSynthwaveScene')
+        scene.scene.remove('GameOverMenuScene')
+        game.scene.add('SinglePlayerSynthwaveScene', SinglePlayerSynthwaveScene)
+        game.scene.add('GameOverMenuScene', GameOverMenuScene)
+      }
+      else if (previousSceneName === 'NeonAlleyScene') {
+        scene.scene.remove('NeonAlleyScene')
+        scene.scene.remove('GameOverMenuScene')
+        game.scene.add('NeonAlleyScene', NeonAlleyScene)
+        game.scene.add('GameOverMenuScene', GameOverMenuScene)
+      }
     })
   }
-  // this.scene.data.systems.config
-  // const game = this.game;
-  // this.click.play();
-  // this.scene.start('HighScoresScene')
-  // this.scene.remove('SaveScoreScene')
-  // game.scene.add('SaveScoreScene', SaveScoreScene)
 
   createRestart(scene, widthFraction, heightFraction) {
     const restart = scene.add.text(scene.width*widthFraction, scene.height*heightFraction, 'Restart Level', { fontFamily: '"Press Start 2P"' }).setFontSize(24).setOrigin(0.5, 0.5)
@@ -90,6 +100,8 @@ export default class GameOverMenuScene extends Phaser.Scene {
       save.setColor('white')
     })
     save.on("pointerup", () => {
+      const game = this.game;
+      const previousSceneName = scene.previousScene.data.systems.config;
       scene.click.play();
       scene.previousScene.scene.stop();
       scene.scene.stop(); //stop this menu scene
@@ -97,6 +109,18 @@ export default class GameOverMenuScene extends Phaser.Scene {
         score: this.previousScene.player.score,
         level: this.previousScene.level
       });
+      if (previousSceneName === 'SinglePlayerSynthwaveScene') {
+        scene.scene.remove('SinglePlayerSynthwaveScene')
+        scene.scene.remove('GameOverMenuScene')
+        game.scene.add('SinglePlayerSynthwaveScene', SinglePlayerSynthwaveScene)
+        game.scene.add('GameOverMenuScene', GameOverMenuScene)
+      }
+      else if (previousSceneName === 'NeonAlleyScene') {
+        scene.scene.remove('NeonAlleyScene')
+        scene.scene.remove('GameOverMenuScene')
+        game.scene.add('NeonAlleyScene', NeonAlleyScene)
+        game.scene.add('GameOverMenuScene', GameOverMenuScene)
+      }
     })
   }
 }
