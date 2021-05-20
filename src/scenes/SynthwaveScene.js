@@ -119,6 +119,14 @@ export default class SynthwaveScene extends Phaser.Scene {
     console.log(scene.platforms)
   }
 
+  addPlatformPhysics(scene){
+    scene.physics.add.collider(scene.player, scene.platforms, function() {
+      scene.player.body.touching.down = true
+    });
+    scene.platformGroup = this.physics.add.group()
+    scene.platforms.setCollisionBetween(1, 2)
+  }
+
   createGround(tileWidth, count) {
     const height = this.game.config.height;
     for (let i=0; i<count; i++) {
@@ -242,6 +250,7 @@ export default class SynthwaveScene extends Phaser.Scene {
     this.physics.add.collider(this.player, this.groundGroup)
     this.cursors = this.input.keyboard.createCursorKeys();
     this.createAnimations();
+    this.addPlatformPhysics(this)
 
     // this.enemy = new enemy(this, 600, 400, 'brandon').setScale(.25)
 
