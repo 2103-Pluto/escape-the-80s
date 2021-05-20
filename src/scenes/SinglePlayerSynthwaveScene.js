@@ -14,7 +14,7 @@ import CharacterChoosingScene from './CharacterChoosingScene'
 import StoryScene from './StoryScene'
 
 
-const numberOfFrames = 15;
+const numberOfFrames = 13;
 
 export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
   constructor() {
@@ -122,7 +122,7 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
       frameHeight: 37,
     });
   }
-  
+
   preloadSpeaker() {
     this.load.image("speakerOn", "assets/sprites/speaker_on.png");
     this.load.image("speakerOff", "assets/sprites/speaker_off.png");
@@ -314,7 +314,7 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
   }
 
   createFlagpole(scene) {
-    scene.flagpole = new Flagpole(scene, scene.playerZones.end.x, 310, 'flagpole').setScale(2.78)
+    scene.flagpole = new Flagpole(scene, scene.playerZones.end.x + 300, 310, 'flagpole').setScale(2.78)
     scene.flagpole.body.setSize(2, 160)
     scene.flagpole.body.setOffset(16, 0)
 
@@ -344,7 +344,7 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
           player.decreaseHealth(1)
         }
       });
-      enemyX+=70 //if you create a troop of enemies, they'll be 50 pixels apart
+      enemyX+=60 //if you create a troop of enemies, they'll be 50 pixels apart
     }
     return scene.mario
   }
@@ -449,14 +449,14 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
       scene
     );
   }
-  
+
   createSpeechBubble (x, y, width, height, quote, scene) {
     const bubbleWidth = width;
     const bubbleHeight = height;
     const bubblePadding = 10;
     const arrowHeight = bubbleHeight / 4;
 
-  
+
     let bubble = scene.add.graphics({ x: x, y: y });
 
     //  Bubble shado
@@ -499,7 +499,7 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
     content.setPosition(bubble.x + (bubbleWidth / 2) - (b.width / 2), bubble.y + (bubbleHeight / 2) - (b.height / 2));
     return {bubble, content}
 }
-  
+
 clearCharacterChoosing() {
     this.scene.remove('CharacterChoosingScene')
     this.scene.remove('StoryScene')
@@ -543,9 +543,9 @@ clearCharacterChoosing() {
       alpha: 0,
       ease: Phaser.Math.Easing.Expo.InOut
   })
-   
-  
-  
+
+
+
     this.time.addEvent({
       delay: 1000,
       callback: () => {
@@ -554,7 +554,7 @@ clearCharacterChoosing() {
       },
       loop: false
     })
-  
+
     const speechBubble = this.createSpeechBubble(50, 300, 250, 110, "Holy crap, I'm in 1987! How did I get this gun???", this)
 
     this.time.addEvent({
@@ -567,7 +567,7 @@ clearCharacterChoosing() {
     })
 
     this.cursors = this.input.keyboard.createCursorKeys();
-    
+
 
     this.createEnemies(this, 'mario', this.marioSpawns.m1.x, this.marioSpawns.m1.y, 2, 2.7)
     this.createEnemies(this, 'mario', this.marioSpawns.m2.x, this.marioSpawns.m2.y, 5, 2.7)
@@ -588,7 +588,7 @@ clearCharacterChoosing() {
     this.backgroundSound.setLoop(true);
     this.backgroundSound.volume = 0.1;
     this.backgroundSound.play();
-    
+
      //VOLUME
      this.volumeSpeaker = this.add
      .image(727, 35, "speakerOn")
@@ -609,7 +609,7 @@ clearCharacterChoosing() {
 
    this.volumeUp.on("pointerdown", () => {
      this.volumeUp.setTint(0xc2c2c2);
-     
+
      let newVol = this.backgroundSound.volume + 0.1;
      this.backgroundSound.setVolume(newVol);
      if (this.backgroundSound.volume < 0.2) {
@@ -683,7 +683,7 @@ clearCharacterChoosing() {
 
     this.terminatorDeathSound = this.sound.add('terminator-dead');
     this.terminatorDeathSound.volume = 0.3
-    
+
 
   }
 
@@ -699,7 +699,7 @@ clearCharacterChoosing() {
 
     this.marios.getChildren().forEach(function (mario) {
       mario.update(scene.marioDeathSound)
-    }) 
+    })
     this.terminators.getChildren().forEach(function (terminator) {
       terminator.update(time, delta, scene.terminatorFire, scene.shootingSound, scene.player.x)
     })
