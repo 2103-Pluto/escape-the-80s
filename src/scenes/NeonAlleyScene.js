@@ -19,7 +19,6 @@ export default class NeonAlleyScene extends Phaser.Scene {
     this.createBackgroundElement = this.createBackgroundElement.bind(this);
     this.preloadMusic = this.preloadMusic.bind(this)
     this.createSounds = this.createSounds.bind(this)
-    this.preloadSpeaker = this.preloadSpeaker.bind(this)
     this.preloadBoss = this.preloadBoss.bind(this)
     this.preloadColaBomb = this.preload.bind(this)
     this.createBoss = this.createBoss.bind(this)
@@ -86,12 +85,12 @@ export default class NeonAlleyScene extends Phaser.Scene {
   
   createSounds() {
     this.game.sound.stopAll()
-    this.backgroundMusic = this.sound.add('mfn-reagan')
-    this.backgroundMusic.play()
-    this.backgroundMusic.once('complete', function (backgroundMusic) {
-      backgroundMusic = this.sound.add('mfn-no-reagan')
-      backgroundMusic.volume = 0.1
-      backgroundMusic.play()
+    this.backgroundSound = this.sound.add('mfn-reagan')
+    this.backgroundSound.play()
+    this.backgroundSound.once('complete', function (backgroundSound) {
+      backgroundSound = this.sound.add('mfn-no-reagan')
+      backgroundSound.volume = 0.1
+      backgroundSound.play()
     })
     
     //VOLUME
@@ -115,12 +114,12 @@ export default class NeonAlleyScene extends Phaser.Scene {
     this.volumeUp.on("pointerdown", () => {
       this.volumeUp.setTint(0xc2c2c2);
 
-      let newVol = this.backgroundMusic.volume + 0.1;
-      this.backgroundMusic.setVolume(newVol);
-      if (this.backgroundMusic.volume < 0.2) {
+      let newVol = this.backgroundSound.volume + 0.1;
+      this.backgroundSound.setVolume(newVol);
+      if (this.backgroundSound.volume < 0.2) {
         this.volumeSpeaker.setTexture("speakerOn");
       }
-      if (this.backgroundMusic.volume >= 0.9) {
+      if (this.backgroundSound.volume >= 0.9) {
         this.volumeUp.setTint(0xff0000);
         this.volumeUp.disableInteractive();
       } else {
@@ -132,9 +131,9 @@ export default class NeonAlleyScene extends Phaser.Scene {
     
     this.volumeDown.on("pointerdown", () => {
       this.volumeDown.setTint(0xc2c2c2);
-      let newVol = this.backgroundMusic.volume - 0.1;
-      this.backgroundMusic.setVolume(newVol);
-      if (this.backgroundMusic.volume <= 0.2) {
+      let newVol = this.backgroundSound.volume - 0.1;
+      this.backgroundSound.setVolume(newVol);
+      if (this.backgroundSound.volume <= 0.2) {
         this.volumeDown.setTint(0xff0000);
         this.volumeDown.disableInteractive();
         this.volumeSpeaker.setTexture("speakerOff");
@@ -154,10 +153,10 @@ export default class NeonAlleyScene extends Phaser.Scene {
     this.volumeSpeaker.on("pointerdown", () => {
       if (this.volumeSpeaker.texture.key === "speakerOn") {
         this.volumeSpeaker.setTexture("speakerOff");
-        this.backgroundMusic.setMute(true);
+        this.backgroundSound.setMute(true);
       } else {
         this.volumeSpeaker.setTexture("speakerOn");
-        this.backgroundMusic.setMute(false);
+        this.backgroundSound.setMute(false);
       }
     });
     
@@ -193,8 +192,8 @@ export default class NeonAlleyScene extends Phaser.Scene {
     this.width = this.game.config.width;
 
      //---------->These shoulds be in order
-    this.createSounds()
     this.createMap()
+    this.createSounds()
     this.scene.get('SinglePlayerSynthwaveScene').createPlayer(this) //create player
     this.player.score = this.initialScore
     this.player.health = this.initialHealth
