@@ -16,6 +16,7 @@ export default class WaitingRoom extends Phaser.Scene {
   create() {
     const scene = this;
     document.querySelector('div').style.display = 'block'
+    console.log('form---->', document.querySelector('entry-form'))
     
     scene.popUp = scene.add.graphics();
     scene.boxes = scene.add.graphics();

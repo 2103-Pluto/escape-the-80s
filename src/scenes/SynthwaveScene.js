@@ -21,9 +21,11 @@ export default class SynthwaveScene extends Phaser.Scene {
     // this.hit = this.hit.bind(this);
     this.createBackgroundElement = this.createBackgroundElement.bind(this);
     this.color = 'Blue';
-
+    this.winTime = 0
+    this.winner = null
     this.flagpoleIsUp = false;
     this.touchingFlagpole = false;
+    
     this.raiseFlagpole = this.raiseFlagpole.bind(this)
     this.createFlagpole = this.createFlagpole.bind(this)
 
@@ -39,7 +41,36 @@ export default class SynthwaveScene extends Phaser.Scene {
   }
 
   preloadSoldier() {
+    //Blue soldier
     this.load.spritesheet(`${this.color}SoldierRunning`, `assets/spriteSheets/${this.color}/Gunner_${this.color}_Run.png`, {
+      frameWidth: 48,
+      frameHeight: 48,
+    })
+    //Idle Soldier
+    this.load.spritesheet(`${this.color}SoldierIdle`, `assets/spriteSheets/${this.color}/Gunner_${this.color}_Idle.png`, {
+      frameWidth: 48,
+      frameHeight: 48,
+    })
+
+    //Jumping Soldier
+    this.load.spritesheet(`${this.color}SoldierJumping`, `assets/spriteSheets/${this.color}/Gunner_${this.color}_Jump.png`, {
+      frameWidth: 48,
+      frameHeight: 48,
+    })
+
+    //Dying Soldier
+    this.load.spritesheet(`${this.color}SoldierDying`, `assets/spriteSheets/${this.color}/Gunner_${this.color}_Death.png`, {
+      frameWidth: 48,
+      frameHeight: 48,
+    })
+
+    //Crouching Soldier
+    this.load.spritesheet(`${this.color}SoldierCrouching`, `assets/spriteSheets/${this.color}/Gunner_${this.color}_Crouch.png`, {
+      frameWidth: 48,
+      frameHeight: 48,
+    })
+
+     this.load.spritesheet(`${this.color}SoldierRunning`, `assets/spriteSheets/${this.color}/Gunner_${this.color}_Run.png`, {
       frameWidth: 48,
       frameHeight: 48,
     })
@@ -69,6 +100,63 @@ export default class SynthwaveScene extends Phaser.Scene {
 
     this.load.image('bullet', 'assets/sprites/SpongeBullet.png');
     this.load.image('muzzleFlash', 'assets/sprites/MuzzleFlash.png');
+
+    //Red Soldier
+    this.load.spritesheet(`RedSoldierRunning`, `assets/spriteSheets/Red/Gunner_Red_Run.png`, {
+      frameWidth: 48,
+      frameHeight: 48,
+    })
+    //Idle Soldier
+    this.load.spritesheet(`RedSoldierIdle`, `assets/spriteSheets/Red/Gunner_Red_Idle.png`, {
+      frameWidth: 48,
+      frameHeight: 48,
+    })
+
+    //Jumping Soldier
+    this.load.spritesheet(`RedSoldierJumping`, `assets/spriteSheets/Red/Gunner_Red_Jump.png`, {
+      frameWidth: 48,
+      frameHeight: 48,
+    })
+
+    //Dying Soldier
+    this.load.spritesheet(`RedSoldierDying`, `assets/spriteSheets/Red/Gunner_Red_Death.png`, {
+      frameWidth: 48,
+      frameHeight: 48,
+    })
+
+    //Crouching Soldier
+    this.load.spritesheet(`RedSoldierCrouching`, `assets/spriteSheets/Red/Gunner_Red_Crouch.png`, {
+      frameWidth: 48,
+      frameHeight: 48,
+    })
+
+     this.load.spritesheet(`RedSoldierRunning`, `assets/spriteSheets/Red/Gunner_Red_Run.png`, {
+      frameWidth: 48,
+      frameHeight: 48,
+    })
+    //Idle Soldier
+    this.load.spritesheet(`RedSoldierIdle`, `assets/spriteSheets/Red/Gunner_Red_Idle.png`, {
+      frameWidth: 48,
+      frameHeight: 48,
+    })
+
+    //Jumping Soldier
+    this.load.spritesheet(`RedSoldierJumping`, `assets/spriteSheets/Red/Gunner_Red_Jump.png`, {
+      frameWidth: 48,
+      frameHeight: 48,
+    })
+
+    //Dying Soldier
+    this.load.spritesheet(`RedSoldierDying`, `assets/spriteSheets/Red/Gunner_Red_Death.png`, {
+      frameWidth: 48,
+      frameHeight: 48,
+    })
+
+    //Crouching Soldier
+    this.load.spritesheet(`RedSoldierCrouching`, `assets/spriteSheets/Red/Gunner_Red_Crouch.png`, {
+      frameWidth: 48,
+      frameHeight: 48,
+    })
   }
 
 
@@ -132,12 +220,13 @@ export default class SynthwaveScene extends Phaser.Scene {
         scene.touchingFlagpole = true;
         scene.raiseFlagpole(scene)
       }
+      if(scene.winner===null) scene.winner = "You win!!!"
     })
   }
 
   createFlagpole(scene) {
     // scene.flagpole = new Flagpole(scene, scene.playerZones.end.x + 300, 310, 'flagpole').setScale(2.78)
-    scene.flagpole = new Flagpole(scene, 7000, 310, 'flagpole').setScale(2.78) //testing mode
+    scene.flagpole = new Flagpole(scene, 300, 310, 'flagpole').setScale(2.78) //testing mode
     scene.flagpole.body.setSize(2, 160)
     scene.flagpole.body.setOffset(16, 0)
 
@@ -184,12 +273,20 @@ export default class SynthwaveScene extends Phaser.Scene {
       console.log('players--->', players)
       Object.keys(players).forEach(function (id) {
         if (players[id].playerId !== scene.socket.id) {
-          scene.otherPlayer = new SoldierPlayer(scene, 60, 500, `${scene.color}SoldierIdle`, scene.socket,).setSize(14, 32).setOffset(15, 7).setScale(2.78);
+          scene.otherPlayer = new SoldierPlayer(scene, 60, 500, `${scene.color}SoldierIdle`, scene.socket).setSize(14, 32).setOffset(15, 7).setScale(2.78);
           scene.add.existing(scene.otherPlayer)
           scene.physics.add.collider(scene.otherPlayer, scene.groundGroup)
           scene.physics.add.collider(scene.otherPlayer, scene.platforms, function() {
             scene.otherPlayer.body.touching.down = true
           });
+          scene.physics.add.overlap(scene.otherPlayer, scene.flagpole, function() {
+            if (!scene.touchingFlagpole){
+              console.log('crossed pole!!!')
+              scene.touchingFlagpole = true;
+              scene.raiseFlagpole(scene)
+            }
+            if(scene.winner===null) scene.winner = "You LOSE"
+          })
         }
       });
     });
@@ -197,12 +294,20 @@ export default class SynthwaveScene extends Phaser.Scene {
     this.socket.on("newPlayer", function (arg) {
       const playerInfo  = arg;
      //need to add socket id to player?
-      scene.otherPlayer = new SoldierPlayer(scene, 60, 500, `${scene.color}SoldierIdle`, scene.socket,).setSize(14, 32).setOffset(15, 7).setScale(2.78);
+      scene.otherPlayer = new SoldierPlayer(scene, 60, 500, `${scene.color}SoldierIdle`, scene.socket).setSize(14, 32).setOffset(15, 7).setScale(2.78);
       scene.add.existing(scene.otherPlayer)
       scene.physics.add.collider(scene.otherPlayer, scene.groundGroup)
       scene.physics.add.collider(scene.otherPlayer, scene.platforms, function() {
         scene.otherPlayer.body.touching.down = true
       });
+      scene.physics.add.overlap(scene.otherPlayer, scene.flagpole, function() {
+        if (!scene.touchingFlagpole){
+          ('crossed pole!!!')
+          scene.touchingFlagpole = true;
+          scene.raiseFlagpole(scene)
+        }
+        if(scene.winner===null) scene.winner = "You LOSE"
+      })
     });
 
     this.socket.on("playerMoved", function (moveState){
@@ -226,7 +331,7 @@ export default class SynthwaveScene extends Phaser.Scene {
     const width = this.game.config.width;
     const height = this.game.config.height;
 
-    this.add.image(width * 0.5, height * 0.46, 'sky').setOrigin(0.5).setScale(3.5).setScrollFactor(0)
+    this.sky = this.add.image(width * 0.5, height * 0.46, 'sky').setOrigin(0.5).setScale(3.5).setScrollFactor(0)
     this.createBackgroundElement(504, 'mountains', 2*numberOfFrames, 0.15)
     this.createBackgroundElement(168, 'palms-back', 5*numberOfFrames, 0.3)
     this.createBackgroundElement(448, 'palms', 2*numberOfFrames, 0.45)
@@ -377,14 +482,11 @@ export default class SynthwaveScene extends Phaser.Scene {
       scene.time.delayedCall(200, () => {
         scene.scene.pause()
         scene.backgroundSound.pause()
-        scene.scene.launch('LevelCompletedScene', {
-          level: scene.level,
-          score: scene.player.score,
-          health: scene.player.health,
-          color: scene.color,
-          previousSceneName: scene.data.systems.config
+        scene.scene.launch('MultiplayerCompletedScene', {
+          winner: scene.winner,
+          winTime: scene.formatTime(scene.winTime),
         })
-        scene.scene.moveAbove(scene, 'LevelCompletedScene')
+        scene.scene.moveAbove(scene, 'MultiplayerCompletedScene')
       }, null, this)
     }
   }
@@ -393,11 +495,10 @@ export default class SynthwaveScene extends Phaser.Scene {
   timer(){
     const screenCenterX = this.cameras.main.worldView.x + this.cameras.main.width / 2;
     const screenCenterY = this.cameras.main.worldView.y + this.cameras.main.height / 2;
-    this.initialTime = 0
     //timer
     
     this.clock = this.add.text(screenCenterX, screenCenterY-250, 
-    'Time:' + this.formatTime(this.initialTime), { fontFamily: '"Press Start 2P"' }).setFontSize(20).setOrigin(0.5)
+    'Time:' + this.formatTime(this.winTime), { fontFamily: '"Press Start 2P"' }).setFontSize(20).setOrigin(0.5)
     this.timedEvent = this.time.addEvent({
       delay: 1000,
       callback: this.timerCount,
@@ -414,9 +515,9 @@ export default class SynthwaveScene extends Phaser.Scene {
     return `${minutes}:${partInSeconds}`;
   }
   timerCount(){
-    this.initialTime++
-    if(this.initialTime <= 0) this.clock.setText("TIME'S UP!!!")
-    else this.clock.setText('Time:' + this.formatTime(this.initialTime))
+    this.winTime++
+    if(this.winTime <= 0) this.clock.setText("TIME'S UP!!!")
+    else this.clock.setText('Time:' + this.formatTime(this.winTime))
 
   }
 
