@@ -93,9 +93,6 @@ export default class WaitingRoom extends Phaser.Scene {
       scene.socket.emit("joinRoom", key);
       scene.scene.stop("WaitingRoom");
       if(playerNumber<2) scene.scene.launch("WaitingforPlayer")
-      
-      //scene.launch(waiting)
-      
     });
   }
   update() {}

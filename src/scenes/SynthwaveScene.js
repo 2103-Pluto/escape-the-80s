@@ -10,7 +10,7 @@ import SoldierPlayer from '../entity/SoldierPlayer'
 import Phaser from 'phaser'
 import MuzzleFlash from '../entity/MuzzleFlash';
 
-const numberOfFrames = 15;
+const numberOfFrames = 13;
 
 export default class SynthwaveScene extends Phaser.Scene {
   constructor() {
@@ -22,11 +22,10 @@ export default class SynthwaveScene extends Phaser.Scene {
     this.createBackgroundElement = this.createBackgroundElement.bind(this);
     this.color = 'Blue';
 
-    this.createStar = this.createStar.bind(this)
-    this.createHeart = this.createHeart.bind(this);
-    
-
-    //this.gameStart = false
+    this.flagpoleIsUp = false;
+    this.touchingFlagpole = false;
+    this.raiseFlagpole = this.raiseFlagpole.bind(this)
+    this.createFlagpole = this.createFlagpole.bind(this)
 
     this.preloadSpeaker = this.preloadSpeaker.bind(this)
   }
@@ -79,8 +78,8 @@ export default class SynthwaveScene extends Phaser.Scene {
     this.preloadSoldier()
     
     this.load.spritesheet('flagpole', 'assets/spriteSheets/flagpoles_sheet.png', {
-      frameWidth: 32,
-      frameHeight: 168,
+      frameWidth: 31.6,
+      frameHeight: 168
     })
     
 
@@ -127,6 +126,23 @@ export default class SynthwaveScene extends Phaser.Scene {
     });
     scene.platformGroup = this.physics.add.group()
     scene.platforms.setCollisionBetween(1, 2)
+    scene.physics.add.collider(scene.flagpole, scene.groundGroup)
+    scene.physics.add.overlap(scene.player, scene.flagpole, function() {
+      if (!scene.touchingFlagpole){
+        scene.touchingFlagpole = true;
+        scene.raiseFlagpole(scene)
+      }
+    })
+  }
+
+  createFlagpole(scene) {
+    // scene.flagpole = new Flagpole(scene, scene.playerZones.end.x + 300, 310, 'flagpole').setScale(2.78)
+    scene.flagpole = new Flagpole(scene, 7000, 310, 'flagpole').setScale(2.78) //testing mode
+    scene.flagpole.body.setSize(2, 160)
+    scene.flagpole.body.setOffset(16, 0)
+
+    scene.flagpole.body.immovable = true
+    scene.flagpole.body.allowGravity = false
   }
 
   createGround(tileWidth, count) {
@@ -218,7 +234,7 @@ export default class SynthwaveScene extends Phaser.Scene {
     this.groundGroup = this.physics.add.staticGroup();
     this.createGround(168, 5*numberOfFrames);
     this.createPlatforms(this)
-
+    this.createFlagpole(this)
 
     // Create game entities
     // << CREATE GAME ENTITIES HERE >>
@@ -244,35 +260,6 @@ export default class SynthwaveScene extends Phaser.Scene {
     this.cursors = this.input.keyboard.createCursorKeys();
     this.createAnimations();
     this.addPlatformPhysics(this)
-
-    // this.enemy = new enemy(this, 600, 400, 'brandon').setScale(.25)
-
-
-    // ...
-    // this.physics.add.collider(this.enemy, this.groundGroup);
-    // this.physics.add.collider(this.enemy, this.player);
-
-    // We're going to create a group for our lasers
-    this.bullets = this.physics.add.group({
-      classType: Bullet,
-      runChildUpdate: true,
-      allowGravity: false,
-      maxSize: 40     // Important! When an obj is added to a group, it will inherit
-                          // the group's attributes. So if this group's gravity is enabled,
-                          // the individual lasers will also have gravity enabled when they're
-                          // added to this group
-    });
-
-    // When the laser collides with the enemy
-    // this.physics.add.overlap(
-    //   this.bullets,
-    //   this.enemy,
-    //   this.hit,
-    //   null,
-    //   this
-    // );
-
-
 
     // Create sounds
     // << CREATE SOUNDS HERE >>
@@ -381,13 +368,32 @@ export default class SynthwaveScene extends Phaser.Scene {
     const scene = this
     this.player.update(time, this.cursors, this.jumpSound, this.fire, this.shootingSound);
     if (this.muzzleFlash) this.muzzleFlash.update(delta)
+    this.updateLevelEnded(this)
+  }
+
+  updateLevelEnded(scene) {
+    if (scene.flagpoleIsUp) {
+      scene.sky.setTint(0x004c99)
+      scene.time.delayedCall(200, () => {
+        scene.scene.pause()
+        scene.backgroundSound.pause()
+        scene.scene.launch('LevelCompletedScene', {
+          level: scene.level,
+          score: scene.player.score,
+          health: scene.player.health,
+          color: scene.color,
+          previousSceneName: scene.data.systems.config
+        })
+        scene.scene.moveAbove(scene, 'LevelCompletedScene')
+      }, null, this)
+    }
   }
 
 
   timer(){
     const screenCenterX = this.cameras.main.worldView.x + this.cameras.main.width / 2;
     const screenCenterY = this.cameras.main.worldView.y + this.cameras.main.height / 2;
-    this.initialTime = 90
+    this.initialTime = 0
     //timer
     
     this.clock = this.add.text(screenCenterX, screenCenterY-250, 
@@ -408,7 +414,7 @@ export default class SynthwaveScene extends Phaser.Scene {
     return `${minutes}:${partInSeconds}`;
   }
   timerCount(){
-    this.initialTime--
+    this.initialTime++
     if(this.initialTime <= 0) this.clock.setText("TIME'S UP!!!")
     else this.clock.setText('Time:' + this.formatTime(this.initialTime))
 
@@ -481,6 +487,15 @@ export default class SynthwaveScene extends Phaser.Scene {
       frames: this.anims.generateFrameNumbers('flagpole'),
       frameRate: 10,
       repeat: 0,
+    })
+  }
+
+  raiseFlagpole(scene) {
+    if (!this.flagpoleIsUp) {
+      scene.flagpole.play("raise-flagpole", false)
+    }
+    scene.flagpole.on('animationcomplete-raise-flagpole', () => {
+      this.flagpoleIsUp = true
     })
   }
 }
