@@ -5,6 +5,7 @@ import Bullet from '../entity/Bullet';
 import MuzzleFlash from '../entity/MuzzleFlash';
 import Heart from '../entity/Heart';
 import Star from '../entity/Star';
+import Wall from '../entity/Wall';
 
 const numberOfFrames = 3;
 
@@ -33,6 +34,7 @@ export default class NeonAlleyScene extends Phaser.Scene {
     this.pickupStar = this.pickupStar.bind(this)
     this.pickupHeart = this.pickupHeart.bind(this)
     this.createGround = this.createGround.bind(this)
+    this.hitWall = this.hitWall.bind(this)
   }
 
   init(data) {
@@ -46,6 +48,23 @@ export default class NeonAlleyScene extends Phaser.Scene {
     this.load.audio('mfn-no-reagan', 'assets/audio/MoneyForNothing-small.wav');
     this.load.audio('rick-roll-sound', 'assets/audio/rick-roll.wav');
   }
+
+
+  preloadWall(){
+    const wall1 =  this.load.image("Wall1", "assets/spriteSheets/Wall/wall-state1.png" /*{
+      frameWidth: 750,
+      frameHeight: 250,
+    }*/);
+    const wall2 = this.load.image("Wall2", "assets/spriteSheets/Wall/wall-state2.png", {
+      frameWidth: 750,
+      frameHeight: 250,
+    });
+    const wall3 = this.load.image("Wall3", "assets/spriteSheets/Wall/wall-state3.png", {
+      frameWidth: 750,
+      frameHeight: 250,
+    });
+  }
+
 
   preloadBoss() {
     this.load.spritesheet("Boss", "assets/spriteSheets/Boss/Original-Dimensions/Sprite-Sheet-trimmy.png", {
@@ -65,11 +84,18 @@ export default class NeonAlleyScene extends Phaser.Scene {
     this.load.image("front", "assets/backgrounds/neon_alley_scene/front.png");
   }
 
+  preloadWallSounds(){
+    this.load.audio("wallHit", "assets/audio/hittingWall.wav")
+    // maybe find a wall crumbling sound
+  }
+
   preload() {
     this.scene.get('TitleScene').displayLoadingBar(this, "I want my MTV!")
     this.preloadMap()
     this.preloadBoss()
     this.preloadMusic()
+    this.preloadWall()
+    this.preloadWallSounds()
   }
 
 
@@ -188,6 +214,22 @@ export default class NeonAlleyScene extends Phaser.Scene {
     })
   }
 
+  createWall(scene, x, y){
+    scene.wall = new Wall(scene, 600, 475, 'Wall1').setScale(.35)
+    scene.physics.add.collider(scene.wall, scene.player)
+    // need to think about bullet colliders
+    scene.wallGroup.add(scene.wall)
+  }
+
+  createWallGroup(scene) {
+    this.wallGroup = this.physics.add.group({
+      classType: Wall,
+      runChildUpdate: true,
+      allowGravity: false,
+      immovable: true
+    })
+  }
+
   create() {
     this.input.keyboard.enabled = false
     this.height = this.game.config.height;
@@ -205,11 +247,18 @@ export default class NeonAlleyScene extends Phaser.Scene {
     this.scene.get('SinglePlayerSynthwaveScene').createHealthLabel(this)
     this.createPhysics(this)
     this.setCamera(this) //set camera
+    this.createWallGroup(this)
+    this.createWall(this)
     this.createBulletGroup(this)
     this.scene.get('SinglePlayerSynthwaveScene').pause(this)
+    console.log(this)
     //<-----------
 
+
+    this.wallHitSound = this.sound.add('wallHit')
+   
     const level1 = this.add.text(400, 200, 'LEVEL 2',{ fontFamily: '"Press Start 2P"' }).setFontSize(46).setOrigin(0.5, 0.5)
+
 
     const flashLevel1 = this.tweens.add({
       targets: level1,
@@ -251,10 +300,17 @@ export default class NeonAlleyScene extends Phaser.Scene {
       maxSize: 40
     });
 
-    scene.physics.add.overlap(
+    scene.physics.add.overlap( // do we need this
       scene.player,
       scene.bullets,
       scene.hit,
+      null,
+      scene
+    );
+    scene.physics.add.overlap(
+      scene.wall,
+      scene.bullets,
+      scene.hitWall,
       null,
       scene
     );
@@ -287,6 +343,7 @@ export default class NeonAlleyScene extends Phaser.Scene {
   }
 
   fire() {
+
     const offsetX = 60;
     const offsetY = 5.5;
     const bulletX =
@@ -375,6 +432,13 @@ export default class NeonAlleyScene extends Phaser.Scene {
     if (this.muzzleFlash) this.muzzleFlash.update(delta) //updates muzzleFlash
 
     this.scene.get('SinglePlayerSynthwaveScene').updateLevelEnded(this)
+  }
+  hitWall(wall, bullet){
+    console.log("BULLETS OVERLAP")
+    bullet.setActive(false)
+    const hitSound =this.wallHitSound
+    hitSound.play()
+    bullet.destroy()
   }
 
 }
