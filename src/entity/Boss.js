@@ -2,7 +2,7 @@ import 'phaser';
 
 export default class Boss extends Phaser.Physics.Arcade.Sprite {
   constructor(scene, x, y, spriteKey) {
-    super(scene, x, y, spritekey);
+    super(scene, x, y, spriteKey);
     this.scene = scene;
     this.scene.add.existing(this);
     this.scene.physics.world.enable(this);
@@ -16,7 +16,7 @@ export default class Boss extends Phaser.Physics.Arcade.Sprite {
     this.playDamageTween = this.playDamageTween.bind(this)
     
     this.bulletHits = 0
-    this.bulletDeath = 20
+    this.bulletDeath = 30
     this.name = 'Boss'
   }
   
@@ -51,7 +51,7 @@ export default class Boss extends Phaser.Physics.Arcade.Sprite {
     const dead = this.bulletHits===this.bulletDeath
     const playerIsNear = -400< (this.x - playerX) && (this.x - playerX) < 400
     this.patrol()
-    if(!dead) this.anims.play('terminator-walk', true)
+    if(!dead) this.anims.play('boss-run', true)
     
     
     if(!dead && playerIsNear && this.timeFromLastAttack + this.attackDelay <=time){
