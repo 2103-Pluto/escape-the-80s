@@ -48,12 +48,12 @@ module.exports = (io) => {
     });
 
     socket.on("isKeyValid", function (input) {
-      console.log(gameRooms[input]);
-      const playerNumber = gameRooms[input]["numPlayers"];
-
+      
       if (Object.keys(gameRooms).includes(input)) {
+        const playerNumber = gameRooms[input]["numPlayers"];
         if (playerNumber === undefined || playerNumber < 2) {
-          socket.emit("keyIsValid", input);
+          const response = [input, playerNumber+1]
+          socket.emit("keyIsValid", response);
         }
       } else socket.emit("keyNotValid");
     });
@@ -105,10 +105,11 @@ module.exports = (io) => {
 
   function codeGenerator() {
     let code = "";
-    let chars = "ABCDEFGHJKLMNPQRSTUVWXYZ0123456789";
+    let chars = "ABCDEFGHJKLMNPQRSTUVWXYZ123456789";
     for (let i = 0; i < 5; i++) {
       code += chars.charAt(Math.floor(Math.random() * chars.length));
     }
     return code;
   }
+
 };

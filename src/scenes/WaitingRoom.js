@@ -3,7 +3,6 @@ import Phaser from "phaser";
 export default class WaitingRoom extends Phaser.Scene {
   constructor() {
     super("WaitingRoom");
-    this.code = ''
   }
 
   init(data) {
@@ -70,9 +69,9 @@ export default class WaitingRoom extends Phaser.Scene {
       scene.socket.emit("getRoomCode");
     });
 
-    scene.notValidText = scene.add.text(670, 295, "", {
+    scene.notValidText = scene.add.text(450, 260, "", {
       fill: "#ff0000",
-      fontSize: "15px",
+      fontSize: "20px",
     });
     scene.roomKeyText = scene.add.text(210, 250, "", {
       fill: "#000000",
@@ -88,10 +87,15 @@ export default class WaitingRoom extends Phaser.Scene {
     scene.socket.on("keyNotValid", function () {
       scene.notValidText.setText("Invalid Room Key");
     });
-    scene.socket.on("keyIsValid", function (input) {
-      scene.socket.emit("joinRoom", input);
+    scene.socket.on("keyIsValid", function (response) {
+      const key = response[0]
+      const playerNumber = response[1]
+      scene.socket.emit("joinRoom", key);
       scene.scene.stop("WaitingRoom");
-      //scene.scene.resume('SynthwaveScene')
+      if(playerNumber<2) scene.scene.launch("WaitingforPlayer")
+      
+      //scene.launch(waiting)
+      
     });
   }
   update() {}
