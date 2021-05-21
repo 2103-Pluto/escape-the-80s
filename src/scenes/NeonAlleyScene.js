@@ -287,10 +287,6 @@ export default class NeonAlleyScene extends Phaser.Scene {
   }
 
   fire() {
-    //---> testing mode
-    this.player.decreaseHealth(1)
-    this.flagpoleIsUp = true;
-    //<--- testing mode
     const offsetX = 60;
     const offsetY = 5.5;
     const bulletX =
