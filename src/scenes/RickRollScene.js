@@ -39,7 +39,7 @@ export default class RickRollScene extends Phaser.Scene {
     this.game.sound.stopAll()
     this.backgroundSound = this.sound.add('rick-roll-sound')
     this.backgroundSound.setLoop(true);
-    this.backgroundSound.volume = 0.5;
+    this.backgroundSound.volume = 0.2;
     this.backgroundSound.play()
 
     this.sound.pauseOnBlur = false; //prevent sound from cutting when you leave tab
@@ -106,15 +106,13 @@ export default class RickRollScene extends Phaser.Scene {
         this.activeCreditsButton = false;
         const game = this.game;
         this.click.play();
+        this.game.sound.stopAll()
 
-        this.scene.stop('RickRollScene')
-
+        this.scene.start('CreditsScene')
         const backgroundMusic = this.sound.add('title-music');
         backgroundMusic.setLoop(true);
         backgroundMusic.volume = 0.05;
         backgroundMusic.play();
-
-        this.scene.start('CreditsScene')
         this.scene.remove('RickRollScene')
         game.scene.add('RickRollScene', RickRollScene)
       }
