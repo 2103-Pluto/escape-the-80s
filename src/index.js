@@ -35,6 +35,8 @@ import WaitingRoom from './scenes/WaitingRoom'
 import CountdownScene from './scenes/CountdownScene'
 import WaitingforPlayer from './scenes/MultiplayerWaiting'
 import MultiplayerCompletedScene from './scenes/MultiplayerCompletedScene'
+import RickRollScene from './scenes/RickRollScene'
+
 
 class Game extends Phaser.Game {
   constructor() {
@@ -63,6 +65,9 @@ class Game extends Phaser.Game {
     this.scene.add('CountdownScene', CountdownScene)
     this.scene.add("WaitingforPlayer", WaitingforPlayer)
     this.scene.add("MultiplayerCompletedScene", MultiplayerCompletedScene)
+
+    this.scene.add('RickRollScene', RickRollScene)
+
     // Start the game with the titlescene
     this.scene.start('TitleScene')
 

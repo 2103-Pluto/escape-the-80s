@@ -5,6 +5,7 @@ import Bullet from '../entity/Bullet';
 import MuzzleFlash from '../entity/MuzzleFlash';
 import Heart from '../entity/Heart';
 import Star from '../entity/Star';
+import Wall from '../entity/Wall';
 
 const numberOfFrames = 3;
 
@@ -14,6 +15,7 @@ export default class NeonAlleyScene extends Phaser.Scene {
 
     this.scene = this;
     this.level = 2;
+    this.flagpoleIsUp = false;  //this is the variable to toggle when we want to end the game (player wins)
 
     //bind functions
     this.createBackgroundElement = this.createBackgroundElement.bind(this);
@@ -32,6 +34,7 @@ export default class NeonAlleyScene extends Phaser.Scene {
     this.pickupStar = this.pickupStar.bind(this)
     this.pickupHeart = this.pickupHeart.bind(this)
     this.createGround = this.createGround.bind(this)
+    this.hitWall = this.hitWall.bind(this)
   }
 
   init(data) {
@@ -43,15 +46,33 @@ export default class NeonAlleyScene extends Phaser.Scene {
   preloadMusic() {
     this.load.audio('mfn-reagan', 'assets/audio/MoneyForNothingWReagan.wav');
     this.load.audio('mfn-no-reagan', 'assets/audio/MoneyForNothing-small.wav');
+    this.load.audio('rick-roll-sound', 'assets/audio/rick-roll.wav');
   }
-  
+
+
+  preloadWall(){
+    const wall1 =  this.load.image("Wall1", "assets/spriteSheets/Wall/wall-state1.png" /*{
+      frameWidth: 750,
+      frameHeight: 250,
+    }*/);
+    const wall2 = this.load.image("Wall2", "assets/spriteSheets/Wall/wall-state2.png", {
+      frameWidth: 750,
+      frameHeight: 250,
+    });
+    const wall3 = this.load.image("Wall3", "assets/spriteSheets/Wall/wall-state3.png", {
+      frameWidth: 750,
+      frameHeight: 250,
+    });
+  }
+
+
   preloadBoss() {
     this.load.spritesheet("Boss", "assets/spriteSheets/Boss/Original-Dimensions/Sprite-Sheet-trimmy.png", {
       frameWidth: 19,
       frameHeight: 48,
     })
   }
-  
+
   preloadColaBomb() {
     this.load.image("coca-cola", "assets/sprites/coca-cola.png")
     this.load.image("explosion", "assets/spriteSheets/explosion.png")
@@ -63,13 +84,20 @@ export default class NeonAlleyScene extends Phaser.Scene {
     this.load.image("front", "assets/backgrounds/neon_alley_scene/front.png");
   }
 
+  preloadWallSounds(){
+    this.load.audio("wallHit", "assets/audio/hittingWall.wav")
+    // maybe find a wall crumbling sound
+  }
+
   preload() {
     this.scene.get('TitleScene').displayLoadingBar(this, "I want my MTV!")
     this.preloadMap()
     this.preloadBoss()
     this.preloadMusic()
+    this.preloadWall()
+    this.preloadWallSounds()
   }
-  
+
 
   createGround(tileWidth, count) {
     for (let i=0; i<count; i++) {
@@ -82,7 +110,7 @@ export default class NeonAlleyScene extends Phaser.Scene {
       this.add.image(i*imageWidth*factor, height, texture).setOrigin(posX, posY).setScale(3.5).setScrollFactor(scrollFactor)
     }
   }
-  
+
   createSounds() {
     this.game.sound.stopAll()
     this.backgroundSound = this.sound.add('mfn-reagan')
@@ -92,7 +120,7 @@ export default class NeonAlleyScene extends Phaser.Scene {
       backgroundSound.volume = 0.1
       backgroundSound.play()
     })
-    
+
     //VOLUME
     this.volumeSpeaker = this.add
     .image(727, 35, "speakerOn")
@@ -128,7 +156,7 @@ export default class NeonAlleyScene extends Phaser.Scene {
       }
     });
 
-    
+
     this.volumeDown.on("pointerdown", () => {
       this.volumeDown.setTint(0xc2c2c2);
       let newVol = this.backgroundSound.volume - 0.1;
@@ -159,7 +187,7 @@ export default class NeonAlleyScene extends Phaser.Scene {
         this.backgroundSound.setMute(false);
       }
     });
-    
+
     this.sound.pauseOnBlur = false; //prevent sound from cutting when you leave tab
 
     this.jumpSound = this.sound.add('jump');
@@ -170,19 +198,35 @@ export default class NeonAlleyScene extends Phaser.Scene {
 
     this.hurtSound = this.sound.add('hurt');
     this.hurtSound.volume = 0.3;
-    
+
     this.pauseSound = this.sound.add('pause')
     this.pauseSound.volume = 0.03;
 
   }
-  
+
   createBoss(scene, x, y, scale) {
     let boss = new Boss(scene, x, y, scale)
-    
+
     scene.physics.add.collider(boss, scene.groundGroup)
     scene.physics.add.collider(boss, scene.player, function(b, p) {
       p.bounceOff()
       p.decreaseHealth(1)
+    })
+  }
+
+  createWall(scene, x, y){
+    scene.wall = new Wall(scene, 600, 475, 'Wall1').setScale(.35)
+    scene.physics.add.collider(scene.wall, scene.player)
+    // need to think about bullet colliders
+    scene.wallGroup.add(scene.wall)
+  }
+
+  createWallGroup(scene) {
+    this.wallGroup = this.physics.add.group({
+      classType: Wall,
+      runChildUpdate: true,
+      allowGravity: false,
+      immovable: true
     })
   }
 
@@ -203,22 +247,29 @@ export default class NeonAlleyScene extends Phaser.Scene {
     this.scene.get('SinglePlayerSynthwaveScene').createHealthLabel(this)
     this.createPhysics(this)
     this.setCamera(this) //set camera
+    this.createWallGroup(this)
+    this.createWall(this)
     this.createBulletGroup(this)
     this.scene.get('SinglePlayerSynthwaveScene').pause(this)
+    console.log(this)
     //<-----------
 
-    const level1 = this.add.text(400, 300, 'LEVEL 2',{ fontFamily: '"Press Start 2P"' }).setFontSize(46).setOrigin(0.5, 0.5)
+
+    this.wallHitSound = this.sound.add('wallHit')
+   
+    const level1 = this.add.text(400, 200, 'LEVEL 2',{ fontFamily: '"Press Start 2P"' }).setFontSize(46).setOrigin(0.5, 0.5)
+
 
     const flashLevel1 = this.tweens.add({
       targets: level1,
-      duration: 100,
+      duration: 200,
       repeat: -1,
       alpha: 0,
       ease: Phaser.Math.Easing.Expo.InOut
     })
 
     this.time.addEvent({
-      delay: 1000,
+      delay: 2000,
       callback: () => {
         flashLevel1.stop()
         level1.setVisible(false)
@@ -249,17 +300,26 @@ export default class NeonAlleyScene extends Phaser.Scene {
       maxSize: 40
     });
 
-    scene.physics.add.overlap(
+    scene.physics.add.overlap( // do we need this
       scene.player,
       scene.bullets,
       scene.hit,
       null,
       scene
     );
+    scene.physics.add.overlap(
+      scene.wall,
+      scene.bullets,
+      scene.hitWall,
+      null,
+      scene
+    );
   }
 
   createMap() {
-    this.createBackgroundElement(128*3.5, 'back', 2, 0, 0, 0, 0, 1)
+    this.back1 = this.add.image(0*128*3.5*1, 0, 'back').setOrigin(0, 0).setScale(3.5).setScrollFactor(0)
+    this.back2 = this.add.image(1*128*3.5*1, 0, 'back').setOrigin(0, 0).setScale(3.5).setScrollFactor(0)
+
     this.createBackgroundElement(128*3.5, 'middle', 2*numberOfFrames, 0.25, 0, 1, this.height, 1)
     this.createBackgroundElement(176*3.5, 'front', 3, 0.5, 0, 1, this.height, 5)
     // this.createBackgroundElement(448, 'palms', 2*numberOfFrames, 0.75)
@@ -269,7 +329,7 @@ export default class NeonAlleyScene extends Phaser.Scene {
     this.physics.world.setBounds(0, null, this.width * numberOfFrames, this.height, true, true, false, false)
   }
 
-  
+
   createPhysics(scene) {
     scene.player.setCollideWorldBounds(true);
     scene.physics.add.collider(scene.player, scene.groundGroup)
@@ -283,10 +343,7 @@ export default class NeonAlleyScene extends Phaser.Scene {
   }
 
   fire() {
-    //--->testing mode
-    this.player.decreaseHealth(1)
-    console.log(this.player.health)
-    //<---testing mode
+
     const offsetX = 60;
     const offsetY = 5.5;
     const bulletX =
@@ -373,6 +430,15 @@ export default class NeonAlleyScene extends Phaser.Scene {
     this.scene.get('SinglePlayerSynthwaveScene').updateHealth(this) //updates the pleyer's health displayed on scene
     this.scene.get('SinglePlayerSynthwaveScene').updateScore(this) //updates the pleyer's score displayed on scene
     if (this.muzzleFlash) this.muzzleFlash.update(delta) //updates muzzleFlash
+
+    this.scene.get('SinglePlayerSynthwaveScene').updateLevelEnded(this)
+  }
+  hitWall(wall, bullet){
+    console.log("BULLETS OVERLAP")
+    bullet.setActive(false)
+    const hitSound =this.wallHitSound
+    hitSound.play()
+    bullet.destroy()
   }
 
 }
