@@ -109,7 +109,8 @@ export default class GameOverMenuScene extends Phaser.Scene {
       scene.scene.stop(); //stop this menu scene
       scene.scene.start('SaveScoreScene', {
         score: this.previousScene.player.score,
-        level: this.previousScene.level
+        level: this.previousScene.level,
+        gameCompleted: false
       });
       if (previousSceneName === 'SinglePlayerSynthwaveScene') {
         scene.scene.remove('SinglePlayerSynthwaveScene')

@@ -140,7 +140,8 @@ export default class LevelCompletedScene extends Phaser.Scene {
           this.scene.stop('NeonAlleyScene')
           this.scene.start('SaveScoreScene', {
             score: this.score,
-            level: this.level
+            level: this.level,
+            gameCompleted: true
           }) //go to save score
           this.scene.remove('NeonAlleyScene') //remove previous scene instance
           this.scene.remove('SinglePlayerSynthwaveScene') //remove previous first level scene instance

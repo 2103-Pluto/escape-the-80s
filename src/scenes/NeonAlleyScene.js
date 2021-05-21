@@ -44,6 +44,7 @@ export default class NeonAlleyScene extends Phaser.Scene {
   preloadMusic() {
     this.load.audio('mfn-reagan', 'assets/audio/MoneyForNothingWReagan.wav');
     this.load.audio('mfn-no-reagan', 'assets/audio/MoneyForNothing-small.wav');
+    this.load.audio('rick-roll-sound', 'assets/audio/rick-roll.wav');
   }
 
   preloadBoss() {
@@ -287,6 +288,7 @@ export default class NeonAlleyScene extends Phaser.Scene {
 
   fire() {
     //---> testing mode
+    this.player.decreaseHealth(1)
     this.flagpoleIsUp = true;
     //<--- testing mode
     const offsetX = 60;

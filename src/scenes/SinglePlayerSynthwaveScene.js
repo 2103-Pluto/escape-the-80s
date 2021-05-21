@@ -319,7 +319,10 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
 
   createFlagpole(scene) {
     // scene.flagpole = new Flagpole(scene, scene.playerZones.end.x + 300, 310, 'flagpole').setScale(2.78)
-    scene.flagpole = new Flagpole(scene, 300, 310, 'flagpole').setScale(2.78) //testing mode
+
+    //---> testing mode
+    scene.flagpole = new Flagpole(scene, 300, 310, 'flagpole').setScale(2.78)
+    //<--- testing mode
     scene.flagpole.body.setSize(2, 160)
     scene.flagpole.body.setOffset(16, 0)
 
