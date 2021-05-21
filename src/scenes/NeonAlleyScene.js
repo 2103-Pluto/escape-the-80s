@@ -33,6 +33,7 @@ export default class NeonAlleyScene extends Phaser.Scene {
     this.pickupStar = this.pickupStar.bind(this)
     this.pickupHeart = this.pickupHeart.bind(this)
     this.createGround = this.createGround.bind(this)
+    this.hitWall = this.hitWall.bind(this)
   }
 
   init(data) {
@@ -209,26 +210,19 @@ export default class NeonAlleyScene extends Phaser.Scene {
   }
 
   createWall(scene, x, y){
-    scene.wall = new Wall(scene, 600, 400, 'Wall1').setScale(.2)
+    scene.wall = new Wall(scene, 600, 475, 'Wall1').setScale(.35)
     scene.physics.add.collider(scene.wall, scene.player)
     // need to think about bullet colliders
     scene.wallGroup.add(scene.wall)
   }
 
-  createWallGroup() {
+  createWallGroup(scene) {
     this.wallGroup = this.physics.add.group({
       classType: Wall,
       runChildUpdate: true,
       allowGravity: false,
       immovable: true
     })
-   /* scene.physics.add.overlap(
-      scene.walls,
-      scene.bullets,
-      scene.hitWall, // this needs to be built out,
-      null,
-      scene
-    ); */
   }
 
   create() {
@@ -248,9 +242,9 @@ export default class NeonAlleyScene extends Phaser.Scene {
     this.scene.get('SinglePlayerSynthwaveScene').createHealthLabel(this)
     this.createPhysics(this)
     this.setCamera(this) //set camera
-    this.createBulletGroup(this)
-    this.createWallGroup()
+    this.createWallGroup(this)
     this.createWall(this)
+    this.createBulletGroup(this)
     this.scene.get('SinglePlayerSynthwaveScene').pause(this)
     console.log(this)
     //<-----------
@@ -299,10 +293,17 @@ export default class NeonAlleyScene extends Phaser.Scene {
       maxSize: 40
     });
 
-    scene.physics.add.overlap(
+    scene.physics.add.overlap( // do we need this
       scene.player,
       scene.bullets,
       scene.hit,
+      null,
+      scene
+    );
+    scene.physics.add.overlap(
+      scene.wall,
+      scene.bullets,
+      scene.hitWall,
       null,
       scene
     );
@@ -334,8 +335,8 @@ export default class NeonAlleyScene extends Phaser.Scene {
 
   fire() {
     //--->testing mode
-    this.player.decreaseHealth(1)
-    console.log(this.player.health)
+   // this.player.decreaseHealth(1)
+   // console.log(this.player.health)
     //<---testing mode
     const offsetX = 60;
     const offsetY = 5.5;
@@ -424,11 +425,12 @@ export default class NeonAlleyScene extends Phaser.Scene {
     this.scene.get('SinglePlayerSynthwaveScene').updateScore(this) //updates the pleyer's score displayed on scene
     if (this.muzzleFlash) this.muzzleFlash.update(delta) //updates muzzleFlash
   }
-  wallHit(wall, bullet){
+  hitWall(wall, bullet){
+    console.log("BULLETS OVERLAP")
+    bullet.setActive(false)
     const hitSound =this.wallHitSound
-    if (wall.bulletHits % 4 === 0){
-      hitSound.play()
-    }
+    hitSound.play()
+    bullet.destroy()
   }
 
 }
