@@ -14,6 +14,7 @@ export default class NeonAlleyScene extends Phaser.Scene {
 
     this.scene = this;
     this.level = 2;
+    this.flagpoleIsUp = false;  //this is the variable to toggle when we want to end the game (player wins)
 
     //bind functions
     this.createBackgroundElement = this.createBackgroundElement.bind(this);
@@ -259,7 +260,9 @@ export default class NeonAlleyScene extends Phaser.Scene {
   }
 
   createMap() {
-    this.createBackgroundElement(128*3.5, 'back', 2, 0, 0, 0, 0, 1)
+    this.back1 = this.add.image(0*128*3.5*1, 0, 'back').setOrigin(0, 0).setScale(3.5).setScrollFactor(0)
+    this.back2 = this.add.image(1*128*3.5*1, 0, 'back').setOrigin(0, 0).setScale(3.5).setScrollFactor(0)
+
     this.createBackgroundElement(128*3.5, 'middle', 2*numberOfFrames, 0.25, 0, 1, this.height, 1)
     this.createBackgroundElement(176*3.5, 'front', 3, 0.5, 0, 1, this.height, 5)
     // this.createBackgroundElement(448, 'palms', 2*numberOfFrames, 0.75)
@@ -283,6 +286,9 @@ export default class NeonAlleyScene extends Phaser.Scene {
   }
 
   fire() {
+    //---> testing mode
+    this.flagpoleIsUp = true;
+    //<--- testing mode
     const offsetX = 60;
     const offsetY = 5.5;
     const bulletX =
@@ -369,6 +375,8 @@ export default class NeonAlleyScene extends Phaser.Scene {
     this.scene.get('SinglePlayerSynthwaveScene').updateHealth(this) //updates the pleyer's health displayed on scene
     this.scene.get('SinglePlayerSynthwaveScene').updateScore(this) //updates the pleyer's score displayed on scene
     if (this.muzzleFlash) this.muzzleFlash.update(delta) //updates muzzleFlash
+
+    this.scene.get('SinglePlayerSynthwaveScene').updateLevelEnded(this)
   }
 
 }

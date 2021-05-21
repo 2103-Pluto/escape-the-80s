@@ -717,7 +717,13 @@ clearCharacterChoosing() {
 
   updateLevelEnded(scene) {
     if (scene.flagpoleIsUp) {
-      scene.sky.setTint(0x004c99)
+      if (scene.data.systems.config === 'SinglePlayerSynthwaveScene') {
+        scene.sky.setTint(0x004c99)
+      } else {
+        scene.back1.setTint(0x004c99)
+        scene.back2.setTint(0x004c99)
+      }
+
       scene.time.delayedCall(200, () => {
         scene.scene.pause()
         scene.backgroundSound.pause()
@@ -729,7 +735,7 @@ clearCharacterChoosing() {
           previousSceneName: scene.data.systems.config
         })
         scene.scene.moveAbove(scene, 'LevelCompletedScene')
-      }, null, this)
+      }, null, scene)
     }
   }
 

@@ -43,6 +43,11 @@ export default class LevelCompletedScene extends Phaser.Scene {
     this.add.text(this.width*0.5, this.height*0.4, `LEVEL ${this.level} COMPLETED!!!`, { fontFamily: '"Press Start 2P"' }).setFontSize(32).setOrigin(0.5).setColor('#feff38')
 
     this.line1 = this.add.text(this.width*0.5, this.height*0.5, "One step closer to escaping the 80s", { fontFamily: '"Press Start 2P"' }).setFontSize(20).setOrigin(0.5)
+
+    if (this.previousSceneName === 'NeonAlleyScene') {
+      this.line1.text = 'You can escape the 80s now!!'
+    }
+
     this.line1.setVisible(false)
 
     this.createGoToNextLevelButton()
@@ -92,6 +97,12 @@ export default class LevelCompletedScene extends Phaser.Scene {
 
   createGoToNextLevelButton() {
     this.goToNextLevelButton = this.add.text(620, 570, 'Go to Next Level', { fontFamily: '"Press Start 2P"' }).setFontSize(20).setOrigin(0.5).setColor('#4DF3F5')
+
+    if (this.previousSceneName === 'NeonAlleyScene') {
+      this.goToNextLevelButton.text = 'Save Score and Escape'
+      this.goToNextLevelButton.x -= 50
+    }
+
     this.goToNextLevelButton.setVisible(false);
 
     this.goToNextLevelButton.setInteractive();
@@ -126,6 +137,11 @@ export default class LevelCompletedScene extends Phaser.Scene {
             color: this.color
           })
         } else if (this.previousSceneName === 'NeonAlleyScene') {
+          this.scene.stop('NeonAlleyScene')
+          this.scene.start('SaveScoreScene', {
+            score: this.previousScene.player.score,
+            level: this.previousScene.level
+          }) //go to save score
           this.scene.remove('NeonAlleyScene') //remove previous scene instance
           this.scene.remove('SinglePlayerSynthwaveScene') //remove previous first level scene instance
           game.scene.add('NeonAlleyScene', NeonAlleyScene) //add previous scene new instance
