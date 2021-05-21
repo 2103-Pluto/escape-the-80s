@@ -35,7 +35,7 @@ export default class LevelCompletedScene extends Phaser.Scene {
     //play celebration music
     this.backgroundSound = this.sound.add('celebration');
     this.backgroundSound.setLoop(true);
-    this.backgroundSound.volume = 0.12;
+    this.backgroundSound.volume = 0.2;
     this.backgroundSound.play();
     this.sound.pauseOnBlur = false;
 
@@ -139,8 +139,8 @@ export default class LevelCompletedScene extends Phaser.Scene {
         } else if (this.previousSceneName === 'NeonAlleyScene') {
           this.scene.stop('NeonAlleyScene')
           this.scene.start('SaveScoreScene', {
-            score: this.previousScene.player.score,
-            level: this.previousScene.level
+            score: this.score,
+            level: this.level
           }) //go to save score
           this.scene.remove('NeonAlleyScene') //remove previous scene instance
           this.scene.remove('SinglePlayerSynthwaveScene') //remove previous first level scene instance

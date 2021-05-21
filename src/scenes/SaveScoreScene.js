@@ -50,6 +50,7 @@ export default class SaveScoreScene extends Phaser.Scene {
     this.deniedSound.volume = 0.07;
 
     //add background music
+    this.game.sound.stopAll() //stop previous music
     const backgroundMusic = this.sound.add('title-music');
     backgroundMusic.setLoop(true);
     backgroundMusic.volume = 0.03;
