@@ -323,13 +323,13 @@ export default class SoldierPlayer extends Phaser.Physics.Arcade.Sprite {
     this.health = 5;
   }
 
-  bounceOff() {
+  bounceOff(bounceLeft) {
     this.body.checkCollision.none = true;
     this.hasBeenHit = true;
     const hitAnim = this.playDamageTween();
-    this.facingLeft ?
-    this.setVelocity(this.bounceVelocity, -this.bounceVelocity)
-    : this.setVelocity(-this.bounceVelocity, -this.bounceVelocity)
+    (bounceLeft) ?
+    this.setVelocity(-this.bounceVelocity, -this.bounceVelocity)
+    : this.setVelocity(this.bounceVelocity, -this.bounceVelocity)
     this.body.checkCollision.none = false;
     this.scene.time.addEvent({
       delay: 500,
