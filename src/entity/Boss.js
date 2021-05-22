@@ -53,13 +53,20 @@ export default class Boss extends Phaser.Physics.Arcade.Sprite {
     this.patrol()
     if(!dead) this.anims.play('boss-run', true)
     
-    
-    if(!dead && playerIsNear && this.timeFromLastAttack + this.attackDelay <=time){
+
+    if (Math.floor(time) % 3 === 0) {
+      if(!dead && playerIsNear && this.timeFromLastAttack + this.attackDelay <=time){
         shootFn(this)
         shootingSound.play()
         this.timeFromLastAttack = time
         this.attackDelay = this.getAttackDelay()
     }
+    }
+    
+    if (Math.floor(time) % 11 === 0 && this.body.onFloor()) {
+      this.body.setVelocityY(-900)
+    }
+    
   }
   
   getAttackDelay(){
