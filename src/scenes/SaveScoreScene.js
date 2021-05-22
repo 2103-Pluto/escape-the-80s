@@ -27,6 +27,7 @@ export default class SaveScoreScene extends Phaser.Scene {
   init(data) {
     this.score = data.score; //initialize score
     this.level = data.level; //initialize level
+    this.gameCompleted = data.gameCompleted //this tells us if the player has completed the whole game
   }
 
   preload() {
@@ -50,9 +51,10 @@ export default class SaveScoreScene extends Phaser.Scene {
     this.deniedSound.volume = 0.07;
 
     //add background music
+    this.game.sound.stopAll() //stop previous music
     const backgroundMusic = this.sound.add('title-music');
     backgroundMusic.setLoop(true);
-    backgroundMusic.volume = 0.03;
+    backgroundMusic.volume = 0.05;
     backgroundMusic.play();
 
     this.sound.pauseOnBlur = false; //prevent sound from stopping when you switch tabs
@@ -186,6 +188,11 @@ export default class SaveScoreScene extends Phaser.Scene {
 
   createToHighScores() {
     this.toHighScores = this.add.text(this.width*0.5, this.height*0.9, 'Go to High Scores', { fontFamily: '"Press Start 2P"' }).setFontSize(28).setOrigin(0.5).setColor('#4DF3F5')
+
+    if (this.gameCompleted) {
+      this.toHighScores.text = 'Escape the 80s!'
+    }
+
     this.toHighScores.setVisible(false)
 
     this.toHighScores.setInteractive();
@@ -207,7 +214,11 @@ export default class SaveScoreScene extends Phaser.Scene {
       if (this.activeToHighScores) {
         const game = this.game;
         this.click.play();
-        this.scene.start('HighScoresScene')
+
+        (this.gameCompleted ?
+          this.scene.start('RickRollScene')
+          : this.scene.start('HighScoresScene'))
+
         this.scene.remove('SaveScoreScene')
         game.scene.add('SaveScoreScene', SaveScoreScene)
       }
