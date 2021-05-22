@@ -47,7 +47,7 @@ export default class Boss extends Phaser.Physics.Arcade.Sprite {
     
   }
   
-  update(time, delta, shootFn, shootingSound, playerX) {
+  update(time, delta, shootFn, playerX) {
     const dead = this.bulletHits===this.bulletDeath
     const playerIsNear = -400< (this.x - playerX) && (this.x - playerX) < 400
     this.patrol()
@@ -57,7 +57,6 @@ export default class Boss extends Phaser.Physics.Arcade.Sprite {
     if (Math.floor(time) % 3 === 0) {
       if(!dead && playerIsNear && this.timeFromLastAttack + this.attackDelay <=time){
         shootFn(this)
-        shootingSound.play()
         this.timeFromLastAttack = time
         this.attackDelay = this.getAttackDelay()
     }
