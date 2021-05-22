@@ -256,7 +256,7 @@ export default class NeonAlleyScene extends Phaser.Scene {
 
 
     this.wallHitSound = this.sound.add('wallHit')
-   
+
     const level1 = this.add.text(400, 200, 'LEVEL 2',{ fontFamily: '"Press Start 2P"' }).setFontSize(46).setOrigin(0.5, 0.5)
 
 
@@ -343,7 +343,6 @@ export default class NeonAlleyScene extends Phaser.Scene {
   }
 
   fire() {
-
     const offsetX = 60;
     const offsetY = 5.5;
     const bulletX =
