@@ -225,10 +225,14 @@ export default class NeonAlleyScene extends Phaser.Scene {
   createBoss(scene, x, y, scale) {
 
     this.boss = new Boss(scene, x, y, "Boss").setScale(scale)
-    
+    console.log('this.boss-->', this.boss)
     scene.physics.add.collider(this.boss, this.groundGroup)
     scene.physics.add.collider(this.boss, this.player, function(b, p) {
-      p.bounceOff()
+      let bounceLeft = false
+      if (b.x - p.x > 0) {
+        bounceLeft = true
+      }
+      p.bounceOff(bounceLeft)
       p.decreaseHealth(1)
     })
   }
@@ -513,7 +517,11 @@ export default class NeonAlleyScene extends Phaser.Scene {
     } else {
       enemy.bulletHits++
       if (enemy === this.player) {
-        enemy.bounceOff()
+        let bounceLeft = false
+        if (bullet.x - this.player.x > 0) {
+          bounceLeft = true
+        }
+        enemy.bounceOff(bounceLeft)
       } else {
         enemy.playDamageTween()
       }
