@@ -347,7 +347,11 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
             scene.marioDeathSound.play()
         }
         else {
-          player.bounceOff()
+          let bounceLeft = false
+          if (newEnemy.x - player.x > 0) {
+            bounceLeft = true
+          }
+          player.bounceOff(bounceLeft)
           player.decreaseHealth(1)
         }
       });
@@ -896,7 +900,11 @@ clearCharacterChoosing() {
         if (enemy!==this.player) {
           enemy.playDamageTween()
         } else {
-          enemy.bounceOff()
+          let bounceLeft = false
+          if (bullet.x - this.player.x > 0) {
+            bounceLeft = true
+          }
+          enemy.bounceOff(bounceLeft)
         }
       }
       bullet.destroy()
