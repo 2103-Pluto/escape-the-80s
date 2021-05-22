@@ -16,7 +16,7 @@ export default class CreditsScene extends Phaser.Scene {
     backgroundImage.alpha = 0.1;
 
     //addd text
-    this.add.text(width*0.5, height*0.18, 'THIS AMAZING GAME WAS CREATED BY', { fontFamily: '"Press Start 2P"' }).setFontSize(20).setOrigin(0.5, 0.5).setColor('#ED6BF3')
+    this.add.text(width*0.5, height*0.2, 'THIS AMAZING GAME WAS CREATED BY', { fontFamily: '"Press Start 2P"' }).setFontSize(20).setOrigin(0.5, 0.5).setColor('#ED6BF3')
     //our names
     this.add.text(width*0.5, height*0.28, 'TEAM PLUTO:', { fontFamily: '"Press Start 2P"' }).setFontSize(20).setOrigin(0.5, 0.5).setColor('#ED6BF3')
 
@@ -26,10 +26,6 @@ export default class CreditsScene extends Phaser.Scene {
     this.add.text(width*0.5, height*0.48, 'Juan S. Auli', { fontFamily: '"Press Start 2P"' }).setFontSize(18).setOrigin(0, 0.5)
 
     this.add.text(width*0.5, height*0.6, 'SPECIAL THANKS TO:', { fontFamily: '"Press Start 2P"' }).setFontSize(20).setOrigin(0.5, 0).setColor('#ED6BF3')
-
-    // this.add.text(width*0.3, height*0.7, 'Ricky Rhodes', { fontFamily: '"Press Start 2P"' }).setFontSize(18).setOrigin(0.5, 0.5)
-
-    // this.add.text(width*0.7, height*0.7, 'Joe Alves', { fontFamily: '"Press Start 2P"' }).setFontSize(18).setOrigin(0.5, 0.5)
 
     const thanks = this.add.text(width*0.5, height*0.7, 'Ricky Rhodes, Joe Alves, Hannah Bates,\n\n and the Regex Spaceship Team\n\n(Hope Fourie, Adria Orenstein,\n\nand Catalina McQuade)', { fontFamily: '"Press Start 2P"', boundsAlignH: 'center' }).setFontSize(18).setOrigin(0.5, 0)
 

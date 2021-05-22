@@ -15,9 +15,11 @@ export default class WaitingRoom extends Phaser.Scene {
 
   create() {
     const scene = this;
+    scene.width = scene.game.config.width;
+    scene.height = scene.game.config.height;
     document.querySelector('div').style.display = 'block'
     console.log('form---->', document.querySelector('entry-form'))
-    
+
     scene.popUp = scene.add.graphics();
     scene.boxes = scene.add.graphics();
 
@@ -34,19 +36,25 @@ export default class WaitingRoom extends Phaser.Scene {
     scene.popUp.fillRect(25, 25, 750, 500);
 
     //title
-    scene.title = scene.add.text(100, 75, "ESCAPE THE 80s", {
-      fill: "#add8e6",
-      fontSize: "66px",
-      fontStyle: "bold",
-    });
+    scene.title = scene.add.text(scene.width*0.5, scene.width*0.15, "ESCAPE THE 80s", {
+      // fill: "#add8e6",
+      // fontSize: "66px",
+      // fontStyle: "bold",
+      fill: '#feff38',
+      fontSize: '30px',
+      fontFamily: '"Press Start 2P"'
+    }).setOrigin(0.5,0.5);
 
     //left popup
     scene.boxes.strokeRect(100, 200, 275, 100);
     scene.boxes.fillRect(100, 200, 275, 100);
-    scene.requestButton = scene.add.text(140, 215, "Request Room Key", {
-      fill: "#000000",
-      fontSize: "20px",
-      fontStyle: "bold",
+    scene.requestButton = scene.add.text(110, 215, "Request Room Key", {
+      // fill: "#000000",
+      // fontSize: "20px",
+      // fontStyle: "bold",
+      fill: '#4DF3F5',
+      fontSize: '14px',
+      fontFamily: '"Press Start 2P"'
     });
 
     //right popup
