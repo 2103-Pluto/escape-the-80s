@@ -5,7 +5,8 @@ export default class SoldierPlayer extends Phaser.Physics.Arcade.Sprite {
     super(scene, x, y, spriteKey)
     this.scene = scene;
     this.score = 0; //player's score
-    this.health = 5; //player's health
+    this.maxHealth = 5
+    this.health = this.maxHealth; //player's health
     this.dead = false // variable to keep track of whether a player is dead
     this.scene.add.existing(this)
     this.scene.physics.world.enable(this)
@@ -47,7 +48,7 @@ export default class SoldierPlayer extends Phaser.Physics.Arcade.Sprite {
     this.playDamageTween = this.playDamageTween.bind(this)
 
     this.bulletHits = 0
-    this.bulletDeath = 5
+    this.bulletDeath = this.maxHealth
   }
 
   updateMovement(cursors) {
@@ -165,9 +166,9 @@ export default class SoldierPlayer extends Phaser.Physics.Arcade.Sprite {
       this.isCrouching = true
       this.body.setSize(16, 27)
       if (!this.facingLeft) {
-        this.body.setOffset(17, 12) 
+        this.body.setOffset(17, 12)
       } else {
-        this.body.setOffset(15, 12) 
+        this.body.setOffset(15, 12)
       }
       this.play(`${this.color}Crouch`, true)
 
@@ -299,7 +300,7 @@ export default class SoldierPlayer extends Phaser.Physics.Arcade.Sprite {
   }
 
   increaseHealth(deltaHealth) {
-    this.health = Math.min(5, this.health + deltaHealth);
+    this.health = Math.min(this.maxHealth, this.health + deltaHealth);
   }
 
   increaseScore(deltaScore) {
@@ -321,7 +322,7 @@ export default class SoldierPlayer extends Phaser.Physics.Arcade.Sprite {
   revive() {
     this.dead = false;
     this.score = 0;
-    this.health = 5;
+    this.health = this.maxHealth;
   }
 
   bounceOff() {
