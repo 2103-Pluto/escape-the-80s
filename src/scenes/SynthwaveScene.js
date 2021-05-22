@@ -333,6 +333,9 @@ export default class SynthwaveScene extends Phaser.Scene {
       scene.beginTimer = Date.now()
     })
 
+    this.socket.on("disconnected", function(){
+      scene.otherPlayer.destroy()
+    })
     
 
     //mute the previous scene
@@ -516,8 +519,6 @@ export default class SynthwaveScene extends Phaser.Scene {
 
     if (secondsPassed > 999) {
       this.winTime += 1;
-
-      //this.socket.emit("sendTime", this.initialTime);
 
       this.timerLabel.setText(this.formatTime(this.winTime));
       
