@@ -59,7 +59,11 @@ export default class WaitingRoom extends Phaser.Scene {
     console.log(scene.inputElement)
     scene.inputElement.addListener("click");
     scene.inputElement.on("click", function (event) {
+      event.preventDefault()
       if (event.target.name === "enterRoom") {
+        //if (event.keyCode === 13) {
+    //    event.preventDefault();
+    //   //document.getElementById("enterRoom-id").click();
         const input = scene.inputElement.getChildByName("code-form");
         scene.socket.emit("isKeyValid", input.value);
       }

@@ -226,7 +226,7 @@ export default class SynthwaveScene extends Phaser.Scene {
 
   createFlagpole(scene) {
     // scene.flagpole = new Flagpole(scene, scene.playerZones.end.x + 300, 310, 'flagpole').setScale(2.78)
-    scene.flagpole = new Flagpole(scene, 300, 310, 'flagpole').setScale(2.78) //testing mode
+    scene.flagpole = new Flagpole(scene, 700, 310, 'flagpole').setScale(2.78) //testing mode
     scene.flagpole.body.setSize(2, 160)
     scene.flagpole.body.setOffset(16, 0)
 
@@ -322,7 +322,18 @@ export default class SynthwaveScene extends Phaser.Scene {
     }
     })
 
+    // this.socket.on("startTimer", function() {
+    //   scene.beginTimer = Date.now()
+    // })
 
+    this.socket.on("startGame", function () {
+
+      scene.scene.stop("WaitingforPlayer")
+      scene.scene.launch("CountdownScene")
+      scene.beginTimer = Date.now()
+    })
+
+    
 
     //mute the previous scene
     this.game.sound.stopAll();
@@ -453,26 +464,18 @@ export default class SynthwaveScene extends Phaser.Scene {
     scene.scene.pause()
     scene.scene.launch("WaitingRoom", { socket: scene.socket })
 
-    this.socket.on("startGame", function () {
-
-      scene.scene.stop("WaitingforPlayer")
-      scene.scene.launch("CountdownScene")
-    })
-    
     this.timer()
+    
+    
   
 
-    // Create collisions for all entities
-    // << CREATE COLLISIONS HERE >>
   }
 
-  // time: total time elapsed (ms)
-  // delta: time elapsed (ms) since last update() call. 16.666 ms @ 60fps
   update(time, delta) {
     // << DO UPDATE LOGIC HERE >>
-    const scene = this
     this.player.update(time, this.cursors, this.jumpSound, this.fire, this.shootingSound);
     if (this.muzzleFlash) this.muzzleFlash.update(delta)
+    this.countdown()
     this.updateLevelEnded(this)
   }
 
@@ -495,17 +498,32 @@ export default class SynthwaveScene extends Phaser.Scene {
   timer(){
     const screenCenterX = this.cameras.main.worldView.x + this.cameras.main.width / 2;
     const screenCenterY = this.cameras.main.worldView.y + this.cameras.main.height / 2;
-    //timer
     
-    this.clock = this.add.text(screenCenterX, screenCenterY-250, 
+    this.timerLabel = this.add.text(screenCenterX, screenCenterY-250, 
     'Time:' + this.formatTime(this.winTime), { fontFamily: '"Press Start 2P"' }).setFontSize(20).setOrigin(0.5)
-    this.timedEvent = this.time.addEvent({
-      delay: 1000,
-      callback: this.timerCount,
-      callbackScope: this,
-      loop: true
-    })
-    this.clock.setScrollFactor(0)
+    // this.timedEvent = this.time.addEvent({
+    //   delay: 1000,
+    //   callback: this.timerCount,
+    //   callbackScope: this,
+    //   loop: true
+    // })
+    this.timerLabel.setScrollFactor(0)
+  }
+
+  countdown() {
+    const currentTime = Date.now();
+    const secondsPassed = currentTime - this.beginTimer;
+
+    if (secondsPassed > 999) {
+      this.winTime += 1;
+
+      //this.socket.emit("sendTime", this.initialTime);
+
+      this.timerLabel.setText(this.formatTime(this.winTime));
+      
+      this.beginTimer = currentTime;
+     
+    }
   }
 
   formatTime(seconds) {
@@ -514,12 +532,11 @@ export default class SynthwaveScene extends Phaser.Scene {
     partInSeconds = partInSeconds.toString().padStart(2, "0");
     return `${minutes}:${partInSeconds}`;
   }
-  timerCount(){
-    this.winTime++
-    if(this.winTime <= 0) this.clock.setText("TIME'S UP!!!")
-    else this.clock.setText('Time:' + this.formatTime(this.winTime))
+  // timerCount(){
+  //   this.winTime++
+  //   this.clock.setText('Time:' + this.formatTime(this.winTime))
 
-  }
+  // }
 
   fire(x, y, left) {
     // These are the offsets from the player's position that make it look like
