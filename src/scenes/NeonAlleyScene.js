@@ -5,6 +5,8 @@ import Bullet from '../entity/Bullet';
 import MuzzleFlash from '../entity/MuzzleFlash';
 import Heart from '../entity/Heart';
 import Star from '../entity/Star';
+import Bomb from '../entity/Bomb'
+import Explosion from '../entity/Explosion';
 import Wall from '../entity/Wall';
 
 const numberOfFrames = 3;
@@ -22,18 +24,25 @@ export default class NeonAlleyScene extends Phaser.Scene {
     this.preloadMusic = this.preloadMusic.bind(this)
     this.createSounds = this.createSounds.bind(this)
     this.preloadBoss = this.preloadBoss.bind(this)
-    this.preloadColaBomb = this.preload.bind(this)
+    this.preloadColaBomb = this.preloadColaBomb.bind(this)
     this.createBoss = this.createBoss.bind(this)
     this.preloadMap = this.preloadMap.bind(this)
     this.createMap = this.createMap.bind(this)
     this.createPhysics = this.createPhysics.bind(this)
+    this.createAnimations = this.createAnimations.bind(this)
     this.fire = this.fire.bind(this);
+    this.bossFire = this.bossFire.bind(this)
     this.createBulletGroup = this.createBulletGroup.bind(this)
     this.createHeartGroup = this.createHeartGroup.bind(this)
     this.createStarGroup = this.createStarGroup.bind(this)
     this.pickupStar = this.pickupStar.bind(this)
     this.pickupHeart = this.pickupHeart.bind(this)
     this.createGround = this.createGround.bind(this)
+    this.createBombGroup = this.createBombGroup.bind(this)
+    this.hit = this.hit.bind(this);
+    this.explodeFn = this.explodeFn.bind(this)
+    this.createExplosionGroup = this.createExplosionGroup.bind(this)
+
     this.hitWall = this.hitWall.bind(this)
   }
 
@@ -44,8 +53,7 @@ export default class NeonAlleyScene extends Phaser.Scene {
   }
 
   preloadMusic() {
-    this.load.audio('mfn-reagan', 'assets/audio/MoneyForNothingWReagan.wav');
-    this.load.audio('mfn-no-reagan', 'assets/audio/MoneyForNothing-small.wav');
+    this.load.audio('mfn-reagan', 'assets/audio/clean-mfn.wav');
     this.load.audio('rick-roll-sound', 'assets/audio/rick-roll.wav');
   }
 
@@ -71,11 +79,16 @@ export default class NeonAlleyScene extends Phaser.Scene {
       frameWidth: 19,
       frameHeight: 48,
     })
+    this.load.audio('boss-dead', 'assets/audio/i-aint-goin-nowhere.wav')
   }
 
   preloadColaBomb() {
     this.load.image("coca-cola", "assets/sprites/coca-cola.png")
-    this.load.image("explosion", "assets/spriteSheets/explosion.png")
+    this.load.spritesheet("explosion", "assets/spriteSheets/explosion-trimmy.png", {
+      frameWidth: 76,
+      frameHeight: 76
+    })
+    this.load.audio("bomb-drop", "assets/audio/bomb-drop.wav")
   }
 
   preloadMap() {
@@ -94,6 +107,8 @@ export default class NeonAlleyScene extends Phaser.Scene {
     this.preloadMap()
     this.preloadBoss()
     this.preloadMusic()
+    this.preloadColaBomb()
+
     this.preloadWall()
     this.preloadWallSounds()
   }
@@ -114,12 +129,9 @@ export default class NeonAlleyScene extends Phaser.Scene {
   createSounds() {
     this.game.sound.stopAll()
     this.backgroundSound = this.sound.add('mfn-reagan')
+    this.backgroundSound.setLoop(true)
+    this.backgroundSound.volume = 0.1
     this.backgroundSound.play()
-    this.backgroundSound.once('complete', function (backgroundSound) {
-      backgroundSound = this.sound.add('mfn-no-reagan')
-      backgroundSound.volume = 0.1
-      backgroundSound.play()
-    })
 
     //VOLUME
     this.volumeSpeaker = this.add
@@ -201,16 +213,38 @@ export default class NeonAlleyScene extends Phaser.Scene {
 
     this.pauseSound = this.sound.add('pause')
     this.pauseSound.volume = 0.03;
+    
+    this.bombDropSound = this.sound.add('bomb-drop')
+    this.bombDropSound.volume = 0.03
+    
+    this.bossDeathSound = this.sound.add('boss-dead')
+    this.bossDeathSound.volume = 0.3
 
   }
 
   createBoss(scene, x, y, scale) {
-    let boss = new Boss(scene, x, y, scale)
 
-    scene.physics.add.collider(boss, scene.groundGroup)
-    scene.physics.add.collider(boss, scene.player, function(b, p) {
+    this.boss = new Boss(scene, x, y, "Boss").setScale(scale)
+    
+    scene.physics.add.collider(this.boss, this.groundGroup)
+    scene.physics.add.collider(this.boss, this.player, function(b, p) {
       p.bounceOff()
       p.decreaseHealth(1)
+    })
+  }
+  
+  createAnimations() {
+    this.anims.create({
+      key: 'boss-run',
+      frames: this.anims.generateFrameNumbers('Boss'),
+      frameRate: 10,
+      repeat: -1
+    })
+    this.anims.create({
+      key: 'explode',
+      frames: this.anims.generateFrameNumbers('explosion'),
+      frameRate: 10,
+      repeat: 0
     })
   }
 
@@ -247,11 +281,16 @@ export default class NeonAlleyScene extends Phaser.Scene {
     this.scene.get('SinglePlayerSynthwaveScene').createHealthLabel(this)
     this.createPhysics(this)
     this.setCamera(this) //set camera
+    this.createBoss(this, 800, 400, 4)
+    this.createAnimations()
+
     this.createWallGroup(this)
     this.createWall(this)
+
     this.createBulletGroup(this)
+    this.createBombGroup(this)
+    this.createExplosionGroup(this)
     this.scene.get('SinglePlayerSynthwaveScene').pause(this)
-    console.log(this)
     //<-----------
 
 
@@ -288,6 +327,8 @@ export default class NeonAlleyScene extends Phaser.Scene {
       },
       loop: false
     })
+    
+    this.events.on('explodeFn', this.explodeFn, this)
 
     this.cursors = this.input.keyboard.createCursorKeys();
   }
@@ -299,14 +340,15 @@ export default class NeonAlleyScene extends Phaser.Scene {
       allowGravity: false,
       maxSize: 40
     });
-
-    scene.physics.add.overlap( // do we need this
-      scene.player,
+    
+    scene.physics.add.collider(
+      scene.boss,
       scene.bullets,
       scene.hit,
       null,
       scene
-    );
+    )
+    
     scene.physics.add.overlap(
       scene.wall,
       scene.bullets,
@@ -315,6 +357,44 @@ export default class NeonAlleyScene extends Phaser.Scene {
       scene
     );
   }
+  
+  createBombGroup(scene) {
+    scene.bombs = scene.physics.add.group({
+      classType: Bomb,
+      runChildUpdate: true,
+      allowGravity: true,
+      maxSize: 40
+    });
+    
+    scene.physics.add.collider(
+      scene.bombs,
+      scene.groundGroup,
+    );
+  }
+  
+  createExplosionGroup(scene) {
+    scene.explosions = scene.physics.add.group({
+      classType: Explosion,
+      runChildUpdate: true,
+      allowGravity: true,
+      maxSize: 40,
+    })
+    
+    scene.physics.add.overlap(
+      scene.player,
+      scene.explosions,
+      scene.hit,
+      null,
+      scene
+    )
+    
+    scene.physics.add.collider(
+      scene.explosions,
+      scene.groundGroup,
+    );
+  }
+  
+  
 
   createMap() {
     this.back1 = this.add.image(0*128*3.5*1, 0, 'back').setOrigin(0, 0).setScale(3.5).setScrollFactor(0)
@@ -343,7 +423,6 @@ export default class NeonAlleyScene extends Phaser.Scene {
   }
 
   fire() {
-
     const offsetX = 60;
     const offsetY = 5.5;
     const bulletX =
@@ -424,12 +503,93 @@ export default class NeonAlleyScene extends Phaser.Scene {
     this.powerUpSound.play()
     this.player.increaseHealth(1)
   }
+  
+  hit(enemy, bullet) {
+    bullet.setActive(false);
+    if(enemy.bulletHits===enemy.bulletDeath){
+      enemy.destroy()
+      this.bossDeathSound.play()
+      this.player.increaseScore(50)
+    } else {
+      enemy.bulletHits++
+      if (enemy === this.player) {
+        enemy.bounceOff()
+      } else {
+        enemy.playDamageTween()
+      }
+      
+    }
+    bullet.destroy()
+  }
+  
+  bossFire(boss) {
+    const offsetX = 60;
+    const offsetY = 5.5;
+    const bombX = boss.x + (boss.movingLeft ? -offsetX : offsetX);
+    const bombY = boss.y + offsetY;
+
+    let bomb = this.bombs.getFirstDead()
+    
+    if (!bomb) {
+      bomb = new Bomb(this, bombX, bombY, 'coca-cola', boss.movingLeft).setScale(2)
+      this.bombs.add(bomb)
+    }
+    
+    if (this.boss.movingLeft) {
+    bomb.setVelocityX(-400)
+    bomb.setVelocityY(-400)
+    } else {
+    bomb.setVelocityX(400)
+    bomb.setVelocityY(-400)
+    }
+    
+    
+    this.time.addEvent({
+      delay: 600,
+      callback: () => {
+        this.tweens.add({
+          targets: bomb,
+          duration: 100,
+          repeat: -1,
+          tint: 0xff0000
+        })
+      }
+    })
+    
+    this.time.addEvent({
+      delay: 900,
+      callback: () => {
+        this.events.emit('explodeFn', bomb.x, bomb.y + 10, bomb, this)
+      }
+    })
+    
+    bomb.reset(bombX, bombY, boss.movingLeft);
+  }
+  
+  explodeFn(x, y, bomb, scene) {
+    
+    let explosion = this.explosions.getFirstDead()
+    
+    if(!explosion) {
+      explosion = new Explosion (this, x, y, 'explosion').setScale(2)
+      this.explosions.add(explosion)
+    }
+    
+    bomb.destroy()
+    scene.bombDropSound.play()
+    explosion.play('explode')
+    
+    explosion.reset(x, y)
+  }
 
   update(time, delta) {
+    const scene = this
     this.player.update(time, this.cursors, this.jumpSound, this.fire, this.shootingSound);
     this.scene.get('SinglePlayerSynthwaveScene').updateHealth(this) //updates the pleyer's health displayed on scene
     this.scene.get('SinglePlayerSynthwaveScene').updateScore(this) //updates the pleyer's score displayed on scene
     if (this.muzzleFlash) this.muzzleFlash.update(delta) //updates muzzleFlash
+
+    this.boss.update(time, delta, scene.bossFire, scene.player.x)
 
     this.scene.get('SinglePlayerSynthwaveScene').updateLevelEnded(this)
   }
