@@ -2,7 +2,7 @@ import 'phaser';
 
 export default class Boss extends Phaser.Physics.Arcade.Sprite {
   constructor(scene, x, y, spriteKey) {
-    super(scene, x, y, spritekey);
+    super(scene, x, y, spriteKey);
     this.scene = scene;
     this.scene.add.existing(this);
     this.scene.physics.world.enable(this);
@@ -16,7 +16,7 @@ export default class Boss extends Phaser.Physics.Arcade.Sprite {
     this.playDamageTween = this.playDamageTween.bind(this)
     
     this.bulletHits = 0
-    this.bulletDeath = 20
+    this.bulletDeath = 30
     this.name = 'Boss'
   }
   
@@ -47,19 +47,25 @@ export default class Boss extends Phaser.Physics.Arcade.Sprite {
     
   }
   
-  update(time, delta, shootFn, shootingSound, playerX) {
+  update(time, delta, shootFn, playerX) {
     const dead = this.bulletHits===this.bulletDeath
     const playerIsNear = -400< (this.x - playerX) && (this.x - playerX) < 400
     this.patrol()
-    if(!dead) this.anims.play('terminator-walk', true)
+    if(!dead) this.anims.play('boss-run', true)
     
-    
-    if(!dead && playerIsNear && this.timeFromLastAttack + this.attackDelay <=time){
+
+    if (Math.floor(time) % 3 === 0) {
+      if(!dead && playerIsNear && this.timeFromLastAttack + this.attackDelay <=time){
         shootFn(this)
-        shootingSound.play()
         this.timeFromLastAttack = time
         this.attackDelay = this.getAttackDelay()
     }
+    }
+    
+    if (Math.floor(time) % 11 === 0 && this.body.onFloor()) {
+      this.body.setVelocityY(-900)
+    }
+    
   }
   
   getAttackDelay(){
