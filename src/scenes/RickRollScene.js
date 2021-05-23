@@ -60,8 +60,12 @@ export default class RickRollScene extends Phaser.Scene {
     this.topText = this.add.text(this.width*0.5, this.height*0.1, 'It was all a dream Rex!', { fontFamily: '"Press Start 2P"' }).setFontSize(32).setOrigin(0.5, 0.5).setColor('#ED6BF3')
     this.topText.alpha = 0
 
-    this.bottomText = this.add.text(this.width*0.5, this.height*0.25, 'Go to your interview', { fontFamily: '"Press Start 2P"' }).setFontSize(28).setOrigin(0.5, 0.5)
+    this.bottomText = this.add.text(this.width*0.5, this.height*0.25, "You've escaped the 80s", { fontFamily: '"Press Start 2P"' }).setFontSize(26).setOrigin(0.5, 0.5)
     this.bottomText.setVisible(false)
+
+    this.adviceText = this.add.text(this.width*0.5, this.height*0.76, "Go ace your interview!", { fontFamily: '"Press Start 2P"' }).setFontSize(26).setOrigin(0.5, 0.5)
+    this.adviceText.setVisible(false)
+
 
     this.tweens.add({
       targets: this.topText,
@@ -73,7 +77,7 @@ export default class RickRollScene extends Phaser.Scene {
         this.goToCreditsButton.setVisible(true)
         this.playGoToCreditsButtonTween()
         this.bottomText.setVisible(true)
-
+        this.adviceText.setVisible(true)
       }
     })
   }

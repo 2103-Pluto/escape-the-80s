@@ -17,9 +17,9 @@ export default {
                         // A negative value will pull game objects up along the y-axis
       debug: true,     // Whether physics engine should run in debug mode
     }
-  }, 
+  },
   dom : {
     createContainer: true
-  }, 
+  },
   parent: document.querySelector('main')
 }
