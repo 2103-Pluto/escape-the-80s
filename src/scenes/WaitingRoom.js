@@ -11,6 +11,7 @@ export default class WaitingRoom extends Phaser.Scene {
 
   preload() {
     this.load.html("codeform", "assets/text/codeform.html");
+    this.load.audio("denied", "assets/audio/denied.wav");
   }
 
   create() {
@@ -24,12 +25,16 @@ export default class WaitingRoom extends Phaser.Scene {
     scene.boxes = scene.add.graphics();
 
     // for popup window
-    scene.popUp.lineStyle(1, 0xffffff);
-    scene.popUp.fillStyle(0xffffff, 0.5);
+    // scene.popUp.lineStyle(1, 0xffffff);
+    // scene.popUp.fillStyle(0xffffff, 0.5);
+    scene.popUp.lineStyle(1, 0x000000);
+    scene.popUp.fillStyle(0x000000, 0.8);
 
     // for boxes
+    // scene.boxes.lineStyle(1, 0xffffff);
+    // scene.boxes.fillStyle(0xa9a9a9, 1);
     scene.boxes.lineStyle(1, 0xffffff);
-    scene.boxes.fillStyle(0xa9a9a9, 1);
+    scene.boxes.fillStyle(0x000000, 0);
 
     // popup window
     scene.popUp.strokeRect(25, 25, 750, 500);
@@ -53,7 +58,7 @@ export default class WaitingRoom extends Phaser.Scene {
       // fontSize: "20px",
       // fontStyle: "bold",
       fill: '#4DF3F5',
-      fontSize: '14px',
+      fontSize: '16px',
       fontFamily: '"Press Start 2P"'
     });
 
@@ -72,20 +77,22 @@ export default class WaitingRoom extends Phaser.Scene {
         scene.socket.emit("isKeyValid", input.value);
       }
     });
+    scene.addStyling(scene)
 
-    scene.requestButton.setInteractive();
-    scene.requestButton.on("pointerdown", () => {
-      scene.socket.emit("getRoomCode");
+    scene.notValidText = scene.add.text(451, 275, "", {
+      // fill: "#ff0000",
+      // fontSize: "20px",
+      fill: '#F5452D',
+      fontSize: '14px',
+      fontFamily: '"Press Start 2P"'
     });
-
-    scene.notValidText = scene.add.text(450, 260, "", {
-      fill: "#ff0000",
-      fontSize: "20px",
-    });
-    scene.roomKeyText = scene.add.text(210, 250, "", {
-      fill: "#000000",
-      fontSize: "25px",
-      fontStyle: "bold",
+    scene.roomKeyText = scene.add.text(200, 255, "", {
+      // fill: "#000000",
+      // fontSize: "25px",
+      // fontStyle: "bold",
+      // fill: '#4DF3F5',
+      fontSize: '16px',
+      fontFamily: '"Press Start 2P"'
     });
 
     scene.socket.on("roomCreated", function (roomKey) {
@@ -94,6 +101,7 @@ export default class WaitingRoom extends Phaser.Scene {
     });
 
     scene.socket.on("keyNotValid", function () {
+      scene.deniedSound.play();
       scene.notValidText.setText("Invalid Room Key");
     });
     scene.socket.on("keyIsValid", function (response) {
@@ -105,4 +113,18 @@ export default class WaitingRoom extends Phaser.Scene {
     });
   }
   update() {}
+
+  addStyling(scene) {
+    //request button
+    scene.requestButton.setInteractive();
+    scene.scene.get('MainMenuScene').createClick(scene) // add clicking sound
+    scene.requestButton.on("pointerdown", () => {
+      scene.click.play();
+      scene.socket.emit("getRoomCode");
+    });
+
+    //add denied sound
+    this.deniedSound = this.sound.add('denied');
+    this.deniedSound.volume = 0.1;
+  }
 }

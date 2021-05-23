@@ -6,6 +6,43 @@
     outline: none;
   }
   /* ----- Changes to match our arcade styling (START) ----- */
+  #enterRoom-id {
+    color: #4DF3F5;
+    background-color: transparent;
+    font-size: 12px;
+    font-family: "Press Start 2P";
+    /* outline:none; */
+    /* border: none; */
+    border-radius: 3px;
+    animation: blinking 1300ms infinite;
+    padding: 3px 3px 3px 3px;
+  }
+
+  @keyframes blinking {
+        0% {
+          border-color: white;
+        }
+        50% {
+          border-color: transparent;
+        }
+        100% {
+          border-color: white;
+        }
+      }
+
+  #enterRoom-id:hover {
+    color: #feff38;
+    border-color: white;
+    animation: none;
+  }
+
+  #code-form-id {
+    font-family: "Press Start 2P";
+    font-size: 12px;
+    border: none;
+    padding: 3px 4px 3px 4px;
+
+  }
    /* ----- Changes to match our arcade styling (END) ----- */
 </style>
 
@@ -16,6 +53,7 @@
       id="code-form-id"
       name="code-form"
       placeholder="enter room key"
+      size="14"
     />
     <button type="button" id="enterRoom-id" name="enterRoom">enter</button>
 

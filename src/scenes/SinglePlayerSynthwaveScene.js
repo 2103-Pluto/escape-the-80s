@@ -319,7 +319,7 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
   }
 
   createFlagpole(scene) {
-    scene.flagpole = new Flagpole(scene, scene.playerZones.end.x + 180, 310, 'flagpole').setScale(2.78)
+    scene.flagpole = new Flagpole(scene, scene.playerZones.end.x + 195, 310, 'flagpole').setScale(2.78)
     //---> testing mode (to go to level 2)
     // scene.flagpole = new Flagpole(scene, 300, 310, 'flagpole').setScale(2.78)
     //<--- testing mode
@@ -755,7 +755,6 @@ clearCharacterChoosing() {
   }
 
   fire() {
-    this.player.increaseHealth(5) //testing mode
     const offsetX = 60;
     const offsetY = 5.5;
     const bulletX =
