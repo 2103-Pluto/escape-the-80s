@@ -55,13 +55,7 @@ export default class Mario extends Phaser.Physics.Arcade.Sprite {
   update(hitSound) {
     this.patrol()
     this.anims.play('walk', true)
-
-    if(this.y>600) {
-      this.playDamageTween()
-      this.destroy()
-      hitSound.play()
-
-    }
+    
   }
 
   playDamageTween() {

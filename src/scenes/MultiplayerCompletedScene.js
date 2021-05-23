@@ -2,17 +2,14 @@ import Phaser from 'phaser'
 
 import WaitingRoom from './WaitingRoom'
 import CountdownScene from './CountdownScene'
-import WaitingforPlayer from './MultiplayerWaiting'
+import WaitingforPlayer from './MultiplayerWaitingScene'
 import MultiplayerCompletedScene from './MultiplayerCompletedScene'
 import SynthwaveScene from './SynthwaveScene';
 
 export default class MultiplayerCompletedScene extends Phaser.Scene {
   constructor() {
     super('MultiplayerCompletedScene');
-    this.scoreTweenDuration = 2000;
 
-    // this.timeLabel = this.timeLabel.bind(this)
-    // this.winnerLabel = this.winnerLabel.bind(this)
   }
 
   init(data) {

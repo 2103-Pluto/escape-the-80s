@@ -292,12 +292,13 @@ export default class SoldierPlayer extends Phaser.Physics.Arcade.Sprite {
 
   updateShoot(time, cursors, shootingFn, shootingSound) {
     if (cursors.space.isDown && time > this.lastFired) {
-        shootingSound.play();
+        if(shootingSound!==null) shootingSound.play();
         shootingFn()
         this.lastFired = time + this.fireDelay;
       }
   }
 
+ 
   increaseHealth(deltaHealth) {
     this.health = Math.min(5, this.health + deltaHealth);
   }
