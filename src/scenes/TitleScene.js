@@ -28,6 +28,12 @@ export default class TitleScene extends Phaser.Scene {
     this.load.image("title-background", "assets/backgrounds/title_scene/title-background.png");
     this.load.image("cassette-tape", "assets/sprites/cassette-tape.png");
 
+    this.load.spritesheet("skull", "assets/spriteSheets/skull.png", {
+      frameWidth: 64,
+      frameHeight: 64,
+    })
+
+
     //load audio
     for (let i=1; i<5; i++) {
       this.load.audio(`one-liner${i}`, `assets/audio/one_liners/one-liner${i}.wav`);
@@ -35,6 +41,9 @@ export default class TitleScene extends Phaser.Scene {
     this.load.audio("title-music", "assets/audio/title_scene/title-music.wav");
     this.load.audio("click", "assets/audio/click.wav");
     this.load.audio("typing-sounds", "assets/audio/public_audio_Typing_Text.wav")
+    this.load.audio("insane", "assets/audio/insane.wav");
+    this.load.audio("standard", "assets/audio/standard.wav");
+    this.load.audio("novice", "assets/audio/novice.wav");
     //load other files
     this.load.addFile(new WebFontFile(this.load, 'Press Start 2P'))
   }
