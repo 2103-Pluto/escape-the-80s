@@ -18,7 +18,6 @@ export default class SynthwaveScene extends Phaser.Scene {
 
     this.scene = this;
     this.fire = this.fire.bind(this);
-    // this.hit = this.hit.bind(this);
     this.createBackgroundElement = this.createBackgroundElement.bind(this);
     this.color = "Blue";
     this.winTime = 0;
@@ -286,16 +285,13 @@ export default class SynthwaveScene extends Phaser.Scene {
 
   createPlatforms(scene) {
     scene.map = this.make.tilemap({ key: "multiplayerMap" });
-    console.log("MAP", scene.map);
     scene.platformTileset = scene.map.addTilesetImage("Platform", "block"); // First name is form tiled, Second name is key above
-    console.log("TILESET", scene.platformTileset);
     scene.platforms = scene.map.createStaticLayer(
       "Tile Layer 1",
       scene.platformTileset,
       0,
       -95
     );
-    console.log(scene.platforms);
   }
 
   addPlatformPhysics(scene) {
@@ -365,7 +361,6 @@ export default class SynthwaveScene extends Phaser.Scene {
     //scene.otherPlayer=null;
     this.socket.on("currentPlayers", function (arg) {
       const players = arg;
-      console.log("players--->", players);
       Object.keys(players).forEach(function (id) {
         if (players[id].playerId !== scene.socket.id) {
           scene.otherPlayer = new SoldierPlayer(
@@ -392,7 +387,6 @@ export default class SynthwaveScene extends Phaser.Scene {
             scene.flagpole,
             function () {
               if (!scene.touchingFlagpole) {
-                console.log("crossed pole!!!");
                 scene.touchingFlagpole = true;
                 scene.raiseFlagpole(scene);
               }
@@ -676,11 +670,7 @@ export default class SynthwaveScene extends Phaser.Scene {
     partInSeconds = partInSeconds.toString().padStart(2, "0");
     return `${minutes}:${partInSeconds}`;
   }
-  // timerCount(){
-  //   this.winTime++
-  //   this.clock.setText('Time:' + this.formatTime(this.winTime))
-
-  // }
+ 
 
   fire() {
     return null

@@ -1,7 +1,5 @@
 import 'phaser';
-import MuzzleFlash from './MuzzleFlash';
-import Bullet from './Bullet';
-//import { GetSpeed } from 'phaser/src/math';
+import store from '../store'
 
 export default class Terminator extends Phaser.Physics.Arcade.Sprite {
   constructor(scene, x, y, spritekey) {
@@ -18,13 +16,27 @@ export default class Terminator extends Phaser.Physics.Arcade.Sprite {
     this.attackDelay = this.getAttackDelay()
     this.playDamageTween = this.playDamageTween.bind(this)
     // << INITIALIZE PLAYER ATTRIBUTES HERE >>
-    this.bulletHits = 0
-    this.bulletDeath = 20
+    this.bulletHits = 1
+    this.bulletDeath=this.maxHealth
     this.name = 'terminator'
     
-
+    this.initializeHealth()
   }
-
+ 
+  initializeHealth() {
+    const difficulty = store.getState().settings.campaignDifficulty;
+    switch (difficulty) {
+      case 'novice':
+        this.maxHealth = 10
+        break;
+      case 'insane':
+        this.maxHealth = 30
+        break;
+      default:
+        this.maxHealth = 20
+    }
+    this.bulletDeath=this.maxHealth
+  }
 
   
 
@@ -58,7 +70,7 @@ export default class Terminator extends Phaser.Physics.Arcade.Sprite {
   // Check which controller button is being pushed and execute movement & animation
   update(time, delta, shootFn, shootingSound, playerX) {
     const dead = this.bulletHits===this.bulletDeath
-    const playerIsNear = -400< (this.x - playerX) && (this.x - playerX) < 400
+    const playerIsNear = -600< (this.x - playerX) && (this.x - playerX) < 600
     this.patrol()
     if(!dead) this.anims.play('terminator-walk', true)
     
