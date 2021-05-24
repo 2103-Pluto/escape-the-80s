@@ -12,9 +12,10 @@ import Terminator from '../entity/Terminator'
 import Flagpole from '../entity/Flagpole'
 import CharacterChoosingScene from './CharacterChoosingScene'
 import StoryScene from './StoryScene'
+import createStarsEasterEgg from '../files/StarEasterEgg'
 
 
-const numberOfFrames = 13;
+const numberOfFrames = 12;
 
 export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
   constructor() {
@@ -318,7 +319,9 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
   }
 
   createFlagpole(scene) {
-    scene.flagpole = new Flagpole(scene, scene.playerZones.end.x + 300, 310, 'flagpole').setScale(2.78)
+    //---> testing mode (to go to level 2)
+    // scene.flagpole = new Flagpole(scene, 300, 310, 'flagpole').setScale(2.78)
+    scene.flagpole = new Flagpole(scene, scene.playerZones.end.x + 195, 310, 'flagpole').setScale(2.78)
     //---> testing mode (to go to level 2)
     //scene.flagpole = new Flagpole(scene, 300, 310, 'flagpole').setScale(2.78)
     //<--- testing mode
@@ -355,7 +358,11 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
             })
         }
         else {
-          player.bounceOff()
+          let bounceLeft = false
+          if (newEnemy.x - player.x > 0) {
+            bounceLeft = true
+          }
+          player.bounceOff(bounceLeft)
           player.decreaseHealth(1)
         }
       });
@@ -526,8 +533,7 @@ clearCharacterChoosing() {
    // const scene = this
    this.input.keyboard.enabled = false
    this.clearCharacterChoosing() //this clears player chosen from the CharacterSelectionScene so that we can choose again if we quit)
-   // const scene = this
-   console.log(this)
+
     // ALL THESE ('--->') NEED TO BE IN ORDER
     this.height = this.game.config.height; //retrive width and height (careful--Has to be at the top of create)
     this.width = this.game.config.width;
@@ -549,6 +555,7 @@ clearCharacterChoosing() {
     this.createPhysics(this)
     this.createSounds() //create all the sounds
     this.pause(this) //creates pause functionality
+    createStarsEasterEgg(this, this.width*(numberOfFrames - 0.9), -50) //creates star easter egg
     // --->
     const level1 = this.add.text(400, 200, 'LEVEL 1',{ fontFamily: '"Press Start 2P"' }).setFontSize(46).setOrigin(0.5, 0.5)
 
@@ -904,7 +911,11 @@ clearCharacterChoosing() {
         if (enemy!==this.player) {
           enemy.playDamageTween()
         } else {
-          enemy.bounceOff()
+          let bounceLeft = false
+          if (bullet.x - this.player.x > 0) {
+            bounceLeft = true
+          }
+          enemy.bounceOff(bounceLeft)
         }
       }
       bullet.destroy()

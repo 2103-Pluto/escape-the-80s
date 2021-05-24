@@ -1,11 +1,11 @@
 import 'phaser'
+import store from '../store'
 
 export default class SoldierPlayer extends Phaser.Physics.Arcade.Sprite {
   constructor(scene, x, y, spriteKey, socket, color) {
     super(scene, x, y, spriteKey)
     this.scene = scene;
     this.score = 0; //player's score
-    this.health = 5; //player's health
     this.dead = false // variable to keep track of whether a player is dead
     this.scene.add.existing(this)
     this.scene.physics.world.enable(this)
@@ -40,6 +40,7 @@ export default class SoldierPlayer extends Phaser.Physics.Arcade.Sprite {
     this.updateOtherPlayerMovement = this.updateOtherPlayerMovement.bind(this)
     this.updateOtherPlayerInAir = this.updateOtherPlayerInAir.bind(this)
     this.revive = this.revive.bind(this)
+    this.initializeHealth = this.initializeHealth.bind(this)
 
     // this.body.setSize(5, 40, false)
     // this.body.setOffset(30, 30) //testing
@@ -47,7 +48,26 @@ export default class SoldierPlayer extends Phaser.Physics.Arcade.Sprite {
     this.playDamageTween = this.playDamageTween.bind(this)
 
     this.bulletHits = 0
-    this.bulletDeath = 5
+    this.bulletDeath = this.maxHealth
+
+
+    this.initializeHealth()
+  }
+
+  initializeHealth() {
+    const difficulty = store.getState().settings.campaignDifficulty;
+    switch (difficulty) {
+      case 'novice':
+        this.maxHealth = 10
+        break;
+      case 'insane':
+        this.maxHealth = 2
+        break;
+      default:
+        this.maxHealth = 5
+    }
+    this.health = this.maxHealth; //player's health
+
   }
 
   updateMovement(cursors) {
@@ -165,9 +185,9 @@ export default class SoldierPlayer extends Phaser.Physics.Arcade.Sprite {
       this.isCrouching = true
       this.body.setSize(16, 27)
       if (!this.facingLeft) {
-        this.body.setOffset(17, 12) 
+        this.body.setOffset(17, 12)
       } else {
-        this.body.setOffset(15, 12) 
+        this.body.setOffset(15, 12)
       }
       this.play(`${this.color}Crouch`, true)
 
@@ -253,9 +273,8 @@ export default class SoldierPlayer extends Phaser.Physics.Arcade.Sprite {
       this.decreaseHealth(1)
       this.bulletHits=0
     }
-
-
   }
+
   updateJump(cursors, jumpSound) {
     if (cursors.up.isDown && this.body.onFloor()) {
       this.setVelocityY(-750);
@@ -300,7 +319,7 @@ export default class SoldierPlayer extends Phaser.Physics.Arcade.Sprite {
 
  
   increaseHealth(deltaHealth) {
-    this.health = Math.min(5, this.health + deltaHealth);
+    this.health = Math.min(this.maxHealth, this.health + deltaHealth);
   }
 
   increaseScore(deltaScore) {
@@ -322,16 +341,16 @@ export default class SoldierPlayer extends Phaser.Physics.Arcade.Sprite {
   revive() {
     this.dead = false;
     this.score = 0;
-    this.health = 5;
+    this.health = this.maxHealth;
   }
 
-  bounceOff() {
+  bounceOff(bounceLeft) {
     this.body.checkCollision.none = true;
     this.hasBeenHit = true;
     const hitAnim = this.playDamageTween();
-    this.facingLeft ?
-    this.setVelocity(this.bounceVelocity, -this.bounceVelocity)
-    : this.setVelocity(-this.bounceVelocity, -this.bounceVelocity)
+    (bounceLeft) ?
+    this.setVelocity(-this.bounceVelocity, -this.bounceVelocity)
+    : this.setVelocity(this.bounceVelocity, -this.bounceVelocity)
     this.body.checkCollision.none = false;
     this.scene.time.addEvent({
       delay: 500,

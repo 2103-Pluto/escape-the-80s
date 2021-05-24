@@ -16,15 +16,17 @@ export default class MainMenuScene extends Phaser.Scene {
 
     //add text options
     const options = {};
-    options['CharacterChoosingScene'] = this.add.text(width*0.3, height*0.2, 'Campaign', { fontFamily: '"Press Start 2P"' }).setFontSize(32).setOrigin(0, 0.5)
+    options['CharacterChoosingScene'] = this.add.text(width*0.3, height*0.15, 'Campaign', { fontFamily: '"Press Start 2P"' }).setFontSize(32).setOrigin(0, 0.5)
 
-    options['SynthwaveScene'] = this.add.text(width*0.3, height*0.35, 'Multiplayer', { fontFamily: '"Press Start 2P"' }).setFontSize(32).setOrigin(0, 0.5)
+    options['SynthwaveScene'] = this.add.text(width*0.3, height*0.29, 'Multiplayer', { fontFamily: '"Press Start 2P"' }).setFontSize(32).setOrigin(0, 0.5)
 
-    options['HighScoresScene'] = this.add.text(width*0.3, height*0.5, 'High Scores', { fontFamily: '"Press Start 2P"' }).setFontSize(32).setOrigin(0, 0.5)
+    options['HighScoresScene'] = this.add.text(width*0.3, height*0.43, 'High Scores', { fontFamily: '"Press Start 2P"' }).setFontSize(32).setOrigin(0, 0.5)
 
-    options['ControlsScene'] = this.add.text(width*0.3, height*0.65, 'Controls', { fontFamily: '"Press Start 2P"' }).setFontSize(32).setOrigin(0, 0.5)
+    options['ControlsScene'] = this.add.text(width*0.3, height*0.57, 'Controls', { fontFamily: '"Press Start 2P"' }).setFontSize(32).setOrigin(0, 0.5)
 
-    options['CreditsScene'] = this.add.text(width*0.3, height*0.8, 'Credits', { fontFamily: '"Press Start 2P"' }).setFontSize(32).setOrigin(0, 0.5)
+    options['SettingsScene'] = this.add.text(width*0.3, height*0.71, 'Settings', { fontFamily: '"Press Start 2P"' }).setFontSize(32).setOrigin(0, 0.5)
+
+    options['CreditsScene'] = this.add.text(width*0.3, height*0.85, 'Credits', { fontFamily: '"Press Start 2P"' }).setFontSize(32).setOrigin(0, 0.5)
 
     //add hover icon
     const hoverIcon = this.add.sprite(100, 100, 'cassette-tape');
@@ -57,7 +59,7 @@ export default class MainMenuScene extends Phaser.Scene {
   }
 
   createClick(scene) {
-    scene.click = this.sound.add('click');
+    scene.click = scene.sound.add('click');
     scene.click.volume = 0.05;
   }
 }

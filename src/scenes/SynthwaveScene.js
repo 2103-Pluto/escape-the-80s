@@ -26,6 +26,9 @@ export default class SynthwaveScene extends Phaser.Scene {
     this.flagpoleIsUp = false;
     this.touchingFlagpole = false;
 
+    this.raiseFlagpole = this.raiseFlagpole.bind(this)
+    this.createFlagpole = this.createFlagpole.bind(this)
+
     this.raiseFlagpole = this.raiseFlagpole.bind(this);
     this.createFlagpole = this.createFlagpole.bind(this);
 
@@ -240,17 +243,14 @@ export default class SynthwaveScene extends Phaser.Scene {
 
   preload() {
     //loading bar
-    this.scene.get("TitleScene").displayLoadingBar(this, "ma, you've been bad");
-    this.preloadSoldier();
+    this.scene.get('TitleScene').displayLoadingBar(this, "ma, you've been bad")
+    this.preloadSoldier()
 
-    this.load.spritesheet(
-      "flagpole",
-      "assets/spriteSheets/flagpoles_sheet.png",
-      {
-        frameWidth: 31.6,
-        frameHeight: 168,
-      }
-    );
+    this.load.spritesheet('flagpole', 'assets/spriteSheets/flagpoles_sheet.png', {
+      frameWidth: 31.6,
+      frameHeight: 168
+    })
+
 
     this.load.image("ground", "assets/sprites/ground-juan-test.png");
     this.load.image("bullet", "assets/sprites/SpongeBullet.png");
@@ -667,6 +667,7 @@ export default class SynthwaveScene extends Phaser.Scene {
 
       this.beginTimer = currentTime;
     }
+
   }
 
   formatTime(seconds) {
