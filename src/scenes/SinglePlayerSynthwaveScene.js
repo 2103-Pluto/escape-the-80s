@@ -319,7 +319,9 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
 
   createFlagpole(scene) {
     // scene.flagpole = new Flagpole(scene, scene.playerZones.end.x + 300, 310, 'flagpole').setScale(2.78)
-    scene.flagpole = new Flagpole(scene, 300, 310, 'flagpole').setScale(2.78) //testing mode
+    //---> testing mode (to go to level 2)
+    scene.flagpole = new Flagpole(scene, 300, 310, 'flagpole').setScale(2.78)
+    //<--- testing mode
     scene.flagpole.body.setSize(2, 160)
     scene.flagpole.body.setOffset(16, 0)
 
@@ -345,7 +347,11 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
             scene.marioDeathSound.play()
         }
         else {
-          player.bounceOff()
+          let bounceLeft = false
+          if (newEnemy.x - player.x > 0) {
+            bounceLeft = true
+          }
+          player.bounceOff(bounceLeft)
           player.decreaseHealth(1)
         }
       });
@@ -540,11 +546,11 @@ clearCharacterChoosing() {
     this.createSounds() //create all the sounds
     this.pause(this) //creates pause functionality
     // --->
-    const level1 = this.add.text(400, 300, 'LEVEL 1',{ fontFamily: '"Press Start 2P"' }).setFontSize(46).setOrigin(0.5, 0.5)
+    const level1 = this.add.text(400, 200, 'LEVEL 1',{ fontFamily: '"Press Start 2P"' }).setFontSize(46).setOrigin(0.5, 0.5)
 
     const flashLevel1 = this.tweens.add({
       targets: level1,
-      duration: 100,
+      duration: 200,
       repeat: -1,
       alpha: 0,
       ease: Phaser.Math.Easing.Expo.InOut
@@ -553,7 +559,7 @@ clearCharacterChoosing() {
 
 
     this.time.addEvent({
-      delay: 1000,
+      delay: 2000,
       callback: () => {
         flashLevel1.stop()
         level1.setVisible(false)
@@ -717,7 +723,13 @@ clearCharacterChoosing() {
 
   updateLevelEnded(scene) {
     if (scene.flagpoleIsUp) {
-      scene.sky.setTint(0x004c99)
+      if (scene.data.systems.config === 'SinglePlayerSynthwaveScene') {
+        scene.sky.setTint(0x004c99)
+      } else {
+        scene.back1.setTint(0x004c99)
+        scene.back2.setTint(0x004c99)
+      }
+
       scene.time.delayedCall(200, () => {
         scene.scene.pause()
         scene.backgroundSound.pause()
@@ -729,7 +741,7 @@ clearCharacterChoosing() {
           previousSceneName: scene.data.systems.config
         })
         scene.scene.moveAbove(scene, 'LevelCompletedScene')
-      }, null, this)
+      }, null, scene)
     }
   }
 
@@ -888,7 +900,11 @@ clearCharacterChoosing() {
         if (enemy!==this.player) {
           enemy.playDamageTween()
         } else {
-          enemy.bounceOff()
+          let bounceLeft = false
+          if (bullet.x - this.player.x > 0) {
+            bounceLeft = true
+          }
+          enemy.bounceOff(bounceLeft)
         }
       }
       bullet.destroy()

@@ -165,9 +165,9 @@ export default class SoldierPlayer extends Phaser.Physics.Arcade.Sprite {
       this.isCrouching = true
       this.body.setSize(16, 27)
       if (!this.facingLeft) {
-        this.body.setOffset(17, 12) 
+        this.body.setOffset(17, 12)
       } else {
-        this.body.setOffset(15, 12) 
+        this.body.setOffset(15, 12)
       }
       this.play(`${this.color}Crouch`, true)
 
@@ -253,9 +253,8 @@ export default class SoldierPlayer extends Phaser.Physics.Arcade.Sprite {
       this.decreaseHealth(1)
       this.bulletHits=0
     }
-
-
   }
+
   updateJump(cursors, jumpSound) {
     if (cursors.up.isDown && this.body.onFloor()) {
       this.setVelocityY(-750);
@@ -324,13 +323,13 @@ export default class SoldierPlayer extends Phaser.Physics.Arcade.Sprite {
     this.health = 5;
   }
 
-  bounceOff() {
+  bounceOff(bounceLeft) {
     this.body.checkCollision.none = true;
     this.hasBeenHit = true;
     const hitAnim = this.playDamageTween();
-    this.facingLeft ?
-    this.setVelocity(this.bounceVelocity, -this.bounceVelocity)
-    : this.setVelocity(-this.bounceVelocity, -this.bounceVelocity)
+    (bounceLeft) ?
+    this.setVelocity(-this.bounceVelocity, -this.bounceVelocity)
+    : this.setVelocity(this.bounceVelocity, -this.bounceVelocity)
     this.body.checkCollision.none = false;
     this.scene.time.addEvent({
       delay: 500,

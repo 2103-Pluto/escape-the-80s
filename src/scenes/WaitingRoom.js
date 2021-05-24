@@ -16,6 +16,7 @@ export default class WaitingRoom extends Phaser.Scene {
   create() {
     const scene = this;
     document.querySelector('div').style.display = 'block'
+    console.log('form---->', document.querySelector('entry-form'))
     
     scene.popUp = scene.add.graphics();
     scene.boxes = scene.add.graphics();
@@ -93,9 +94,6 @@ export default class WaitingRoom extends Phaser.Scene {
       scene.socket.emit("joinRoom", key);
       scene.scene.stop("WaitingRoom");
       if(playerNumber<2) scene.scene.launch("WaitingforPlayer")
-      
-      //scene.launch(waiting)
-      
     });
   }
   update() {}

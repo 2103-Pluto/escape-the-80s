@@ -44,7 +44,7 @@ export default class TitleScene extends Phaser.Scene {
     //add background music
     const backgroundMusic = this.sound.add('title-music');
     backgroundMusic.setLoop(true);
-    backgroundMusic.volume = 0.03;
+    backgroundMusic.volume = 0.05;
     backgroundMusic.play();
 
     this.sound.pauseOnBlur = false; //prevent sound from cutting when you leave tab
