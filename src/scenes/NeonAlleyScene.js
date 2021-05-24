@@ -60,7 +60,12 @@ export default class NeonAlleyScene extends Phaser.Scene {
       frameWidth: 750,
       frameHeight: 250,
     });
-  }
+
+    const wallAnim1 = this.load.spritesheet("wallAnim1", "assets/spriteSheets/Wall/wall-anim1", {
+    frameWidth: 250,
+    frameHeight: 250
+    });
+}
 
   preloadBoss() {
     this.load.spritesheet("Boss", "assets/spriteSheets/Boss/Original-Dimensions/Sprite-Sheet-trimmy.png", {
@@ -431,6 +436,14 @@ export default class NeonAlleyScene extends Phaser.Scene {
     const hitSound =this.wallHitSound
     hitSound.play()
     bullet.destroy()
+  }
+  createAnimations(){
+    this.anims.create({
+      key: 'hit-effect',
+      frames: this.anims.generateFrameNumbers('wallAnim1', {start: 0, end: 5}),
+      frameRate: 10,
+      repeat: 0
+    })
   }
 
 }
