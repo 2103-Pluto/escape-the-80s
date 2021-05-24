@@ -219,9 +219,12 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
       m4: markers.find(m => m.name === 'M4'),
       m5: markers.find(m => m.name === 'M5'),
       m6: markers.find(m => m.name === 'M6'),
+      m7: markers.find(m => m.name === 'M7'),
+      m8: markers.find(m => m.name === 'M8'),
+      m9: markers.find(m => m.name === 'M9'),
+      m10: markers.find(m => m.name === 'M10')
     }
   }
-
 
   createGooFromLayer(scene){
     const gooArr = scene.gooLayer.objects
@@ -599,6 +602,12 @@ clearCharacterChoosing() {
     this.createEnemies(this, 'mario', this.marioSpawns.m4.x, this.marioSpawns.m4.y, 2, 2.7)
     this.createEnemies(this, 'mario', this.marioSpawns.m5.x, this.marioSpawns.m5.y, 2, 2.7)
     this.createEnemies(this, 'mario', this.marioSpawns.m6.x, this.marioSpawns.m6.y, 2, 2.7)
+    this.createEnemies(this, 'mario', this.marioSpawns.m7.x, this.marioSpawns.m7.y, 1, 2.7)
+    this.createEnemies(this, 'mario', this.marioSpawns.m8.x, this.marioSpawns.m8.y, 6, 2.7)
+    this.createEnemies(this, 'mario', this.marioSpawns.m9.x, this.marioSpawns.m9.y, 1, 2.7)
+    this.createEnemies(this, 'mario', this.marioSpawns.m10.x, this.marioSpawns.m10.y, 2, 2.7)
+
+
 
 
     this.createEnemies(this, 'terminator', this.terminatorSpawns.t1.x, this.terminatorSpawns.t1.y, 1, 4.5)
