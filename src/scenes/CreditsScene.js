@@ -27,7 +27,7 @@ export default class CreditsScene extends Phaser.Scene {
 
     this.add.text(width*0.5, height*0.6, 'SPECIAL THANKS TO:', { fontFamily: '"Press Start 2P"' }).setFontSize(20).setOrigin(0.5, 0).setColor('#ED6BF3')
 
-    const thanks = this.add.text(width*0.5, height*0.7, 'Ricky Rhodes, Joe Alves, Hannah Bates,\n\n and the Regex Spaceship Team\n\n(Hope Fourie, Adria Orenstein,\n\nand Catalina McQuade)', { fontFamily: '"Press Start 2P"', boundsAlignH: 'center' }).setFontSize(18).setOrigin(0.5, 0)
+    const thanks = this.add.text(width*0.5, height*0.7, 'Ricky Rhodes, Joe Alves, and Hannah Bates\n\n and the Regex Spaceship Team\n\n(Hope Fourie, Adria Orenstein,\n\nand Catalina McQuade)', { fontFamily: '"Press Start 2P"', boundsAlignH: 'center' }).setFontSize(18).setOrigin(0.5, 0)
 
     thanks.setAlign('center')
 

@@ -41,4 +41,4 @@
 
 ## Acknowledgements
 
-Special thanks to Ricky Rhodes, Joe Alves, Hannah Bates, and the Regex Spaceship Team (Hope Fourie, Adria Orenstein, and Catalina McQuade).
+Special thanks to Ricky Rhodes, Joe Alves, and Hannah Bates and the Regex Spaceship Team (Hope Fourie, Adria Orenstein, and Catalina McQuade).
