@@ -95,10 +95,7 @@ module.exports = (io) => {
         // update numPlayers
         roomInfo.numPlayers = Object.keys(roomInfo.players).length;
         // emit a message to all players to remove this player
-        io.to(roomKey).emit("disconnected", {
-          playerId: socket.id,
-          numPlayers: roomInfo.numPlayers,
-        });
+        io.to(roomKey).emit("disconnected");
       }
     });
   });

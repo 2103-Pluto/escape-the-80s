@@ -16,10 +16,9 @@ export default class WaitingRoom extends Phaser.Scene {
 
   create() {
     const scene = this;
+    document.querySelector("div").style.display = "block";
     scene.width = scene.game.config.width;
     scene.height = scene.game.config.height;
-    document.querySelector('div').style.display = 'block'
-    console.log('form---->', document.querySelector('entry-form'))
 
     scene.popUp = scene.add.graphics();
     scene.boxes = scene.add.graphics();
@@ -67,11 +66,13 @@ export default class WaitingRoom extends Phaser.Scene {
     scene.boxes.fillRect(425, 200, 275, 100);
     // const codeForm = this.cache.html.get('codeform')
     // //console.log(codeForm)
-    scene.inputElement = scene.add.
-    scene.inputElement = scene.add.dom(562.5, 250).createFromCache("codeform");
-    console.log(scene.inputElement)
+    scene.inputElement = scene.add.scene.inputElement = scene.add
+      .dom(562.5, 250)
+      .createFromCache("codeform");
+    console.log(scene.inputElement);
     scene.inputElement.addListener("click");
     scene.inputElement.on("click", function (event) {
+      event.preventDefault();
       if (event.target.name === "enterRoom") {
         const input = scene.inputElement.getChildByName("code-form");
         scene.socket.emit("isKeyValid", input.value);
@@ -105,11 +106,11 @@ export default class WaitingRoom extends Phaser.Scene {
       scene.notValidText.setText("Invalid Room Key");
     });
     scene.socket.on("keyIsValid", function (response) {
-      const key = response[0]
-      const playerNumber = response[1]
+      const key = response[0];
+      const playerNumber = response[1];
       scene.socket.emit("joinRoom", key);
       scene.scene.stop("WaitingRoom");
-      if(playerNumber<2) scene.scene.launch("WaitingforPlayer")
+      if (playerNumber < 2) scene.scene.launch("WaitingforPlayer");
     });
   }
   update() {}

@@ -346,8 +346,16 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
       scene.physics.add.collider(newEnemy, scene.platforms)
       scene.physics.add.collider(newEnemy, scene.player, function(newEnemy, player){
         if (enemy==='mario' && newEnemy.body.touching.up){
-            newEnemy.destroy()
+            // newEnemy.destroy()
+            newEnemy.playDamageTween()
             scene.marioDeathSound.play()
+            player.setVelocityY(-400)
+            //newEnemy.destroy()
+            scene.time.addEvent({
+              delay: 200,
+              callback: ()=>newEnemy.destroy(),
+              loop: false
+            })
         }
         else {
           let bounceLeft = false
@@ -358,7 +366,7 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
           player.decreaseHealth(1)
         }
       });
-      enemyX+=60 //if you create a troop of enemies, they'll be 50 pixels apart
+      enemyX+=50 //if you create a troop of enemies, they'll be 50 pixels apart
     }
     return scene.mario
   }
@@ -880,7 +888,7 @@ clearCharacterChoosing() {
       frames: this.anims.generateFrameNumbers('flagpole'),
       frameRate: 10,
       repeat: 0,
-    })
+    });
   }
 
     // make the laser inactive and insivible when it hits the enemy
