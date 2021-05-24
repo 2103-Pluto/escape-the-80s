@@ -7,7 +7,7 @@
 
 ## Introduction
 
-<img src="public/assets/gifs/blue-idle.gif" width="48"/>
+<img src="public/assets/gifs/blue-idle.gif" width="64"/>
 
 <em>Escape the 80s</em> is a web-based side-scrolling game–built using Phaser 3, Redux, Sequelize, and PostgreSQL–with both campaign and multiplayer modes. Players must help Rex Schraeder fight his way back from the 80s if they don't want him to be forever trapped in a world of fanny packs, leg warmers, and neon fashion!
 
