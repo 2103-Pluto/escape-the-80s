@@ -436,10 +436,10 @@ export default class NeonAlleyScene extends Phaser.Scene {
     const offsetY = 5.5;
     const bulletX =
       this.player.x + (this.player.facingLeft ? -offsetX : offsetX);
-    const bulletY = this.player.isCrouching ? this.player.y + offsetY*3.1 : this.player.y - offsetY*1.2;
+    const bulletY = this.player.isCrouching ? this.player.y + offsetY*0.8 : this.player.y - offsetY*1.2;
     const muzzleX =
       this.player.x + (this.player.facingLeft ? -offsetX*0.95 : offsetX*0.95);
-    const muzzleY = this.player.isCrouching ? this.player.y + offsetY*3.1 : this.player.y - offsetY*1.2;
+    const muzzleY = this.player.isCrouching ? this.player.y + offsetY*0.8 : this.player.y - offsetY*1.2;
 
     //create muzzleFlash
     {this.muzzleFlash ? this.muzzleFlash.reset(muzzleX, muzzleY, this.player.facingLeft)
