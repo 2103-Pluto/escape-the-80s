@@ -4,7 +4,7 @@ import WebFontFile from '../files/WebFontFile'
 export default class TitleScene extends Phaser.Scene {
   constructor() {
     super('TitleScene');
-    this.colors = ['Blue', 'Green', 'Red','Yellow'];
+    this.colors = ['Blue', 'Green', 'Red', 'Yellow', 'Black'];
 
     this.playStartTween = this.playStartTween.bind(this);
   }
@@ -35,7 +35,7 @@ export default class TitleScene extends Phaser.Scene {
 
 
     //load audio
-    for (let i=1; i<5; i++) {
+    for (let i=1; i<7; i++) {
       this.load.audio(`one-liner${i}`, `assets/audio/one_liners/one-liner${i}.wav`);
     }
     this.load.audio("title-music", "assets/audio/title_scene/title-music.wav");
