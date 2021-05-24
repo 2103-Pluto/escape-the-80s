@@ -1,10 +1,6 @@
 import Phaser from 'phaser'
-
-import WaitingRoom from './WaitingRoom'
-import CountdownScene from './CountdownScene'
-import WaitingforPlayer from './MultiplayerWaitingScene'
 import MultiplayerCompletedScene from './MultiplayerCompletedScene'
-import SynthwaveScene from './SynthwaveScene';
+
 
 export default class MultiplayerCompletedScene extends Phaser.Scene {
   constructor() {
@@ -40,10 +36,10 @@ export default class MultiplayerCompletedScene extends Phaser.Scene {
     //add text
     
 
-    this.add.text(this.width*0.5, this.height*0.4, `${this.winner}`, { fontFamily: '"Press Start 2P"' }).setFontSize(32).setOrigin(0.5).setColor('#feff38')
-    this.add.text(this.width*0.5, this.height*0.6, `Winner time: ${this.winTime}`, { fontFamily: '"Press Start 2P"' }).setFontSize(32).setOrigin(0.5).setColor('#feff38')
-    this.line1 = this.add.text(this.width*0.5, this.height*0.5, "One step closer to escaping the 80s", { fontFamily: '"Press Start 2P"' }).setFontSize(20).setOrigin(0.5)
-    this.line1.setVisible(false)
+    this.add.text(this.width*0.5, this.height*0.4, `${this.winner}`, { fontFamily: '"Press Start 2P"' }).setFontSize(25).setOrigin(0.5).setColor('#feff38')
+    //this.add.text(this.width*0.5, this.height*0.6, `Winner time: ${this.winTime}`, { fontFamily: '"Press Start 2P"' }).setFontSize(32).setOrigin(0.5).setColor('#feff38')
+    //this.line1 = this.add.text(this.width*0.5, this.height*0.5, "One step closer to escaping the 80s", { fontFamily: '"Press Start 2P"' }).setFontSize(20).setOrigin(0.5)
+    //this.line1.setVisible(false)
 
     this.createGoToMainMenu()
   }
@@ -69,37 +65,7 @@ export default class MultiplayerCompletedScene extends Phaser.Scene {
         const game = this.game;
         this.click.play();
         window.location.reload(true)
-        //this.scene.stop()
-        // this.scene.start('TitleScene')
-        // this.scene.remove("SynthwaveScene")
-        // this.scene.remove("WaitingRoom")
-        // this.scene.remove("SynthwaveScene")
-        // this.scene.remove("WaitingforPlayer")
-        // this.scene.remove("CountdownScene")
-        // this.scene.remove('MultiplayerCompletedScene') //remove this scene
-        // game.scene.add('MultiplayerCompletedScene', MultiplayerCompletedScene) //add new instance of level completed
-        // game.scene.add('WaitingRoom', WaitingRoom)
-        // game.scene.add('CountdownScene', CountdownScene)
-        // game.scene.add("WaitingforPlayer", WaitingforPlayer)
-        // game.scene.add('SynthwaveScene', SynthwaveScene)
 
     })
-  }
-
-  // playGoToNextLevelTween() {
-  //   this.goToNextLevelTween = this.tweens.add({
-  //     targets: this.goToNextLevelButton,
-  //     duration: 600,
-  //     repeat: -1,
-  //     ease: Phaser.Math.Easing.Expo.InOut,
-  //     // ease: Phaser.Math.Easing.Cubic.Out,
-  //     alpha: 0,
-  //     yoyo: true
-  //   })
-  // }
-
-  update() {
-    // this.scoreLabel.setText(Math.floor(this.scoreTween.getValue()))
-    // this.healthLabel.setText(Math.floor(this.healthTween.getValue()))
   }
 }

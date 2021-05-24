@@ -1,5 +1,5 @@
 import 'phaser';
-//import { GetSpeed } from 'phaser/src/math';
+import store from '../store'
 
 export default class Mario extends Phaser.Physics.Arcade.Sprite {
   constructor(scene, x, y, spritekey) {
@@ -15,13 +15,29 @@ export default class Mario extends Phaser.Physics.Arcade.Sprite {
     this.body.setSize(10,35)
     this.playDamageTween = this.playDamageTween.bind(this)
     // << INITIALIZE PLAYER ATTRIBUTES HERE >>
-    this.bulletHits = 0
-    this.bulletDeath = 5
+    this.bulletHits = 1
+    this.bulletDeath = this.maxHealth
     this.name = 'mario'
+
+    this.initializeHealth()
 
   }
 
-
+  initializeHealth() {
+    const difficulty = store.getState().settings.campaignDifficulty;
+    console.log('difficulty--->', difficulty)
+    switch (difficulty) {
+      case 'novice':
+        this.maxHealth = 3
+        break;
+      case 'insane':
+        this.maxHealth = 10
+        break;
+      default:
+        this.maxHealth = 5
+    }
+    this.bulletDeath=this.maxHealth
+  }
 
 
   patrol(){
