@@ -5,6 +5,7 @@ import { composeWithDevTools } from "redux-devtools-extension";
 import records from "./records";
 import settings from "./settings";
 
+
 const reducer = combineReducers({
   records,
   settings

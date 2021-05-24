@@ -8,7 +8,10 @@ import Star from '../entity/Star';
 import Bomb from '../entity/Bomb'
 import Explosion from '../entity/Explosion';
 import Wall from '../entity/Wall';
+import store from '../store'
+import { setPlayerVictory } from '../store/settings';
 import Rock from '../entity/Rock'
+
 
 const numberOfFrames = 3;
 
@@ -456,10 +459,10 @@ export default class NeonAlleyScene extends Phaser.Scene {
     const offsetY = 5.5;
     const bulletX =
       this.player.x + (this.player.facingLeft ? -offsetX : offsetX);
-    const bulletY = this.player.isCrouching ? this.player.y + offsetY*3.1 : this.player.y - offsetY*1.2;
+    const bulletY = this.player.isCrouching ? this.player.y + offsetY*0.8 : this.player.y - offsetY*1.2;
     const muzzleX =
       this.player.x + (this.player.facingLeft ? -offsetX*0.95 : offsetX*0.95);
-    const muzzleY = this.player.isCrouching ? this.player.y + offsetY*3.1 : this.player.y - offsetY*1.2;
+    const muzzleY = this.player.isCrouching ? this.player.y + offsetY*0.8 : this.player.y - offsetY*1.2;
 
     //create muzzleFlash
     {this.muzzleFlash ? this.muzzleFlash.reset(muzzleX, muzzleY, this.player.facingLeft)
@@ -544,7 +547,21 @@ export default class NeonAlleyScene extends Phaser.Scene {
       enemy.destroy()
       this.bossDeathSound.play()
       this.bossAlive = false;
-      this.player.increaseScore(50)
+      
+      // Points vary depending on difficulty of game/Unlock secret character if game beaten on 'insane'/'standard'
+      const difficulty = store.getState().settings.campaignDifficulty; 
+      if (difficulty === 'novice') {
+        this.player.increaseScore(50)
+      } else if (difficulty === 'insane') {
+        this.player.increaseScore(200)
+        store.dispatch(setPlayerVictory(true))
+      } else {
+        this.player.increaseScore(100)
+        store.dispatch(setPlayerVictory(true)) 
+      }
+      
+      
+      
       this.time.addEvent({
         delay: 4000,
         callback: () => this.flagpoleIsUp = true
