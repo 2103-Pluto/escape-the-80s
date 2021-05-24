@@ -8,6 +8,7 @@ import Star from '../entity/Star';
 import Bomb from '../entity/Bomb'
 import Explosion from '../entity/Explosion';
 import Wall from '../entity/Wall';
+import Rock from '../entity/Rock'
 
 const numberOfFrames = 3;
 
@@ -255,6 +256,12 @@ export default class NeonAlleyScene extends Phaser.Scene {
       frameRate: 10,
       repeat: 0
     })
+    this.anims.create({
+      key: 'hit-effect',
+      frames: this.anims.generateFrameNumbers('wallAnim1', {start: 0, end: 5}),
+      frameRate: 10,
+      repeat: 0
+    })
   }
 
   createWall(scene, x, y){
@@ -402,8 +409,6 @@ export default class NeonAlleyScene extends Phaser.Scene {
       scene.groundGroup,
     );
   }
-
-
 
   createMap() {
     this.back1 = this.add.image(0*128*3.5*1, 0, 'back').setOrigin(0, 0).setScale(3.5).setScrollFactor(0)
@@ -620,16 +625,19 @@ export default class NeonAlleyScene extends Phaser.Scene {
     console.log("BULLETS OVERLAP")
     bullet.setActive(false)
     const hitSound =this.wallHitSound
-    hitSound.play()
+    this.wall.hits++
+    console.log(this.wall.hits)
+    if (this.wall.hits % 6 === 0){
+      hitSound.play()
+      const rockL = new Rock(this, wall.x - 100, wall.y, 'wallAnim1').setScale(1.5)
+      const rockR = new Rock(this, wall.x + 100, wall.y, 'wallAnim1').setScale(1.5)
+      rockL.setVelocityX(-600)
+      rockL.setVelocityY(-200)
+      rockR.setVelocityX(600)
+      rockR.setVelocityY(-200)
+      //rocks.play('hit-effect')
+    }
     bullet.destroy()
-  }
-  createAnimations(){
-    this.anims.create({
-      key: 'hit-effect',
-      frames: this.anims.generateFrameNumbers('wallAnim1', {start: 0, end: 5}),
-      frameRate: 10,
-      repeat: 0
-    })
   }
 
   updateWorldBounds() {
