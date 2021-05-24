@@ -8,16 +8,16 @@ export default class Rock extends Phaser.Physics.Arcade.Sprite {
     this.scene.physics.world.enable(this);
     this.scene.add.existing(this);
 
-    this.lifespan = 2000;
+    this.lifespan = 1500;
 
-    this.body.setAllowGravity(true);
+   // this.body.setAllowGravity(true);
     this.reset(x, y)
   }
 
   reset(x, y) {
     this.setActive(true);
     this.setVisible(true);
-    this.lifespan = 1000;
+    this.lifespan = 1500;
     this.setPosition(x, y)
   }
 
