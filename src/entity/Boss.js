@@ -23,8 +23,8 @@ export default class Boss extends Phaser.Physics.Arcade.Sprite {
   patrol(){
     const speed = 3
 
-    this.leftDest = this.initialX-100
-    this.rightDest = this.initialX+100
+    this.leftDest = this.initialX-200
+    this.rightDest = this.initialX+200
 
     if(this.x<=this.rightDest && this.movingLeft===false){
 

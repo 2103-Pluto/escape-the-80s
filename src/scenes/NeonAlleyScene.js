@@ -618,7 +618,7 @@ export default class NeonAlleyScene extends Phaser.Scene {
 
 
     this.time.addEvent({
-      delay: 700,
+      delay: 400,
       callback: () => {
         this.tweens.add({
           targets: bomb,
@@ -630,7 +630,7 @@ export default class NeonAlleyScene extends Phaser.Scene {
     })
 
     this.time.addEvent({
-      delay: 1000,
+      delay: 600,
       callback: () => {
         this.events.emit('explodeFn', bomb.x, bomb.y + 10, bomb, this)
       }
