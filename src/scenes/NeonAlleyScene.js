@@ -81,6 +81,7 @@ export default class NeonAlleyScene extends Phaser.Scene {
       frameHeight: 48,
     })
     this.load.audio('boss-dead', 'assets/audio/i-aint-goin-nowhere.wav')
+    this.load.audio('boss-mad', 'assets/audio/i-will-not-die-sober.wav')
   }
 
   preloadColaBomb() {
@@ -220,7 +221,9 @@ export default class NeonAlleyScene extends Phaser.Scene {
 
     this.bossDeathSound = this.sound.add('boss-dead')
     this.bossDeathSound.volume = 0.3
-
+    
+    this.bossMadSound = this.sound.add('boss-mad')
+    this.bossMadSound.volume = 0.3
   }
 
   createBoss(scene, x, y, scale) {
@@ -510,6 +513,11 @@ export default class NeonAlleyScene extends Phaser.Scene {
 
   hit(enemy, bullet) {
     bullet.setActive(false);
+    
+    if(enemy.bulletHits===enemy.bulletDeath/2) {
+      this.bossMadSound.play()
+    }
+    
     if(enemy.bulletHits===enemy.bulletDeath){
       enemy.destroy()
       this.bossDeathSound.play()
