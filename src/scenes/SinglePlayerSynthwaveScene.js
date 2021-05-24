@@ -90,6 +90,7 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
 
     this.load.image('bullet', 'assets/sprites/SpongeBullet.png');
     this.load.image('muzzleFlash', 'assets/sprites/MuzzleFlash.png');
+    this.load.image('shot', 'assets/sprites/shot.png')
   }
 
   preloadSounds() {
@@ -786,13 +787,24 @@ clearCharacterChoosing() {
       // Check if we can reuse an inactive laser in our pool of lasers
       if (!bullet) {
         // Create a laser bullet and scale the sprite down
-        bullet = new Bullet(
-          this,
-          bulletX,
-          bulletY,
-          'bullet',
-          this.player.facingLeft
-        ).setScale(3);
+        if (this.color === 'Black') {
+          bullet = new Bullet(
+            this,
+            bulletX,
+            bulletY,
+            'shot',
+            this.player.facingLeft
+          ).setScale(3);
+        } else {
+          bullet = new Bullet(
+            this,
+            bulletX,
+            bulletY,
+            'bullet',
+            this.player.facingLeft
+          ).setScale(2);
+        }
+        
         this.bullets.add(bullet);
       }
       // Reset this laser to be used for the shot
