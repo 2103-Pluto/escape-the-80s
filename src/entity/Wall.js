@@ -15,6 +15,8 @@ export default class Wall extends Phaser.Physics.Arcade.Sprite {
     this.state2 = false
     this.state3 = false
     this.setPushable(false)
+    this.setVelocityX(0)
+    this.setVelocityY(0)
     this.phaseTransition = this.phaseTransition.bind(this)
   }
 

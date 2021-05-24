@@ -230,7 +230,7 @@ export default class NeonAlleyScene extends Phaser.Scene {
 
     this.bossDeathSound = this.sound.add('boss-dead')
     this.bossDeathSound.volume = 0.3
-    
+
     this.bossMadSound = this.sound.add('boss-mad')
     this.bossMadSound.volume = 0.3
   }
@@ -272,14 +272,27 @@ export default class NeonAlleyScene extends Phaser.Scene {
 
 
   createWall(scene, x, y){
-    const wall = new Wall(scene, x, y, 'Wall1').setScale(.25)
+    const wall = new Wall(scene, x, y, 'Wall1').setScale(.4) //set size then set offset
     scene.physics.add.collider(wall, scene.player)
-    // need to think about bullet colliders
     this.wallGroup.getChildren().forEach((w) => {
-      scene.physics.add.collider(w, wall)
+      scene.physics.add.collider(w, wall, function () {
+        var b1 = w.body;
+        var b2 = wall.body;
+
+        if (b1.y > b2.y) {
+            b2.y += (b1.top - b2.bottom);
+            b2.stop();
+        }
+        else {
+            b1.y += (b2.top - b1.bottom);
+            b1.stop();
+        }
+    })
     })
     scene.wallGroup.add(wall)
     scene.physics.add.collider(scene.wallGroup, scene.groundGroup)
+    console.log(wall.body)
+    wall.body.touching.down = true
   }
 
   createWallGroup(scene) {
@@ -312,11 +325,11 @@ export default class NeonAlleyScene extends Phaser.Scene {
     this.createBoss(this, this.width*2.6, 400, 4)
     this.createAnimations()
     this.createWallGroup(this)
-    this.createWall(this, 610, -100)
-    this.createWall(this, 610, 50)
-    this.createWall(this, 610, 200)
-    this.createWall(this, 610, 300)
-    this.createWall(this, 610, 400)
+    this.createWall(this, 500, -100)
+    this.createWall(this, 500, 50)
+    this.createWall(this, 500, 200)
+    this.createWall(this, 500, 300)
+    this.createWall(this, 500, 400)
     this.createWall(this, 800, 0)
     this.createWall(this, 800, 100)
     this.createWall(this, 800, 200)
@@ -538,18 +551,18 @@ export default class NeonAlleyScene extends Phaser.Scene {
 
   hit(enemy, bullet) {
     bullet.setActive(false);
-    
+
     if(enemy.bulletHits===enemy.bulletDeath/2) {
       this.bossMadSound.play()
     }
-    
+
     if(enemy.bulletHits===enemy.bulletDeath){
       enemy.destroy()
       this.bossDeathSound.play()
       this.bossAlive = false;
-      
+
       // Points vary depending on difficulty of game/Unlock secret character if game beaten on 'insane'/'standard'
-      const difficulty = store.getState().settings.campaignDifficulty; 
+      const difficulty = store.getState().settings.campaignDifficulty;
       if (difficulty === 'novice') {
         this.player.increaseScore(50)
       } else if (difficulty === 'insane') {
@@ -557,11 +570,11 @@ export default class NeonAlleyScene extends Phaser.Scene {
         store.dispatch(setPlayerVictory(true))
       } else {
         this.player.increaseScore(100)
-        store.dispatch(setPlayerVictory(true)) 
+        store.dispatch(setPlayerVictory(true))
       }
-      
-      
-      
+
+
+
       this.time.addEvent({
         delay: 4000,
         callback: () => this.flagpoleIsUp = true
