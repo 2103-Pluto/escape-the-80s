@@ -14,7 +14,7 @@ export default class Bomb extends Phaser.Physics.Arcade.Sprite {
     // Set how fast the laser travels (pixels/ms). Hard coded it here for simplicity
     this.speed = Phaser.Math.GetSpeed(400, -400); // (distance in pixels, time (ms))
     // How long the laser will live (ms). Hard coded here for simplicity
-    this.lifespan = 5000;
+    this.lifespan = 3000;
 
     this.body.setAllowGravity(true);
     this.reset(x, y, facingLeft)
@@ -23,7 +23,7 @@ export default class Bomb extends Phaser.Physics.Arcade.Sprite {
   reset(x, y, facingLeft) {
     this.setActive(true);
     this.setVisible(true);
-    this.lifespan = 5000;
+    this.lifespan = 3000;
     this.facingLeft = facingLeft
     this.setPosition(x, y)
   }
