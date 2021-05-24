@@ -24,8 +24,8 @@ export default class SettingsScene extends Phaser.Scene {
     // add section header
     this.add.text(this.width*0.5, this.height*0.35, 'Campaign Difficulty', { fontFamily: '"Press Start 2P"' }).setFontSize(26).setOrigin(0.5, 0.5).setColor('#ED6BF3')
 
-    this.createOptions() //add options and make them interactive
     this.createSkulls() // add skulls to be displayed with options
+    this.createOptions() //add options and make them interactive
 
     // add back button
     this.scene.get('CreditsScene').createBack(this, 'MainMenuScene');
@@ -33,9 +33,12 @@ export default class SettingsScene extends Phaser.Scene {
 
   createOptions() {
     this.options = {};
-    this.options["novice"] = this.add.text(this.width*0.18, this.height*0.5, 'Novice', { fontFamily: '"Press Start 2P"' }).setFontSize(24).setOrigin(0.5, 0.5)
-    this.options["standard"] = this.add.text(this.width*0.5, this.height*0.5, 'Standard', { fontFamily: '"Press Start 2P"' }).setFontSize(24).setOrigin(0.5, 0.5)
-    this.options["insane"] = this.add.text(this.width*0.82, this.height*0.5, 'Insane', { fontFamily: '"Press Start 2P"' }).setFontSize(24).setOrigin(0.5, 0.5)
+    this.options["novice"] = this.add.text(this.width*0.19, this.height*0.5, 'Novice', { fontFamily: '"Press Start 2P"' }).setFontSize(24).setOrigin(0.5, 0.5)
+    this.options["standard"] = this.add.text(this.width*0.51, this.height*0.5, 'Standard', { fontFamily: '"Press Start 2P"' }).setFontSize(24).setOrigin(0.5, 0.5)
+    this.options["insane"] = this.add.text(this.width*0.83, this.height*0.5, 'Insane', { fontFamily: '"Press Start 2P"' }).setFontSize(24).setOrigin(0.5, 0.5)
+    this.selected = store.getState().settings.campaignDifficulty
+    this.options[this.selected].setColor('#F57C2D')
+    this.animateSkulls(this.selected, this.skulls)
 
     for (let key of Object.keys(this.options)) {
       this.options[key].setInteractive();
@@ -44,19 +47,23 @@ export default class SettingsScene extends Phaser.Scene {
         this.options[key].setColor('#feff38')
         this.hoverIcon.x = this.options[key].x - this.options[key].width/2 - 35;
         this.hoverIcon.y = this.options[key].y;
-        this.audio[key].play()
       })
       this.options[key].on("pointerout", () => {
+        this.selected = store.getState().settings.campaignDifficulty
         this.hoverIcon.setVisible(false);
-        this.audio[key].stop()
-        this.options[key].setColor('white')
+        // this.audio[key].stop()
+        key === this.selected ? this.options[key].setColor('#F57C2D') : this.options[key].setColor('white')
       })
       this.options[key].on("pointerup", () => {
         this.click.play();
+        this.audio[key].play()
         store.dispatch(setCampaignDifficulty(key))
-        this.unsubscribe = store.subscribe(() => {
-          this.records = store.getState().settings.campaignDifficulty
-        })
+        for (let key of Object.keys(this.options)) {
+          this.options[key].setColor('white')
+        }
+        this.selected = store.getState().settings.campaignDifficulty
+        this.options[this.selected].setColor('#F57C2D')
+        this.animateSkulls(this.selected, this.skulls)
       })
     }
   }
@@ -69,8 +76,9 @@ export default class SettingsScene extends Phaser.Scene {
       frameRate: 10,
       repeat: -1,
     });
-    positions.forEach((coordinateX) => {
-      this.add.sprite(this.width*coordinateX, (this.height*0.5)+50, 'skull').setScale(0.8).setOrigin(0.5).play('moving-skull', true)
+    this.skulls = {};
+    positions.forEach((coordinateX, index) => {
+      this.skulls[index] = this.add.sprite(this.width*coordinateX, (this.height*0.5)+50, 'skull').setScale(0.8).setOrigin(0.5)
     })
   }
 
@@ -82,5 +90,24 @@ export default class SettingsScene extends Phaser.Scene {
       audio[difficulty] = this.sound.add(difficulty);
       difficulty === 'insane' ? audio[difficulty].volume = 0.2 : audio[difficulty].volume = 0.35;
     })
+  }
+
+  animateSkulls(selected, skulls) {
+    Object.keys(skulls).forEach((index) => {
+      skulls[index].anims.stop();
+    })
+    switch (selected) {
+      case "novice":
+        skulls["0"].play('moving-skull', true)
+        break
+      case "insane":
+        skulls["3"].play('moving-skull', true)
+        skulls["4"].play('moving-skull', true)
+        skulls["5"].play('moving-skull', true)
+        break
+      default: "standard"
+        skulls["1"].play('moving-skull', true)
+        skulls["2"].play('moving-skull', true)
+    }
   }
 }
