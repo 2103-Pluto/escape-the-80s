@@ -50,6 +50,7 @@ export default class SoldierPlayer extends Phaser.Physics.Arcade.Sprite {
     this.bulletHits = 0
     this.bulletDeath = this.maxHealth
 
+
     this.initializeHealth()
   }
 
@@ -66,6 +67,7 @@ export default class SoldierPlayer extends Phaser.Physics.Arcade.Sprite {
         this.maxHealth = 5
     }
     this.health = this.maxHealth; //player's health
+
   }
 
   updateMovement(cursors) {
