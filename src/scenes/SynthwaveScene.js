@@ -25,7 +25,7 @@ export default class SynthwaveScene extends Phaser.Scene {
     this.winner = null
     this.flagpoleIsUp = false;
     this.touchingFlagpole = false;
-    
+
     this.raiseFlagpole = this.raiseFlagpole.bind(this)
     this.createFlagpole = this.createFlagpole.bind(this)
 
@@ -164,12 +164,12 @@ export default class SynthwaveScene extends Phaser.Scene {
     //loading bar
     this.scene.get('TitleScene').displayLoadingBar(this, "ma, you've been bad")
     this.preloadSoldier()
-    
+
     this.load.spritesheet('flagpole', 'assets/spriteSheets/flagpoles_sheet.png', {
       frameWidth: 31.6,
       frameHeight: 168
     })
-    
+
 
     this.load.image('ground', 'assets/sprites/ground-juan-test.png');
     this.load.image('brandon', 'assets/sprites/brandon.png');
@@ -458,9 +458,9 @@ export default class SynthwaveScene extends Phaser.Scene {
       scene.scene.stop("WaitingforPlayer")
       scene.scene.launch("CountdownScene")
     })
-    
+
     this.timer()
-  
+
 
     // Create collisions for all entities
     // << CREATE COLLISIONS HERE >>
@@ -496,8 +496,8 @@ export default class SynthwaveScene extends Phaser.Scene {
     const screenCenterX = this.cameras.main.worldView.x + this.cameras.main.width / 2;
     const screenCenterY = this.cameras.main.worldView.y + this.cameras.main.height / 2;
     //timer
-    
-    this.clock = this.add.text(screenCenterX, screenCenterY-250, 
+
+    this.clock = this.add.text(screenCenterX, screenCenterY-250,
     'Time:' + this.formatTime(this.winTime), { fontFamily: '"Press Start 2P"' }).setFontSize(20).setOrigin(0.5)
     this.timedEvent = this.time.addEvent({
       delay: 1000,
