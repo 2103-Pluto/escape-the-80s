@@ -8,6 +8,8 @@ import Star from '../entity/Star';
 import Bomb from '../entity/Bomb'
 import Explosion from '../entity/Explosion';
 import Wall from '../entity/Wall';
+import store from '../store'
+import { setPlayerVictory } from '../store/settings';
 
 const numberOfFrames = 3;
 
@@ -522,7 +524,21 @@ export default class NeonAlleyScene extends Phaser.Scene {
       enemy.destroy()
       this.bossDeathSound.play()
       this.bossAlive = false;
-      this.player.increaseScore(50)
+      
+      // Points vary depending on difficulty of game/Unlock secret character if game beaten on 'insane'/'standard'
+      const difficulty = store.getState().settings.campaignDifficulty; 
+      if (difficulty === 'novice') {
+        this.player.increaseScore(50)
+      } else if (difficulty === 'insane') {
+        this.player.increaseScore(200)
+        store.dispatch(setPlayerVictory(true))
+      } else {
+        this.player.increaseScore(100)
+        store.dispatch(setPlayerVictory(true)) 
+      }
+      
+      
+      
       this.time.addEvent({
         delay: 4000,
         callback: () => this.flagpoleIsUp = true
