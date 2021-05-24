@@ -319,9 +319,11 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
   }
 
   createFlagpole(scene) {
+
     scene.flagpole = new Flagpole(scene, scene.playerZones.end.x + 195, 310, 'flagpole').setScale(2.78)
+
     //---> testing mode (to go to level 2)
-    // scene.flagpole = new Flagpole(scene, 300, 310, 'flagpole').setScale(2.78)
+    //scene.flagpole = new Flagpole(scene, 300, 310, 'flagpole').setScale(2.78)
     //<--- testing mode
     scene.flagpole.body.setSize(2, 160)
     scene.flagpole.body.setOffset(16, 0)
@@ -348,7 +350,11 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
             scene.marioDeathSound.play()
         }
         else {
-          player.bounceOff()
+          let bounceLeft = false
+          if (newEnemy.x - player.x > 0) {
+            bounceLeft = true
+          }
+          player.bounceOff(bounceLeft)
           player.decreaseHealth(1)
         }
       });
@@ -897,7 +903,11 @@ clearCharacterChoosing() {
         if (enemy!==this.player) {
           enemy.playDamageTween()
         } else {
-          enemy.bounceOff()
+          let bounceLeft = false
+          if (bullet.x - this.player.x > 0) {
+            bounceLeft = true
+          }
+          enemy.bounceOff(bounceLeft)
         }
       }
       bullet.destroy()

@@ -78,6 +78,7 @@ export default class RickRollScene extends Phaser.Scene {
         this.playGoToCreditsButtonTween()
         this.bottomText.setVisible(true)
         this.adviceText.setVisible(true)
+
       }
     })
   }

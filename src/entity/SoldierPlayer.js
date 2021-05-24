@@ -254,9 +254,8 @@ export default class SoldierPlayer extends Phaser.Physics.Arcade.Sprite {
       this.decreaseHealth(1)
       this.bulletHits=0
     }
-
-
   }
+
   updateJump(cursors, jumpSound) {
     if (cursors.up.isDown && this.body.onFloor()) {
       this.setVelocityY(-750);
@@ -325,13 +324,13 @@ export default class SoldierPlayer extends Phaser.Physics.Arcade.Sprite {
     this.health = this.maxHealth;
   }
 
-  bounceOff() {
+  bounceOff(bounceLeft) {
     this.body.checkCollision.none = true;
     this.hasBeenHit = true;
     const hitAnim = this.playDamageTween();
-    this.facingLeft ?
-    this.setVelocity(this.bounceVelocity, -this.bounceVelocity)
-    : this.setVelocity(-this.bounceVelocity, -this.bounceVelocity)
+    (bounceLeft) ?
+    this.setVelocity(-this.bounceVelocity, -this.bounceVelocity)
+    : this.setVelocity(this.bounceVelocity, -this.bounceVelocity)
     this.body.checkCollision.none = false;
     this.scene.time.addEvent({
       delay: 500,
