@@ -17,12 +17,18 @@
 
 ## Screenshots
 
-<img src="public/assets/screenshots/screenshot-3.png" width="400"/>
-<img src="public/assets/screenshots/screenshot-4.png" width="400"/>
-<!-- <img src="public/assets/screenshots/screenshot-5.png" width="400"/> -->
-<img src="public/assets/screenshots/screenshot-1.png" width="400"/>
-<img src="public/assets/screenshots/screenshot-2.png" width="400"/>
-<img src="public/assets/screenshots/screenshot-6.png" width="400"/>
+<p float="left">
+  <img src="public/assets/screenshots/screenshot-3.png" width="323"/>
+  <img src="public/assets/screenshots/screenshot-4.png" width="310"/>
+</p>
+<p float="left">
+  <img src="public/assets/screenshots/screenshot-5.png" width="319"/>
+  <img src="public/assets/screenshots/screenshot-1.png" width="320"/>
+</p>
+<p float="left">
+  <img src="public/assets/screenshots/screenshot-2.png" width="323"/>
+  <img src="public/assets/screenshots/screenshot-6.png" width="320"/>
+</p>
 
 ## Getting Started
 
