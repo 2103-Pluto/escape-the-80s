@@ -25,7 +25,6 @@ export default class Terminator extends Phaser.Physics.Arcade.Sprite {
  
   initializeHealth() {
     const difficulty = store.getState().settings.campaignDifficulty;
-    console.log('difficulty--->', difficulty)
     switch (difficulty) {
       case 'novice':
         this.maxHealth = 10
