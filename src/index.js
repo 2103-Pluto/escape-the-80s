@@ -36,6 +36,7 @@ import CountdownScene from './scenes/CountdownScene'
 import WaitingforPlayer from './scenes/MultiplayerWaiting'
 import MultiplayerCompletedScene from './scenes/MultiplayerCompletedScene'
 import RickRollScene from './scenes/RickRollScene'
+import SettingsScene from './scenes/SettingsScene'
 
 
 class Game extends Phaser.Game {
@@ -56,6 +57,7 @@ class Game extends Phaser.Game {
     this.scene.add('LevelCompletedScene', LevelCompletedScene)
     this.scene.add('ControlsScene', ControlsScene)
     this.scene.add('HighScoresScene', HighScoresScene)
+    this.scene.add('SettingsScene', SettingsScene)
     this.scene.add('CharacterChoosingScene', CharacterChoosingScene)
     this.scene.add('StoryScene', StoryScene)
     this.scene.add('GameOverMenuScene', GameOverMenuScene)
