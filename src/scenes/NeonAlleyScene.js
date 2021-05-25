@@ -130,7 +130,7 @@ export default class NeonAlleyScene extends Phaser.Scene {
 
   createBerlinWall(){
     const orange = this.add.image(200, 200, 'berlinWall').setOrigin(0,0).setScale(3)
-    console.log(orange)
+    // console.log(orange)
     return orange
   }
 
@@ -303,12 +303,12 @@ export default class NeonAlleyScene extends Phaser.Scene {
     })
     scene.wallGroup.add(wall)
     scene.physics.add.collider(scene.wallGroup, scene.groundGroup)
-    console.log(wall.body)
     wall.body.touching.down = true
   }
 
   createWallGroup(scene) {
-    scene.wallGroup = scene.physics.add.group({
+    //make this group static to get rid of bug with the player vibrating on top of wall
+    scene.wallGroup = scene.physics.add.staticGroup({
       classType: Wall,
       runChildUpdate: true,
       allowGravity: true,
