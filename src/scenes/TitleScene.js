@@ -66,7 +66,7 @@ export default class TitleScene extends Phaser.Scene {
     this.startText = this.add.text(width*0.5, height*0.65, '- PRESS ENTER TO START -', { fontFamily: '"Press Start 2P"' }).setFontSize(18).setOrigin(0.5, 0.5)
     this.playStartTween();
 
-    this.add.text(width*0.5, height*0.92, '\u00A9 2021 TEAM PLUTO', { fontFamily: '"Press Start 2P"' }).setFontSize(14).setOrigin(0.5, 0.5).setColor('#feff38')
+    this.add.text(width*0.5, height*0.92, '2021 TEAM PLUTO', { fontFamily: '"Press Start 2P"' }).setFontSize(14).setOrigin(0.5, 0.5).setColor('#feff38')
     this.playStartTween();
 
     //listen to event to transition to next scene

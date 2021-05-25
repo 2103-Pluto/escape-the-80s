@@ -283,7 +283,7 @@ export default class NeonAlleyScene extends Phaser.Scene {
 
 
   createWall(scene, x, y){
-    const wall = new Wall(scene, x, y, 'Wall1').setScale(.4).setSize(740, 250).setOffset(11, 0) //set size then set offset //testing mode
+    const wall = new Wall(scene, x, y, 'Wall1').setScale(.4).setSize(740, 250).setOffset(11, 0) //set size then set offset
     scene.physics.add.collider(wall, scene.player)
 
     // need to think about bullet colliders
