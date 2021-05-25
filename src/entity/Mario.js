@@ -25,7 +25,6 @@ export default class Mario extends Phaser.Physics.Arcade.Sprite {
 
   initializeHealth() {
     const difficulty = store.getState().settings.campaignDifficulty;
-    console.log('difficulty--->', difficulty)
     switch (difficulty) {
       case 'novice':
         this.maxHealth = 3
@@ -71,7 +70,7 @@ export default class Mario extends Phaser.Physics.Arcade.Sprite {
   update(hitSound) {
     this.patrol()
     this.anims.play('walk', true)
-    
+
   }
 
   playDamageTween() {

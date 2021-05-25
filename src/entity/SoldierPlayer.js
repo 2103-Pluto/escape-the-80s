@@ -43,7 +43,7 @@ export default class SoldierPlayer extends Phaser.Physics.Arcade.Sprite {
     this.initializeHealth = this.initializeHealth.bind(this)
 
     // this.body.setSize(5, 40, false)
-    // this.body.setOffset(30, 30) //testing
+    // this.body.setOffset(30, 30)
     this.bounceOff = this.bounceOff.bind(this)
     this.playDamageTween = this.playDamageTween.bind(this)
 
@@ -317,7 +317,7 @@ export default class SoldierPlayer extends Phaser.Physics.Arcade.Sprite {
       }
   }
 
- 
+
   increaseHealth(deltaHealth) {
     this.health = Math.min(this.maxHealth, this.health + deltaHealth);
   }

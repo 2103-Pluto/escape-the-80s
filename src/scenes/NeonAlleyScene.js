@@ -64,7 +64,7 @@ export default class NeonAlleyScene extends Phaser.Scene {
 
 
   preloadWall(){
-    const wall1 =  this.load.spritesheet("Wall1", "assets/spriteSheets/Wall/wall-state1.png", {
+    const wall1 = this.load.spritesheet("Wall1", "assets/spriteSheets/Wall/wall-state1.png", {
       frameWidth: 750,
       frameHeight: 250,
     });
@@ -230,7 +230,7 @@ export default class NeonAlleyScene extends Phaser.Scene {
 
     this.bossDeathSound = this.sound.add('boss-dead')
     this.bossDeathSound.volume = 0.3
-    
+
     this.bossMadSound = this.sound.add('boss-mad')
     this.bossMadSound.volume = 0.3
   }
@@ -275,21 +275,31 @@ export default class NeonAlleyScene extends Phaser.Scene {
     const wall = new Wall(scene, x, y, 'Wall1').setScale(.25)
     scene.physics.add.collider(wall, scene.player)
     // need to think about bullet colliders
-    this.wallGroup.getChildren().forEach((w) => {
-      scene.physics.add.collider(w, wall)
+    scene.wallGroup.getChildren().forEach((w) => {
+      scene.physics.add.collider(w, wall, function() {
+        const b1 = w.body;
+        const b2 = wall.body;
+        if (b1.y > b2.y) {
+            b2.y += (b1.top - b2.bottom);
+            b2.stop();
+        }
+        else {
+            b1.y += (b2.top - b1.bottom);
+            b1.stop();
+        }
+      })
     })
     scene.wallGroup.add(wall)
     scene.physics.add.collider(scene.wallGroup, scene.groundGroup)
   }
 
   createWallGroup(scene) {
-    this.wallGroup = this.physics.add.group({
+    scene.wallGroup = scene.physics.add.group({
       classType: Wall,
       runChildUpdate: true,
       allowGravity: true,
-      immovable: false,
+      immovable: false
     })
-    //scene.physics.add.collider(this.wallGroup, this.wallGroup)
   }
 
   create() {
@@ -401,7 +411,7 @@ export default class NeonAlleyScene extends Phaser.Scene {
 
     scene.physics.add.collider(
       scene.bombs,
-      scene.groundGroup,
+      scene.groundGroup
     );
   }
 
@@ -423,7 +433,7 @@ export default class NeonAlleyScene extends Phaser.Scene {
 
     scene.physics.add.collider(
       scene.explosions,
-      scene.groundGroup,
+      scene.groundGroup
     );
   }
 
@@ -444,7 +454,8 @@ export default class NeonAlleyScene extends Phaser.Scene {
   createPhysics(scene) {
     scene.player.setCollideWorldBounds(true);
     scene.physics.add.collider(scene.player, scene.groundGroup)
-    scene.physics.add.collider(scene.groundGroup, scene.wallGroup)
+    // scene.physics.add.collider(scene.groundGroup, scene.wallGroup)
+    // <--- THE LINE ABOVE IS WHAT CAUSED THE RESTART BUG---> //
   }
 
   showGameOverMenu(scene) {
@@ -548,18 +559,18 @@ export default class NeonAlleyScene extends Phaser.Scene {
 
   hit(enemy, bullet) {
     bullet.setActive(false);
-    
+
     if(enemy.bulletHits===enemy.bulletDeath/2) {
       this.bossMadSound.play()
     }
-    
+
     if(enemy.bulletHits===enemy.bulletDeath){
       enemy.destroy()
       this.bossDeathSound.play()
       this.bossAlive = false;
-      
+
       // Points vary depending on difficulty of game/Unlock secret character if game beaten on 'insane'/'standard'
-      const difficulty = store.getState().settings.campaignDifficulty; 
+      const difficulty = store.getState().settings.campaignDifficulty;
       if (difficulty === 'novice') {
         this.player.increaseScore(50)
       } else if (difficulty === 'insane') {
@@ -567,11 +578,11 @@ export default class NeonAlleyScene extends Phaser.Scene {
         store.dispatch(setPlayerVictory(true))
       } else {
         this.player.increaseScore(100)
-        store.dispatch(setPlayerVictory(true)) 
+        store.dispatch(setPlayerVictory(true))
       }
-      
-      
-      
+
+
+
       this.time.addEvent({
         delay: 4000,
         callback: () => this.flagpoleIsUp = true

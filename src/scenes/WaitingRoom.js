@@ -69,7 +69,7 @@ export default class WaitingRoom extends Phaser.Scene {
     scene.inputElement = scene.add.scene.inputElement = scene.add
       .dom(562.5, 250)
       .createFromCache("codeform");
-    console.log(scene.inputElement);
+
     scene.inputElement.addListener("click");
     scene.inputElement.on("click", function (event) {
       event.preventDefault();
