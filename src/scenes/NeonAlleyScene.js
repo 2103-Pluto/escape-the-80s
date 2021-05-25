@@ -90,7 +90,7 @@ export default class NeonAlleyScene extends Phaser.Scene {
       frameHeight: 48,
     })
     this.load.audio('boss-dead', 'assets/audio/i-aint-goin-nowhere.wav')
-    this.load.audio('boss-mad', 'assets/audio/i-will-not-die-sober.wav')
+    this.load.audio('boss-mad', 'assets/audio/I-will-not-die-sober.wav')
   }
 
   preloadColaBomb() {
