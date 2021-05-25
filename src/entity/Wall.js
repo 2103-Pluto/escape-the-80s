@@ -9,7 +9,7 @@ export default class Wall extends Phaser.Physics.Arcade.Sprite {
     this.spritekey = spritekey
     this.scene.add.existing(this)
     this.scene.physics.world.enable(this)
-    this.health = 18 // MUST BE DIVISIBLE BY 3
+    this.health = 21 // MUST BE DIVISIBLE BY 3
     this.hits = 0
     this.state1 = true // use these to manage which stage the wall is in relative to the health of the wall
     this.state2 = false
