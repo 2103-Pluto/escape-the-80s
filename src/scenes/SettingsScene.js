@@ -44,6 +44,7 @@ export default class SettingsScene extends Phaser.Scene {
     this.difficultyOptions[this.selectedDifficulty].setColor('#F57C2D')
     this.animateSkulls(this.selectedDifficulty, this.skulls)
 
+    let currentAudio;
     for (let key of Object.keys(this.difficultyOptions)) {
       this.difficultyOptions[key].setInteractive();
       this.difficultyOptions[key].on("pointerover", () => {
@@ -60,8 +61,11 @@ export default class SettingsScene extends Phaser.Scene {
       })
       this.difficultyOptions[key].on("pointerup", () => {
         this.click.play();
-        this.audio[key].play()
+        if (currentAudio) currentAudio.stop(); //stop previous audio clip fro selection
+        currentAudio = this.audio[key];
+        currentAudio.play()
         store.dispatch(setCampaignDifficulty(key))
+
         for (let key of Object.keys(this.difficultyOptions)) {
           this.difficultyOptions[key].setColor('white')
         }

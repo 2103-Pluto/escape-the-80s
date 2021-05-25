@@ -130,7 +130,7 @@ export default class NeonAlleyScene extends Phaser.Scene {
 
   createBerlinWall(){
     const orange = this.add.image(200, 200, 'berlinWall').setOrigin(0,0).setScale(3)
-    console.log(orange)
+    // console.log(orange)
     return orange
   }
 
@@ -283,7 +283,7 @@ export default class NeonAlleyScene extends Phaser.Scene {
 
 
   createWall(scene, x, y){
-    const wall = new Wall(scene, x, y, 'Wall1').setScale(.4) //set size then set offset
+    const wall = new Wall(scene, x, y, 'Wall1').setScale(.4).setSize(740, 250).setOffset(11, 0) //set size then set offset
     scene.physics.add.collider(wall, scene.player)
 
     // need to think about bullet colliders
@@ -303,12 +303,12 @@ export default class NeonAlleyScene extends Phaser.Scene {
     })
     scene.wallGroup.add(wall)
     scene.physics.add.collider(scene.wallGroup, scene.groundGroup)
-    console.log(wall.body)
     wall.body.touching.down = true
   }
 
   createWallGroup(scene) {
-    scene.wallGroup = scene.physics.add.group({
+    //make this group static to get rid of bug with the player vibrating on top of wall
+    scene.wallGroup = scene.physics.add.staticGroup({
       classType: Wall,
       runChildUpdate: true,
       allowGravity: true,
@@ -341,13 +341,13 @@ export default class NeonAlleyScene extends Phaser.Scene {
     this.createWall(this, 500, 200)
     this.createWall(this, 500, 300)
     this.createWall(this, 500, 400)
-    this.createWall(this, 800, 0)
+    this.createWall(this, 797, 0)
    // this.createWall(this, 800, 100)
-    this.createWall(this, 800, 200)
-    this.createWall(this, 800, 300)
-    this.createWall(this, 800, 400)
+    this.createWall(this, 797, 200)
+    this.createWall(this, 797, 300)
+    this.createWall(this, 797, 400)
     const blue = this.createBerlinWall()
-    console.log(blue)
+    // console.log(blue)
     this.createBulletGroup(this)
     this.createBombGroup(this)
     this.createExplosionGroup(this)
