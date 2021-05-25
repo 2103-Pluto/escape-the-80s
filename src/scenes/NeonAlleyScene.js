@@ -122,8 +122,17 @@ export default class NeonAlleyScene extends Phaser.Scene {
 
     this.preloadWall()
     this.preloadWallSounds()
+    this.load.spritesheet("berlinWall", "assets/spriteSheets/berlinWall.png",{
+      frameWidth: 266,
+      frameHeight: 65
+    })
   }
 
+  createBerlinWall(){
+    const orange = this.add.image(200, 200, 'berlinWall').setOrigin(0,0).setScale(3)
+    console.log(orange)
+    return orange
+  }
 
   createGround(tileWidth, count) {
     for (let i=0; i<count; i++) {
@@ -326,15 +335,17 @@ export default class NeonAlleyScene extends Phaser.Scene {
     this.createAnimations()
     this.createWallGroup(this)
     this.createWall(this, 500, -100)
-    this.createWall(this, 500, 50)
+    //this.createWall(this, 500, 50)
     this.createWall(this, 500, 200)
     this.createWall(this, 500, 300)
     this.createWall(this, 500, 400)
     this.createWall(this, 800, 0)
-    this.createWall(this, 800, 100)
+   // this.createWall(this, 800, 100)
     this.createWall(this, 800, 200)
     this.createWall(this, 800, 300)
     this.createWall(this, 800, 400)
+    const blue = this.createBerlinWall()
+    console.log(blue)
     this.createBulletGroup(this)
     this.createBombGroup(this)
     this.createExplosionGroup(this)
@@ -695,6 +706,7 @@ export default class NeonAlleyScene extends Phaser.Scene {
     }
     if (wall.health === wall.hits){
       wall.destroy()
+      this.player.increaseScore(4)
       // add breaking sound
     }
     bullet.destroy()
