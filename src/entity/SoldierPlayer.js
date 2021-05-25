@@ -257,6 +257,9 @@ export default class SoldierPlayer extends Phaser.Physics.Arcade.Sprite {
       this.updateShoot(time, cursors, shootingFn, shootingSound);
     }
     this.updateBulletHits()
+
+    // Kill the playe if they fall bellow ground (outside of world bounds)
+    if (this.y > this.scene.game.config.height) this.decreaseHealth(this.maxHealth)
   }
 
   updateDying() {
