@@ -141,7 +141,7 @@ export default class NeonAlleyScene extends Phaser.Scene {
     this.game.sound.stopAll()
     this.backgroundSound = this.sound.add('mfn-reagan')
     this.backgroundSound.setLoop(true)
-    this.backgroundSound.volume = 0.6
+    this.backgroundSound.volume = 0.4
     this.backgroundSound.play()
 
     //VOLUME
@@ -226,13 +226,13 @@ export default class NeonAlleyScene extends Phaser.Scene {
     this.pauseSound.volume = 0.03;
 
     this.bombDropSound = this.sound.add('bomb-drop')
-    this.bombDropSound.volume = 0.03
+    this.bombDropSound.volume = 0.02
 
     this.bossDeathSound = this.sound.add('boss-dead')
-    this.bossDeathSound.volume = 0.3
+    this.bossDeathSound.volume = 0.8
 
     this.bossMadSound = this.sound.add('boss-mad')
-    this.bossMadSound.volume = 0.3
+    this.bossMadSound.volume = 0.9
   }
 
   createBoss(scene, x, y, scale) {
