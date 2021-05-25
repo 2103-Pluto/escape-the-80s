@@ -306,10 +306,11 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
     scene.platformGroup = this.physics.add.group()
     scene.platforms.setCollisionBetween(1, 2)
     scene.physics.add.collider(scene.flagpole, scene.groundGroup)
-    scene.physics.add.overlap(scene.player, scene.flagpole, function() {
+    scene.physics.add.overlap(scene.player, scene.flagpole, function(p, f) {
       if (!scene.touchingFlagpole){
         scene.touchingFlagpole = true;
         scene.raiseFlagpole(scene)
+        p.increaseScore(Math.ceil((600 - p.y)/10))
       }
     })
     scene.physics.add.overlap(scene.platforms, scene.bullets, scene.hitPlatform, null, scene)
