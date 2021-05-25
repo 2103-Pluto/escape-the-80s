@@ -1,6 +1,6 @@
 import Phaser from 'phaser'
 import store from '../store'
-import { setCampaignDifficulty } from '../store/settings'
+import { setCampaignDifficulty, setBackgroundColor } from '../store/settings'
 
 
 export default class SettingsScene extends Phaser.Scene {
@@ -22,13 +22,13 @@ export default class SettingsScene extends Phaser.Scene {
     this.add.text(this.width*0.5, this.height*0.18, 'SETTINGS', { fontFamily: '"Press Start 2P"' }).setFontSize(28).setOrigin(0.5, 0.5).setColor('#ED6BF3')
 
     // add section header
-    this.add.text(this.width*0.5, this.height*0.33, 'Campaign Difficulty', { fontFamily: '"Press Start 2P"' }).setFontSize(26).setOrigin(0.5, 0.5).setColor('#ED6BF3')
+    this.add.text(this.width*0.5, this.height*0.33, 'Campaign Difficulty', { fontFamily: '"Press Start 2P"' }).setFontSize(24).setOrigin(0.5, 0.5).setColor('#ED6BF3')
 
     this.createSkulls() // add skulls to be displayed with options
     this.createDifficultyOptions() //add options and make them interactive
 
     // add section header
-    this.add.text(this.width*0.5, this.height*0.73, 'Background Color', { fontFamily: '"Press Start 2P"' }).setFontSize(26).setOrigin(0.5, 0.5).setColor('#ED6BF3')
+    this.add.text(this.width*0.5, this.height*0.73, 'Background Color', { fontFamily: '"Press Start 2P"' }).setFontSize(24).setOrigin(0.5, 0.5).setColor('#ED6BF3')
     this.createBackgroundOptions()
 
     // add back button
@@ -36,38 +36,38 @@ export default class SettingsScene extends Phaser.Scene {
   }
 
   createDifficultyOptions() {
-    this.Difficultyoptions = {};
-    this.Difficultyoptions["novice"] = this.add.text(this.width*0.19, this.height*0.48, 'Novice', { fontFamily: '"Press Start 2P"' }).setFontSize(24).setOrigin(0.5, 0.5)
-    this.Difficultyoptions["standard"] = this.add.text(this.width*0.51, this.height*0.48, 'Standard', { fontFamily: '"Press Start 2P"' }).setFontSize(24).setOrigin(0.5, 0.5)
-    this.Difficultyoptions["insane"] = this.add.text(this.width*0.83, this.height*0.48, 'Insane', { fontFamily: '"Press Start 2P"' }).setFontSize(24).setOrigin(0.5, 0.5)
-    this.selected = store.getState().settings.campaignDifficulty
-    this.Difficultyoptions[this.selected].setColor('#F57C2D')
-    this.animateSkulls(this.selected, this.skulls)
+    this.difficultyOptions = {};
+    this.difficultyOptions["novice"] = this.add.text(this.width*0.19, this.height*0.48, 'Novice', { fontFamily: '"Press Start 2P"' }).setFontSize(22).setOrigin(0.5, 0.5)
+    this.difficultyOptions["standard"] = this.add.text(this.width*0.51, this.height*0.48, 'Standard', { fontFamily: '"Press Start 2P"' }).setFontSize(22).setOrigin(0.5, 0.5)
+    this.difficultyOptions["insane"] = this.add.text(this.width*0.83, this.height*0.48, 'Insane', { fontFamily: '"Press Start 2P"' }).setFontSize(22).setOrigin(0.5, 0.5)
+    this.selectedDifficulty = store.getState().settings.campaignDifficulty
+    this.difficultyOptions[this.selectedDifficulty].setColor('#F57C2D')
+    this.animateSkulls(this.selectedDifficulty, this.skulls)
 
-    for (let key of Object.keys(this.Difficultyoptions)) {
-      this.Difficultyoptions[key].setInteractive();
-      this.Difficultyoptions[key].on("pointerover", () => {
+    for (let key of Object.keys(this.difficultyOptions)) {
+      this.difficultyOptions[key].setInteractive();
+      this.difficultyOptions[key].on("pointerover", () => {
         this.hoverIcon.setVisible(true);
-        this.Difficultyoptions[key].setColor('#feff38')
-        this.hoverIcon.x = this.Difficultyoptions[key].x - this.Difficultyoptions[key].width/2 - 35;
-        this.hoverIcon.y = this.Difficultyoptions[key].y;
+        this.difficultyOptions[key].setColor('#feff38')
+        this.hoverIcon.x = this.difficultyOptions[key].x - this.difficultyOptions[key].width/2 - 35;
+        this.hoverIcon.y = this.difficultyOptions[key].y;
       })
-      this.Difficultyoptions[key].on("pointerout", () => {
-        this.selected = store.getState().settings.campaignDifficulty
+      this.difficultyOptions[key].on("pointerout", () => {
+        this.selectedDifficulty = store.getState().settings.campaignDifficulty
         this.hoverIcon.setVisible(false);
         // this.audio[key].stop()
-        key === this.selected ? this.Difficultyoptions[key].setColor('#F57C2D') : this.Difficultyoptions[key].setColor('white')
+        key === this.selectedDifficulty ? this.difficultyOptions[key].setColor('#F57C2D') : this.difficultyOptions[key].setColor('white')
       })
-      this.Difficultyoptions[key].on("pointerup", () => {
+      this.difficultyOptions[key].on("pointerup", () => {
         this.click.play();
         this.audio[key].play()
         store.dispatch(setCampaignDifficulty(key))
-        for (let key of Object.keys(this.Difficultyoptions)) {
-          this.Difficultyoptions[key].setColor('white')
+        for (let key of Object.keys(this.difficultyOptions)) {
+          this.difficultyOptions[key].setColor('white')
         }
-        this.selected = store.getState().settings.campaignDifficulty
-        this.Difficultyoptions[this.selected].setColor('#F57C2D')
-        this.animateSkulls(this.selected, this.skulls)
+        this.selectedDifficulty = store.getState().settings.campaignDifficulty
+        this.difficultyOptions[this.selectedDifficulty].setColor('#F57C2D')
+        this.animateSkulls(this.selectedDifficulty, this.skulls)
       })
     }
   }
@@ -117,7 +117,37 @@ export default class SettingsScene extends Phaser.Scene {
 
   createBackgroundOptions() {
     this.backgroundOptions = {};
-    this.backgroundOptions["light"] = this.add.text(this.width*0.3, this.height*0.88, 'Light', { fontFamily: '"Press Start 2P"' }).setFontSize(24).setOrigin(0.5, 0.5)
-    this.backgroundOptions["dark"] = this.add.text(this.width*0.7, this.height*0.9, 'Dark', { fontFamily: '"Press Start 2P"' }).setFontSize(24).setOrigin(0.5, 0.5)
+    this.backgroundOptions["light"] = this.add.text(this.width*0.3, this.height*0.88, 'Light', { fontFamily: '"Press Start 2P"' }).setFontSize(22).setOrigin(0.5, 0.5)
+    this.backgroundOptions["dark"] = this.add.text(this.width*0.7, this.height*0.88, 'Dark', { fontFamily: '"Press Start 2P"' }).setFontSize(22).setOrigin(0.5, 0.5)
+    this.selectedBackgroundColor = store.getState().settings.backgroundColor
+    this.backgroundOptions[this.selectedBackgroundColor].setColor('#F57C2D')
+
+    for (let key of Object.keys(this.backgroundOptions)) {
+      this.backgroundOptions[key].setInteractive();
+      this.backgroundOptions[key].on("pointerover", () => {
+        this.hoverIcon.setVisible(true);
+        this.backgroundOptions[key].setColor('#feff38')
+        this.hoverIcon.x = this.backgroundOptions[key].x - this.backgroundOptions[key].width/2 - 35;
+        this.hoverIcon.y = this.backgroundOptions[key].y;
+      })
+      this.backgroundOptions[key].on("pointerout", () => {
+        this.selectedBackgroundColor  = store.getState().settings.backgroundColor
+        this.hoverIcon.setVisible(false);
+        key === this.selectedBackgroundColor ? this.backgroundOptions[key].setColor('#F57C2D') : this.backgroundOptions[key].setColor('white')
+      })
+      this.backgroundOptions[key].on("pointerup", () => {
+        this.click.play();
+        store.dispatch(setBackgroundColor(key))
+        this.backgroundOptions[key].setColor('#F57C2D')
+
+        if (key === 'light') {
+          this.backgroundOptions['dark'].setColor('white')
+          document.body.style.backgroundColor = "white";
+        } else {
+          this.backgroundOptions['light'].setColor('white')
+          document.body.style.backgroundColor = "black";
+        }
+      })
+    }
   }
 }

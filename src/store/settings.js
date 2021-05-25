@@ -1,6 +1,7 @@
 //ACTION CONSTANTS
 const SET_CAMPAIGN_DIFFICULTY = "SET_CAMPAIGN_DIFFICULTY"
 const SET_PLAYER_WON = "PLAYER_WON"
+const SET_BACKGROUND_COLOR = "SET_BACKGROUND_COLOR"
 
 //ACTION CREATORS
 export const setCampaignDifficulty = (difficulty) => {
@@ -17,10 +18,18 @@ export const setPlayerVictory = (binary) => {
   }
 }
 
+export const setBackgroundColor = (backgroundColor) => {
+  return {
+    type: SET_BACKGROUND_COLOR,
+    backgroundColor
+  }
+}
+
 //INITIAL STATE
 const initState = {
   campaignDifficulty: 'standard',
   playerWon: false,
+  backgroundColor: 'dark'
 }
 
 
@@ -31,6 +40,8 @@ export default function recordsReducer (state = initState, action) {
       return Object.assign({}, state, {campaignDifficulty: action.difficulty})
     case SET_PLAYER_WON:
       return Object.assign({}, state, {playerWon: action.binary})
+    case SET_BACKGROUND_COLOR:
+      return Object.assign({}, state, {backgroundColor: action.backgroundColor})
     default:
       return state;
   }
