@@ -305,10 +305,11 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
     scene.platformGroup = this.physics.add.group()
     scene.platforms.setCollisionBetween(1, 2)
     scene.physics.add.collider(scene.flagpole, scene.groundGroup)
-    scene.physics.add.overlap(scene.player, scene.flagpole, function() {
+    scene.physics.add.overlap(scene.player, scene.flagpole, function(p, f) {
       if (!scene.touchingFlagpole){
         scene.touchingFlagpole = true;
         scene.raiseFlagpole(scene)
+        p.increaseScore(Math.ceil((600 - p.y)/10))
       }
     })
     scene.physics.add.overlap(scene.platforms, scene.bullets, scene.hitPlatform, null, scene)
@@ -324,7 +325,7 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
   createFlagpole(scene) {
     //---> testing mode (to go to level 2)
     // scene.flagpole = new Flagpole(scene, 300, 310, 'flagpole').setScale(2.78)
-    scene.flagpole = new Flagpole(scene, scene.playerZones.end.x + 195, 310, 'flagpole').setScale(2.78)
+    scene.flflagpole = new Flagpole(scene, scene.playerZones.end.x + 195, 310, 'flagpole').setScale(2.78)
     //---> testing mode (to go to level 2)
     //scene.flagpole = new Flagpole(scene, 300, 310, 'flagpole').setScale(2.78)
     //<--- testing mode
@@ -948,7 +949,7 @@ clearCharacterChoosing() {
       this.player.decreaseHealth(1)
     }
 
-    raiseFlagpole(scene) {
+    flagpole(scene) {
       if (!this.flagpoleIsUp) {
         scene.flagpole.play("raise-flagpole", false)
       }
