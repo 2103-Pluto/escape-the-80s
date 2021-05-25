@@ -949,7 +949,7 @@ clearCharacterChoosing() {
       this.player.decreaseHealth(1)
     }
 
-    flagpole(scene) {
+    raiseFlagpole(scene) {
       if (!this.flagpoleIsUp) {
         scene.flagpole.play("raise-flagpole", false)
       }
