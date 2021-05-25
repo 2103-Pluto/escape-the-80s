@@ -64,7 +64,7 @@ export default class NeonAlleyScene extends Phaser.Scene {
 
 
   preloadWall(){
-    const wall1 =  this.load.spritesheet("Wall1", "assets/spriteSheets/Wall/wall-state1.png", {
+    const wall1 = this.load.spritesheet("Wall1", "assets/spriteSheets/Wall/wall-state1.png", {
       frameWidth: 750,
       frameHeight: 250,
     });
@@ -90,7 +90,7 @@ export default class NeonAlleyScene extends Phaser.Scene {
       frameHeight: 48,
     })
     this.load.audio('boss-dead', 'assets/audio/i-aint-goin-nowhere.wav')
-    this.load.audio('boss-mad', 'assets/audio/i-will-not-die-sober.wav')
+    this.load.audio('boss-mad', 'assets/audio/I-will-not-die-sober.wav')
   }
 
   preloadColaBomb() {
@@ -150,7 +150,7 @@ export default class NeonAlleyScene extends Phaser.Scene {
     this.game.sound.stopAll()
     this.backgroundSound = this.sound.add('mfn-reagan')
     this.backgroundSound.setLoop(true)
-    this.backgroundSound.volume = 0.6
+    this.backgroundSound.volume = 0.4
     this.backgroundSound.play()
 
     //VOLUME
@@ -235,13 +235,15 @@ export default class NeonAlleyScene extends Phaser.Scene {
     this.pauseSound.volume = 0.03;
 
     this.bombDropSound = this.sound.add('bomb-drop')
-    this.bombDropSound.volume = 0.03
+    this.bombDropSound.volume = 0.02
 
     this.bossDeathSound = this.sound.add('boss-dead')
-    this.bossDeathSound.volume = 0.3
+
+    this.bossDeathSound.volume = 0.8
+
 
     this.bossMadSound = this.sound.add('boss-mad')
-    this.bossMadSound.volume = 0.3
+    this.bossMadSound.volume = 0.9
   }
 
   createBoss(scene, x, y, scale) {
@@ -283,11 +285,12 @@ export default class NeonAlleyScene extends Phaser.Scene {
   createWall(scene, x, y){
     const wall = new Wall(scene, x, y, 'Wall1').setScale(.4) //set size then set offset
     scene.physics.add.collider(wall, scene.player)
-    this.wallGroup.getChildren().forEach((w) => {
-      scene.physics.add.collider(w, wall, function () {
-        var b1 = w.body;
-        var b2 = wall.body;
 
+    // need to think about bullet colliders
+    scene.wallGroup.getChildren().forEach((w) => {
+      scene.physics.add.collider(w, wall, function() {
+        const b1 = w.body;
+        const b2 = wall.body;
         if (b1.y > b2.y) {
             b2.y += (b1.top - b2.bottom);
             b2.stop();
@@ -305,13 +308,12 @@ export default class NeonAlleyScene extends Phaser.Scene {
   }
 
   createWallGroup(scene) {
-    this.wallGroup = this.physics.add.group({
+    scene.wallGroup = scene.physics.add.group({
       classType: Wall,
       runChildUpdate: true,
       allowGravity: true,
-      immovable: false,
+      immovable: false
     })
-    //scene.physics.add.collider(this.wallGroup, this.wallGroup)
   }
 
   create() {
@@ -425,7 +427,7 @@ export default class NeonAlleyScene extends Phaser.Scene {
 
     scene.physics.add.collider(
       scene.bombs,
-      scene.groundGroup,
+      scene.groundGroup
     );
   }
 
@@ -447,7 +449,7 @@ export default class NeonAlleyScene extends Phaser.Scene {
 
     scene.physics.add.collider(
       scene.explosions,
-      scene.groundGroup,
+      scene.groundGroup
     );
   }
 
@@ -468,7 +470,8 @@ export default class NeonAlleyScene extends Phaser.Scene {
   createPhysics(scene) {
     scene.player.setCollideWorldBounds(true);
     scene.physics.add.collider(scene.player, scene.groundGroup)
-    scene.physics.add.collider(scene.groundGroup, scene.wallGroup)
+    // scene.physics.add.collider(scene.groundGroup, scene.wallGroup)
+    // <--- THE LINE ABOVE IS WHAT CAUSED THE RESTART BUG---> //
   }
 
   showGameOverMenu(scene) {
@@ -496,13 +499,23 @@ export default class NeonAlleyScene extends Phaser.Scene {
       // Check if we can reuse an inactive laser in our pool of lasers
       if (!bullet) {
         // Create a laser bullet and scale the sprite down
-        bullet = new Bullet(
-          this,
-          bulletX,
-          bulletY,
-          'bullet',
-          this.player.facingLeft
-        ).setScale(3);
+        if (this.color === 'Black') {
+          bullet = new Bullet(
+            this,
+            bulletX,
+            bulletY,
+            'shot',
+            this.player.facingLeft
+          ).setScale(3);
+        } else {
+          bullet = new Bullet(
+            this,
+            bulletX,
+            bulletY,
+            'bullet',
+            this.player.facingLeft
+          ).setScale(2);
+        }
         this.bullets.add(bullet);
       }
       // Reset this laser to be used for the shot
@@ -632,7 +645,7 @@ export default class NeonAlleyScene extends Phaser.Scene {
 
 
     this.time.addEvent({
-      delay: 700,
+      delay: 400,
       callback: () => {
         this.tweens.add({
           targets: bomb,
@@ -644,7 +657,7 @@ export default class NeonAlleyScene extends Phaser.Scene {
     })
 
     this.time.addEvent({
-      delay: 1000,
+      delay: 600,
       callback: () => {
         this.events.emit('explodeFn', bomb.x, bomb.y + 10, bomb, this)
       }

@@ -90,6 +90,7 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
 
     this.load.image('bullet', 'assets/sprites/SpongeBullet.png');
     this.load.image('muzzleFlash', 'assets/sprites/MuzzleFlash.png');
+    this.load.image('shot', 'assets/sprites/shot.png')
   }
 
   preloadSounds() {
@@ -219,9 +220,12 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
       m4: markers.find(m => m.name === 'M4'),
       m5: markers.find(m => m.name === 'M5'),
       m6: markers.find(m => m.name === 'M6'),
+      m7: markers.find(m => m.name === 'M7'),
+      m8: markers.find(m => m.name === 'M8'),
+      m9: markers.find(m => m.name === 'M9'),
+      m10: markers.find(m => m.name === 'M10')
     }
   }
-
 
   createGooFromLayer(scene){
     const gooArr = scene.gooLayer.objects
@@ -302,10 +306,11 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
     scene.platformGroup = this.physics.add.group()
     scene.platforms.setCollisionBetween(1, 2)
     scene.physics.add.collider(scene.flagpole, scene.groundGroup)
-    scene.physics.add.overlap(scene.player, scene.flagpole, function() {
+    scene.physics.add.overlap(scene.player, scene.flagpole, function(p, f) {
       if (!scene.touchingFlagpole){
         scene.touchingFlagpole = true;
         scene.raiseFlagpole(scene)
+        p.increaseScore(Math.ceil((600 - p.y)/10))
       }
     })
     scene.physics.add.overlap(scene.platforms, scene.bullets, scene.hitPlatform, null, scene)
@@ -319,11 +324,9 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
   }
 
   createFlagpole(scene) {
-    //---> testing mode (to go to level 2)
-    // scene.flagpole = new Flagpole(scene, 300, 310, 'flagpole').setScale(2.78)
     scene.flagpole = new Flagpole(scene, scene.playerZones.end.x + 195, 310, 'flagpole').setScale(2.78)
     //---> testing mode (to go to level 2)
-    //scene.flagpole = new Flagpole(scene, 300, 310, 'flagpole').setScale(2.78)
+    // scene.flagpole = new Flagpole(scene, 300, 310, 'flagpole').setScale(2.78)
     //<--- testing mode
     scene.flagpole.body.setSize(2, 160)
     scene.flagpole.body.setOffset(16, 0)
@@ -599,6 +602,12 @@ clearCharacterChoosing() {
     this.createEnemies(this, 'mario', this.marioSpawns.m4.x, this.marioSpawns.m4.y, 2, 2.7)
     this.createEnemies(this, 'mario', this.marioSpawns.m5.x, this.marioSpawns.m5.y, 2, 2.7)
     this.createEnemies(this, 'mario', this.marioSpawns.m6.x, this.marioSpawns.m6.y, 2, 2.7)
+    this.createEnemies(this, 'mario', this.marioSpawns.m7.x, this.marioSpawns.m7.y, 1, 2.7)
+    this.createEnemies(this, 'mario', this.marioSpawns.m8.x, this.marioSpawns.m8.y, 6, 2.7)
+    this.createEnemies(this, 'mario', this.marioSpawns.m9.x, this.marioSpawns.m9.y, 1, 2.7)
+    this.createEnemies(this, 'mario', this.marioSpawns.m10.x, this.marioSpawns.m10.y, 2, 2.7)
+
+
 
 
     this.createEnemies(this, 'terminator', this.terminatorSpawns.t1.x, this.terminatorSpawns.t1.y, 1, 4.5)
@@ -786,13 +795,24 @@ clearCharacterChoosing() {
       // Check if we can reuse an inactive laser in our pool of lasers
       if (!bullet) {
         // Create a laser bullet and scale the sprite down
-        bullet = new Bullet(
-          this,
-          bulletX,
-          bulletY,
-          'bullet',
-          this.player.facingLeft
-        ).setScale(3);
+        if (this.color === 'Black') {
+          bullet = new Bullet(
+            this,
+            bulletX,
+            bulletY,
+            'shot',
+            this.player.facingLeft
+          ).setScale(3);
+        } else {
+          bullet = new Bullet(
+            this,
+            bulletX,
+            bulletY,
+            'bullet',
+            this.player.facingLeft
+          ).setScale(2);
+        }
+
         this.bullets.add(bullet);
       }
       // Reset this laser to be used for the shot
