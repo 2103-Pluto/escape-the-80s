@@ -1,5 +1,6 @@
 import Phaser from 'phaser'
 import store from '../store'
+import { setPlayerVictory } from '../store/settings'
 
 export default class CharacterChoosingScene extends Phaser.Scene {
   constructor() {

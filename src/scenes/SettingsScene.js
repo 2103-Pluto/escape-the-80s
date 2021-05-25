@@ -28,7 +28,7 @@ export default class SettingsScene extends Phaser.Scene {
     this.createDifficultyOptions() //add options and make them interactive
 
     // add section header
-    this.add.text(this.width*0.5, this.height*0.73, 'Background Color', { fontFamily: '"Press Start 2P"' }).setFontSize(24).setOrigin(0.5, 0.5).setColor('#ED6BF3')
+    this.add.text(this.width*0.5, this.height*0.73, 'Background Theme', { fontFamily: '"Press Start 2P"' }).setFontSize(24).setOrigin(0.5, 0.5).setColor('#ED6BF3')
     this.createBackgroundOptions()
 
     // add back button
