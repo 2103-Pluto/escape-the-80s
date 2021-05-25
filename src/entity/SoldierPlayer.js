@@ -24,7 +24,7 @@ export default class SoldierPlayer extends Phaser.Physics.Arcade.Sprite {
       left: false,
       right: false,
       up: false,
-      down: false
+      down: false, 
     }
 
     //firing features
@@ -163,7 +163,11 @@ export default class SoldierPlayer extends Phaser.Physics.Arcade.Sprite {
       } else {
         this.body.setOffset(19, 7)
       }
-      if(this.socket){
+      if(this.socket &&
+        (this.moveState.left===true ||
+          this.moveState.right===true ||
+          this.moveState.up===true ||
+          this.moveState.down === true)){
       this.moveState.left = false
       this.moveState.right = false
       this.moveState.up = false
