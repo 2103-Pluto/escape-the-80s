@@ -324,11 +324,9 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
   }
 
   createFlagpole(scene) {
-    //---> testing mode (to go to level 2)
-    // scene.flagpole = new Flagpole(scene, 300, 310, 'flagpole').setScale(2.78)
     scene.flagpole = new Flagpole(scene, scene.playerZones.end.x + 195, 310, 'flagpole').setScale(2.78)
     //---> testing mode (to go to level 2)
-    //scene.flagpole = new Flagpole(scene, 300, 310, 'flagpole').setScale(2.78)
+    // scene.flagpole = new Flagpole(scene, 300, 310, 'flagpole').setScale(2.78)
     //<--- testing mode
     scene.flagpole.body.setSize(2, 160)
     scene.flagpole.body.setOffset(16, 0)
@@ -814,7 +812,7 @@ clearCharacterChoosing() {
             this.player.facingLeft
           ).setScale(2);
         }
-        
+
         this.bullets.add(bullet);
       }
       // Reset this laser to be used for the shot

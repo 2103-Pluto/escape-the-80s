@@ -1,5 +1,6 @@
 import Phaser from 'phaser'
 import store from '../store'
+import { setPlayerVictory } from '../store/settings'
 
 export default class CharacterChoosingScene extends Phaser.Scene {
   constructor() {
@@ -23,13 +24,13 @@ export default class CharacterChoosingScene extends Phaser.Scene {
     options['Green'] = this.add.sprite(width*0.35, height*0.75, 'GreenIdle').setScale(3);
     options['Red'] = this.add.sprite(width*0.65, height*0.45, 'RedIdle').setScale(3);
     options['Yellow'] = this.add.sprite(width*0.65, height*0.75, 'YellowIdle').setScale(3);
-    
+
     //add Easter Egg black character
     const playerAlreadyWon = store.getState().settings.playerWon;
     if (playerAlreadyWon) {
       options['Black'] = this.add.sprite(width*0.50, height*0.6, 'BlackIdle').setScale(3);
     }
-    
+
     //add clicking sound effect
     const click = this.sound.add('click');
     click.volume = 0.05;
@@ -37,17 +38,17 @@ export default class CharacterChoosingScene extends Phaser.Scene {
     //add one liner audio files
     const audio = {}
       audio['Green'] = this.sound.add(`one-liner1`); //Sudden Impact 0.15
-      audio['Green'].volume =0.15
-      audio['Blue'] = this.sound.add(`one-liner2`); //Rocky 0.17
-      audio['Blue'].volume =0.17
-      audio['Red'] = this.sound.add(`one-liner3`); //Airplane 0.15
-      audio['Red'].volume =0.17
-      audio['Yellow'] = this.sound.add(`one-liner4`); //Terminator 0.12
-      audio['Yellow'].volume =0.12
-      const audio5 = this.sound.add(`one-liner5`); //Incredible Hulk 0.2
+      audio['Green'].volume =0.2
+      audio['Blue'] = this.sound.add(`one-liner2`);
+      audio['Blue'].volume =0.2
+      audio['Red'] = this.sound.add(`one-liner3`);
+      audio['Red'].volume =0.2
+      audio['Yellow'] = this.sound.add(`one-liner4`);
+      audio['Yellow'].volume =0.2
+      const audio5 = this.sound.add(`one-liner5`);
       audio5.volume =0.2
-      audio['Black'] = this.sound.add(`one-liner6`); //Scarface 0.15
-      audio['Black'].volume =0.15
+      audio['Black'] = this.sound.add(`one-liner6`);
+      audio['Black'].volume =0.25
 
     //set interactivity and selection
     let selected;
