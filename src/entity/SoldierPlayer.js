@@ -24,7 +24,7 @@ export default class SoldierPlayer extends Phaser.Physics.Arcade.Sprite {
       left: false,
       right: false,
       up: false,
-      down: false, 
+      down: false 
     }
 
     //firing features
