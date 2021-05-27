@@ -302,8 +302,20 @@ export default class NeonAlleyScene extends Phaser.Scene {
     })
     })
     scene.wallGroup.add(wall)
-    scene.physics.add.collider(scene.wallGroup, scene.groundGroup)
+    scene.physics.add.collider(wall, scene.groundGroup, function(wall, ground) {
+      const b1 = wall.body;
+      const b2 = ground.body;
+      if (b1.y > b2.y) {
+          b2.y += (b1.top - b2.bottom);
+          b2.stop();
+      }
+      else {
+          b1.y += (b2.top - b1.bottom);
+          b1.stop();
+      }
+  })
     wall.body.touching.down = true
+
   }
 
   createWallGroup(scene) {
@@ -337,16 +349,16 @@ export default class NeonAlleyScene extends Phaser.Scene {
     this.createAnimations()
     this.createWallGroup(this)
     this.createWall(this, 500, -100)
-    //this.createWall(this, 500, 50)
+    // // //this.createWall(this, 500, 50)
     this.createWall(this, 500, 200)
     this.createWall(this, 500, 300)
     this.createWall(this, 500, 400)
-    this.createWall(this, 797, 0)
-   // this.createWall(this, 800, 100)
+    this.createWall(this, 797, -100)
+  //  // this.createWall(this, 800, 100)
     this.createWall(this, 797, 200)
     this.createWall(this, 797, 300)
     this.createWall(this, 797, 400)
-    const blue = this.createBerlinWall()
+    // const blue = this.createBerlinWall()
     // console.log(blue)
     this.createBulletGroup(this)
     this.createBombGroup(this)
