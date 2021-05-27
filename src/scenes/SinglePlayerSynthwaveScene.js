@@ -324,9 +324,9 @@ export default class SinglePlayerSynthwaveScene extends Phaser.Scene {
   }
 
   createFlagpole(scene) {
-    // scene.flagpole = new Flagpole(scene, scene.playerZones.end.x + 195, 310, 'flagpole').setScale(2.78)
+    scene.flagpole = new Flagpole(scene, scene.playerZones.end.x + 195, 310, 'flagpole').setScale(2.78)
     //---> testing mode (to go to level 2)
-    scene.flagpole = new Flagpole(scene, 300, 310, 'flagpole').setScale(2.78)
+    // scene.flagpole = new Flagpole(scene, 300, 310, 'flagpole').setScale(2.78)
     //<--- testing mode
     scene.flagpole.body.setSize(2, 160)
     scene.flagpole.body.setOffset(16, 0)
@@ -787,9 +787,13 @@ clearCharacterChoosing() {
       this.player.x + (this.player.facingLeft ? -offsetX*0.95 : offsetX*0.95);
     const muzzleY = this.player.isCrouching ? this.player.y + offsetY*0.8 : this.player.y - offsetY*1.2;
 
-    //create muzzleFlash
-    {this.muzzleFlash ? this.muzzleFlash.reset(muzzleX, muzzleY, this.player.facingLeft)
-      : this.muzzleFlash = new MuzzleFlash(this, muzzleX, muzzleY, 'muzzleFlash', this.player.facingLeft)}
+    //create muzzleFlash (in case we want to recycle it)
+    // {this.muzzleFlash ? this.muzzleFlash.reset(muzzleX, muzzleY, this.player.facingLeft)
+    //   : this.muzzleFlash = new MuzzleFlash(this, muzzleX, muzzleY, 'muzzleFlash', this.player.facingLeft)}
+
+     //create muzzleFlash (from scratch)
+    if (this.muzzleFlash) this.muzzleFlash.destroy()
+    this.muzzleFlash = new MuzzleFlash(this, muzzleX, muzzleY, 'muzzleFlash', this.player.facingLeft)
       // Get the first available laser object that has been set to inactive
       let bullet = this.bullets.getFirstDead();
       // Check if we can reuse an inactive laser in our pool of lasers
