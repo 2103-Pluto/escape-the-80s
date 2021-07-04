@@ -63,5 +63,8 @@ secrets.js
 # next.js build output
 .next
 
+.DS_store
+
+.vscode
 
 bundle.js
